@@ -1,0 +1,140 @@
+﻿@await Html.PartialAsync("_Header2")
+
+@{
+    ViewData["Title"] = "Contact Us";
+}
+
+<main>
+    <!-- Breadcrumb Area Start -->
+    <div class="breadcrumb__area breadcrumb-height p-relative grey-bg"
+         data-background="~/assets/frontend/img/breadcrumb/breadcrumb.jpg">
+        <div class="breadcrumb__scroll-bottom smooth">
+            <a href="#contact">
+                <i class="far fa-arrow-down"></i>
+            </a>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xxl-12">
+                    <div class="breadcrumb__content text-center">
+                        <h3 class="breadcrumb__title">Contact us</h3>
+                        <div class="breadcrumb__list">
+                            <span><a href="/">Home</a></span>
+                            <span class="dvdr"><i class="fa fa-angle-right"></i></span>
+                            <span>Contact us</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb Area End -->
+    <!-- Contact Area Start -->
+    <div class="tp-conatact-area pt-125 pb-125">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-4 col-lg-4 col-md-4 mb-30">
+                    <div class="contact-info text-center">
+                        <span class="contact-icon"><i class="fas fa-map-marker-alt"></i></span>
+                        <h4>Visit Us Daily</h4>
+                        <span>
+                            <a href="@ViewData["MapLink"]" target="_blank">
+                                @ViewData["Address"] <br> @ViewData["Country"]
+                            </a>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-4 mb-30">
+                    <div class="contact-info text-center">
+                        <span class="contact-icon"><i class="fas fa-phone-volume"></i></span>
+                        <h4>Contact Us</h4>
+                        <span>
+                            <a href="tel:@ViewData["Contact1"]">@ViewData["Contact1"]<br>@ViewData["Contact2"]</a>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-4 mb-30">
+                    <div class="contact-info text-center">
+                        <span class="contact-icon"><i class="fas fa-envelope"></i></span>
+                        <h4>Email Us</h4>
+                        <span>
+                            <a href="mailto:@ViewData["Email1"]">@ViewData["Email1"]</a><br>
+                            <a href="mailto:@ViewData["Email2"]">@ViewData["Email2"]</a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-12">
+                    <div id="contact" class="contact-form-box pt-60">
+                        <div class="contact-form-box text-center">
+                            <div class="row justify-content-center">
+                                <div class="col-8">
+                                    <h4 class="contact-title">Send us a Message :</h4>
+                                </div>
+                            </div>
+
+                            @if (TempData["Success"] != null)
+                            {
+                                <div class="alert alert-success" role="alert">
+                                    @TempData["Success"]
+                                </div>
+                            }
+
+                            @if (TempData["Error"] != null)
+                            {
+                                <div class="alert alert-danger" role="alert">
+                                    @TempData["Error"]
+                                </div>
+                            }
+
+                            <form action="@Url.Action("SendMail", "Contact")" method="post">
+                                @Html.AntiForgeryToken()
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6 col-12">
+                                        <div class="tp-contact-input">
+                                            <input type="text" required name="name" maxlength="20"
+                                                   placeholder="Enter your Name">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-12">
+                                        <div class="tp-contact-input">
+                                            <input type="email" required name="email" maxlength="40"
+                                                   placeholder="Enter your Mail">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-12">
+                                        <div class="tp-contact-input">
+                                            <input type="number" required name="phone" maxlength="15"
+                                                   placeholder="Enter your Number">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-12">
+                                        <div class="tp-contact-input">
+                                            <input type="text" placeholder="Subject" maxlength="100"
+                                                   required name="subject">
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="tp-contact-input">
+                                            <textarea placeholder="Type your Message" maxlength="500"
+                                                      required name="message"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="tp-submit-button">
+                                            <button type="submit" class="tp-btn-blue-square"><span>Send Message</span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Contact Area End -->
+</main>

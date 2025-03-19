@@ -1,0 +1,395 @@
+﻿@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@using Newtonsoft.Json;
+@using WASender.Models
+@model dynamic
+@await Html.PartialAsync("_Header1")
+
+
+@{
+    ViewData["Title"] = "Home";
+
+}
+
+<main>
+    <!-- tp-slider-area-start -->
+    <div class="tp-hero__area tp-hero__bg p-relative" data-background="@Url.Content("~/assets/frontend/img/hero/hero-bg.png")">
+        <div class="scroll-down smooth d-none d-xl-block">
+            <a href="#tp-feature-area">
+                <div class="scroll-dots d-flex justify-content-center flex-column align-items-center">
+                    <span class="rotate-text">Scrool Down</span>
+                    <span class="circle-1"></span>
+                    <span class="circle-2"></span>
+                    <span class="circle-3"></span>
+                    <button class="scroll-mouse"><i class="fal fa-mouse"></i></button>
+                </div>
+            </a>
+        </div>
+        <div class="tp-hero__social d-none d-xl-flex">
+            <a class="p-relative" href="https://twitter.com/">
+                <i class="fab fa-twitter"></i>
+                <div class="social-icon">
+                    <span><i class="fab fa-twitter"></i> twitter</span>
+                </div>
+            </a>
+            <a class="p-relative" href="https://www.facebook.com/">
+                <i class="fab fa-facebook-f"></i>
+                <div class="social-icon facebook">
+                    <span><i class="fab fa-facebook-f"></i> facebook</span>
+                </div>
+            </a>
+            <a class="p-relative" href="https://www.instagram.com/">
+                <i class="fab fa-instagram"></i>
+                <div class="social-icon instagram">
+                    <span><i class="fab fa-instagram"></i> instagram</span>
+                </div>
+            </a>
+            <a class="p-relative" href="https://linkedin.com/">
+                <i class="fab fa-linkedin"></i>
+                <div class="social-icon dribbble">
+                    <span><i class="fab fa-linkedin"></i> linkedin</span>
+                </div>
+            </a>
+
+        </div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-8 col-12">
+                    <div class="tp-hero__wrapper">
+                        <div class="tp-hero__content pb-70 text-center">
+                            <h2 class="tp-hero__title wow tpfadeUp" data-wow-duration=".7s" data-wow-delay=".5s">@Html.Raw(ViewBag.Heading)</h2>
+                        </div>
+                        <div class="tp-hero__thumb text-xl-block text-lg-center  p-relative">
+                            <img class="wow tpfadeUp" data-wow-duration=".7s" data-wow-delay=".7s" src="@Url.Content(ViewBag.HeroImage)" alt="">
+
+                            <div class="tp-hero__thumb-icon">
+                                <span class="hero-icon-1 tp-pulse-border z-index d-none d-md-block wow tpfadeLeft" data-wow-duration=".7s" data-wow-delay=".9s">
+                                    <img src="@Url.Content(Model.Home?.HeroLeftImage ?? "~/assets/frontend/img/hero/hero-icon-1.png")"
+                                         alt="Left Icon">
+                                </span>
+                                <span class="hero-icon-2 tp-pulse-border z-index d-none d-md-block wow tpfadeRight" data-wow-duration=".7s" data-wow-delay="1s">
+                                    <img src="@Url.Content(Model.Home?.HeroRightImage ?? "~/assets/frontend/img/hero/hero-icon-2.png")"
+                                         alt="Right Icon">
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Features Section -->
+    @if (Model.Features != null && Model.Features.Count > 0)
+    {
+        <div id="tp-feature-area" class="section-title text-center mb-50 mt-50">
+            <h2 style="font-size: 48px; line-height: 1.2;">
+                @Html.Raw(ViewBag.FeatureTitle)
+            </h2>
+        </div>
+
+        <div class="container">
+            <div class="row gx-20">
+                @foreach (var feature in Model.Features)
+                {
+                    <div class="col-xl-4 col-lg-4 col-md-6 wow tpfadeUp" data-wow-duration=".9s" data-wow-delay=".5s">
+                        <div class="tp-service__item tp-service__inner-item service-inner mb-20">
+                            <div class="tp-service__icon">
+                                <img src="@Url.Content(feature.Preview ?? "/default-image.jpg")" alt="Feature Image">
+                            </div>
+                            <div class="tp-service__content">
+                                <h4 class="tp-service__title-sm">
+                                    <a href="@Url.Action("FeatureDetails", "Home", new { slug = feature.Slug })">
+                                        @(feature.Title.Length > 20 ? feature.Title.Substring(0, 20) + "..." : feature.Title)
+                                    </a>
+                                </h4>
+                                <p>@(feature.Excerpt.Length > 100 ? feature.Excerpt.Substring(0, 100) + "..." : feature.Excerpt)</p>
+                            </div>
+                            <div class="tp-service__link">
+                                <a href="@Url.Action("Details", "Features", new { slug = feature.Slug })">
+                                    <svg width="39" height="16" viewBox="0 0 39 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M38.7071 8.70711C39.0976 8.31658 39.0976 7.68342 38.7071 7.29289L32.3431 0.928932C31.9526 0.538408 31.3195 0.538408 30.9289 0.928932C30.5384 1.31946 30.5384 1.95262 30.9289 2.34315L36.5858 8L30.9289 13.6569C30.5384 14.0474 30.5384 14.6805 30.9289 15.0711C31.3195 15.4616 31.9526 15.4616 32.3431 15.0711L38.7071 8.70711ZM0 9H38V7H0V9Z" fill="currentColor" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="text-center">No features available.</p>
+    }
+
+
+
+
+
+    <!--Whatsapp Animation -->
+
+    <div class="tp-app__area pt-120 pb-120">
+        <div class="container">
+            <div class="row align-items-center">
+                <!-- Left Column: About Cover Image -->
+                <div class="col-xl-6 col-lg-6 wow tpfadeLeft" data-wow-duration=".7s" data-wow-delay=".5s">
+                    <div class="tp-app__thumb">
+                        <img src="@Url.Content(Model.Home?["about_cover"]?.ToString() ?? "")" alt="About Cover" />
+                    </div>
+                </div>
+                <!-- Right Column: About Content -->
+                <div class="col-xl-6 col-lg-6 wow tpfadeRight" data-wow-duration=".7s" data-wow-delay=".7s">
+                    <div class="tp-app__wrapper">
+                        <div class="tp-app__content">
+                            <h3 class="tp-section-title mb-30">
+                                @Html.Raw(Model.Home?["about"]?["title"]?.ToString() ?? "")
+                            </h3>
+                            <p class="text-dark">
+                                @Html.Raw(Model.Home?["about"]?["description"]?.ToString() ?? "")
+                            </p>
+                        </div>
+                        <div class="tp-app__download">
+                            <h4 class="tp-app__title-sm">
+                                @Html.Raw(Model.Home?["about"]?["action_area_title"]?.ToString() ?? "")
+                            </h4>
+                            <div class="tp-app__thumb-sm d-flex">
+                                @* Right Button Image *@
+                                @if (!string.IsNullOrEmpty(ViewData["FooterButtonImage"] as string))
+                                {
+                                    <div class="tp-app__thumb-sm-1">
+                                        <a href="@Url.Content(ViewData["RightImageLink"] as string ?? "#")">
+                                            <img src="@Url.Content(ViewData["FooterButtonImage"] as string)" alt="Right Button Image" />
+                                        </a>
+                                    </div>
+                                }
+                                @* Left Button Image *@
+                                @if (!string.IsNullOrEmpty(ViewData["FooterLeftButtonImage"] as string))
+                                {
+                                    <div class="tp-app__thumb-sm-2">
+                                        <a href="@Url.Content(ViewData["RightImageLink"] as string ?? "#")">
+                                            <img src="@Url.Content(ViewData["FooterLeftButtonImage"] as string)" alt="Left Button Image" />
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="tp-faq__area grey-bg">
+        <div class="container">
+            <div class="row align-items-end">
+                <div class="col-xl-6 col-lg-6">
+                    <div class="tp-faq__wrapper-box">
+                        <div class="tp-faq__title-box">
+                            <h3 class="tp-section-title wow tpfadeUp" data-wow-duration=".7s" data-wow-delay=".3s">
+                                @(Model.Home?.top_faq?.title ?? "")
+                            </h3>
+                            <p class="wow tpfadeUp" data-wow-duration=".7s" data-wow-delay=".5s">
+                                @(Model.Home?.top_faq?.description ?? "")
+                            </p>
+                        </div>
+
+                        <div class="tp-custom-accordio">
+                            <div class="accordion" id="accordionExample">
+                                @if (Model.Faqs != null && Model.Faqs.Count > 0)
+                                {
+                                    int faqKey = 0;
+                                    @foreach (var faq in Model.Faqs)
+                                    {
+                                        if (faq.Slug == "top")
+                                        {
+                                            string collapseId = $"collapse{faqKey}";
+                                            string headingId = $"heading{faqKey}";
+
+                                            <div class="accordion-items wow tpfadeUp" data-wow-duration=".7s" data-wow-delay=".7s">
+                                                <h2 class="accordion-header" id="@headingId">
+                                                    <button class="accordion-buttons @(faqKey > 0 ? "collapsed" : "")" type="button"
+                                                            data-bs-toggle="collapse" data-bs-target="#@collapseId"
+                                                            aria-expanded="@(faqKey == 0 ? "true" : "false")"
+                                                            aria-controls="@collapseId">
+                                                        @faq.Title
+                                                    </button>
+                                                </h2>
+                                                <div id="@collapseId" class="accordion-collapse collapse @(faqKey == 0 ? "show" : "")"
+                                                     aria-labelledby="@headingId" data-bs-parent="#accordionExample">
+                                                    <div class="accordion-body">
+                                                        @Html.Raw(faq.Excerpt)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            faqKey++;
+                                        }
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-6 wow tpfadeRight" data-wow-duration=".7s" data-wow-delay="1s">
+                    <div class="tp-faq__thumb text-center">
+                        <img src="https://ik.imagekit.io/gupshup/revamp/assets/v3/images/home/v5-casual-life.png?ik-sdk-version=react-1.1.1" alt="FAQ Image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top integration -->
+
+    <div class="tp-integration_area tp-integration_bg pt-120">
+        <div class="tp-integration__title-box text-center">
+            <h3 class="tp-section-title">
+                @(Model.Home?.integration?.title ?? "")
+            </h3>
+        </div>
+        <div class="tp-integration__wrapper d-none d-md-block p-relative">
+            <div class="tp-integration__border-shape">
+                <img src="assets/frontend/img/border/border-shapepng.png" alt="">
+            </div>
+
+            @if (Model.Brands != null && Model.Brands.Count > 0)
+            {
+                int brandKey = 0;
+                @foreach (var brand in Model.Brands)
+                {
+                    if (brand.Lang == "integration")
+                    {
+                        <div class="tp-integration__icon int-icon-@(brandKey+1) wow tpfadeUp" data-wow-duration=".7s" data-wow-delay=".@(3 + brandKey)s">
+                            <span><img src="@brand.Slug" alt=""></span>
+                        </div>
+                        brandKey++;
+                    }
+                }
+            }
+        </div>
+
+        <div class="tp-integration__bottom p-relative text-center">
+            <div class="tp-integration__big-thumb wow tpfadeUp" data-wow-duration=".7s" data-wow-delay="1s">
+                <img src="@Model.Home?.integration_cover" alt="">
+            </div>
+            <div class="int-icon-bottom int-icon-8 d-none d-md-block wow tpfadeLeft" data-wow-duration=".7s" data-wow-delay=".8s">
+                <span class="tp-pulse-border z-index"><img src="@Model.Home?.integration_left" alt=""></span>
+            </div>
+            <div class="int-icon-bottom int-icon-9 d-none d-md-block wow tpfadeRight" data-wow-duration=".7s" data-wow-delay=".7s">
+                <span class="tp-pulse-border z-index"><img src="@Model.Home?.integration_right" alt=""></span>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Pricing Section -->
+    @await Html.PartialAsync("~/Views/PartialView/Pricing.cshtml", ViewData["Plan"])
+
+
+
+    <div class="tp-testimonial__area grey-bg pt-120 pb-120">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="tp-testimonial__title-box text-center mb-80 wow tpfadeUp" data-wow-duration=".7s" data-wow-delay=".3s">
+                        <h3 class="tp-section-title">@Model.Home?.testimonial?.title</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-6 col-lg-6 col-12 wow tpfadeLeft" data-wow-duration=".9s" data-wow-delay=".5s">
+                    <div class="tp-testimonial__thumb">
+                        <img src="@Model.Home?.testimonial_cover" alt="">
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-12">
+                    <div class="tp-testimonial__wrapper">
+                        @foreach (var testimonial in Model.Testimonials)
+                        {
+                            var postMetaList = (testimonial.Postmetas as IEnumerable<Postmeta>)?.ToList(); // Ensure conversion
+                            var previewMeta = postMetaList?.FirstOrDefault(m => m.Key == "preview")?.Value;
+                            var excerptMeta = postMetaList?.FirstOrDefault(m => m.Key == "excerpt")?.Value;
+
+                            <div class="tp-testimonial__item mb-15 d-flex wow tpfadeUp" data-wow-duration=".7s" data-wow-delay=".7s">
+                                <div class="tp-testimonial__icon">
+                                    <span><img src="@previewMeta" alt=""></span>
+                                </div>
+                                <div class="tp-testimonial__content">
+                                    <p>@(excerptMeta != null ? excerptMeta.Substring(0, Math.Min(150, excerptMeta.Length)) : "")</p>
+                                    <h3 class="tp-testimonial__title-sm">@testimonial.Title <span>(@testimonial.Slug)</span></h3>
+                                </div>
+                            </div>
+                        }
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- tp-choose-area-start -->
+    @await Html.PartialAsync("~/Views/PartialView/WhyChoose.cshtml", ViewData["WhyChoose"])
+
+
+
+
+
+    <div class="tp-support__area pt-120 pb-120 grey-bg p-relative">
+        <div class="tp-support__bg">
+            <img src="~/assets/frontend/img/faq/faq-bg-shape.png" alt="">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="tp-support__title-box text-center mb-70">
+                        <h3 class="tp-section-title">Frequently asked questions 📣</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="tp-support__faq">
+                        <div class="tp-custom-accordio-2">
+                            <div class="accordion" id="accordionExample-2">
+                                @if (Model.Faqs != null && Model.Faqs.Count > 0)
+                                {
+                                    int key = 1;
+                                    foreach (var faq in Model.Faqs)
+                                    {
+                                        if (faq.Slug != "top")
+                                        {
+                                            <div class="accordion-items">
+                                                <h2 class="accordion-header" id="heading-@key">
+                                                    <button class="accordion-buttons @(key > 1 ? "collapsed" : "")" type="button" data-bs-toggle="collapse"
+                                                            data-bs-target="#collapse-@key" aria-expanded="@(key == 1 ? "true" : "false")" aria-controls="collapse-@key">
+                                                        @faq.Title
+                                                    </button>
+                                                </h2>
+                                                <div id="collapse-@key" class="accordion-collapse collapse @(key == 1 ? "show" : "")" aria-labelledby="heading-@key"
+                                                     data-bs-parent="#accordionExample-2">
+                                                    <div class="accordion-body">
+                                                        @faq.Excerpt
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            key++;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <p class="text-center">No FAQs available at the moment.</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

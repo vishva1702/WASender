@@ -1,0 +1,132 @@
+﻿@model List<WASender.Models.Plan>
+@using Microsoft.AspNetCore.Http
+@using System.Globalization
+@using System.Text.Json
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Title"] = "Subscription Plan";
+    var userPlanId = HttpContextAccessor.HttpContext?.User?.FindFirst("PlanId")?.Value;
+    int.TryParse(userPlanId, out int currentPlanId);
+}
+
+<style>
+    .plan-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        transition: 0.3s ease-in-out;
+        border: 1px solid #ddd;
+    }
+
+        .plan-card:hover {
+            transform: scale(1.02);
+        }
+
+    .plan-title {
+        font-size: 20px; /* Match Screenshot */
+        font-weight: 600;
+        color: #333; /* Darker Text */
+        text-transform: uppercase;
+    }
+
+    .plan-price {
+        font-size: 22px; /* Bigger and Bolder */
+        font-weight: bold;
+        color: #0056b3; /* Dark Blue */
+    }
+
+    .plan-duration {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .feature-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #333; /* Dark Gray */
+        }
+
+        .feature-list i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        .feature-list .fa-check-circle {
+            color: #28a745; /* Green */
+        }
+
+        .feature-list .fa-times-circle {
+            color: #dc3545; /* Red */
+        }
+
+    .btn-subscribe {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+</style>
+
+
+<div class="container mt-4">
+    <nav class="breadcrumb">
+        <a class="breadcrumb-item text-primary" href="#"><i class="fa fa-home"></i> Subscription Plan</a>
+        <span class="breadcrumb-item active">User - Subscription</span>
+    </nav>
+
+    <div class="row justify-content-center">
+        @foreach (var plan in Model)
+        {
+            <div class="col-md-5 mx-2 mb-4">
+                <div class="plan-card text-center">
+                    <h4 class="plan-title">@plan.Title</h4>
+                    <h2 class="plan-price">@plan.Price?.ToString("C", CultureInfo.CurrentCulture)</h2>
+                    <p class="plan-duration">@(plan.Days == 30 ? "Per month" : "Per year")</p>
+                    <hr />
+                    <ul class="feature-list text-left">
+                        @if (!string.IsNullOrEmpty(plan.Data))
+                        {
+                            var parsedData = JsonSerializer.Deserialize<Dictionary<string, string>>(plan.Data);
+                            @foreach (var entry in parsedData)
+                            {
+                                <li class="d-flex align-items-center">
+                                    <i class="@(entry.Value.ToLower() == "true" ? "fa fa-check-circle text-success me-2" : "fa fa-times-circle text-danger me-2")"></i>
+                                    <span>@entry.Key.Replace("_", " ") <strong>@(entry.Value.ToLower() != "true" && entry.Value.ToLower() != "false" ? $"({entry.Value})" : "")</strong></span>
+                                </li>
+                            }
+                        }
+                    </ul>
+                    <hr />
+                    <a class="btn btn-subscribe @(currentPlanId == (int)plan.Id ? "btn-success" : "btn-primary")" asp-action="Show" asp-route-id="@plan.Id">
+                        <i class="@(currentPlanId == (int)plan.Id ? "fa fa-check" : "fa fa-plus-circle")"></i>
+                        @(currentPlanId == (int)plan.Id ? "Activated" : "Subscribe")
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>

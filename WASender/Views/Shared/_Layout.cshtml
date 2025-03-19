@@ -1,0 +1,73 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WASender</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="~/assets/uploads/favicon.png" />
+
+    <!-- CSS Stylesheets -->
+    <link rel="stylesheet" href="~/assets/frontend/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/frontend/css/animate.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/frontend/css/custom-animation.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/frontend/css/swiper-bundle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/frontend/css/slick.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/frontend/css/nice-select.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/frontend/css/flaticon.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/frontend/css/meanmenu.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/frontend/css/font-awesome-pro.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/frontend/css/magnific-popup.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/frontend/css/spacing.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/frontend/css/style.css" asp-append-version="true" />
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WASender.styles.css" asp-append-version="true" />
+</head>
+<body>
+
+    <!-- MAIN CONTENT -->
+    <main class="container-fluid mt-3">
+        @RenderBody()
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        @await Html.PartialAsync("_Footer")
+    </footer>
+    <button class="scroll-top scroll-to-target" data-target="html">
+        <i class="far fa-angle-double-up"></i>
+    </button>
+   
+    <!-- JS Scripts -->
+    <script src="~/assets/frontend/js/jquery.js" asp-append-version="true"></script>
+    <script src="~/assets/frontend/js/waypoints.js" asp-append-version="true"></script>
+    <script src="~/assets/frontend/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="~/assets/frontend/js/swiper-bundle.js" asp-append-version="true"></script>
+    <script src="~/assets/frontend/js/slick.js" asp-append-version="true"></script>
+    <script src="~/assets/frontend/js/magnific-popup.js" asp-append-version="true"></script>
+    <script src="~/assets/frontend/js/counterup.js" asp-append-version="true"></script>
+    <script src="~/assets/frontend/js/wow.js" asp-append-version="true"></script>
+    <script src="~/assets/frontend/js/nice-select.js" asp-append-version="true"></script>
+    <script src="~/assets/frontend/js/meanmenu.js" asp-append-version="true"></script>
+    <script src="~/assets/frontend/js/isotope-pkgd.js" asp-append-version="true"></script>
+    <script src="~/assets/frontend/js/imagesloaded-pkgd.js" asp-append-version="true"></script>
+    <script src="~/assets/frontend/js/ajax-form.js" asp-append-version="true"></script>
+    <script src="~/assets/frontend/js/main.js" asp-append-version="true"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Language Switcher Script (Fixed) -->
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelector('.language-switch').addEventListener('change', function () {
+                window.location.href = '@Url.Content("~/local/")' + this.value;
+            });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

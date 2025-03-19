@@ -1,0 +1,59 @@
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    string prev = ViewData["Prev"] as string;
+    string title = ViewData["Title"] as string;
+    var buttons = ViewData["Buttons"] as List<dynamic>;
+    var segments = HttpContextAccessor.HttpContext.Request.Path.Value.Split('/', StringSplitOptions.RemoveEmptyEntries);
+}
+
+<div class="header" style="margin-top:80px;">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    @if (!string.IsNullOrEmpty(prev))
+                    {
+                        <a href="@Url.Content(prev)" class="btn btn-outline-primary btn-sm btn-icon">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                    }
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links">
+                            <li class="breadcrumb-item">
+                                <a href="@Url.Action("Login", "Account")"><i class="fas fa-home"></i></a>
+                            </li>
+                            @if (!string.IsNullOrEmpty(title))
+                            {
+                                <li class="breadcrumb-item"><a href="#">@Html.Raw(title)</a></li>
+                            }
+                            @foreach (var segment in segments)
+                            {
+                                <li class="breadcrumb-item"><a href="#">@(segment.Length > 28 ? segment.Substring(0, 28) + "..." : segment)</a></li>
+                            }
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-6 col-5 text-right">
+                    @if (buttons != null)
+                    {
+                        @foreach (var button in buttons)
+                        {
+                            if (button.is_button != null && button.is_button == true)
+                            {
+                                <button type="button" class="btn btn-sm btn-neutral" @Html.Raw(button.components)>
+                                    @Html.Raw(button.name)
+                                </button>
+                            }
+                            else
+                            {
+                                <a href="@button.url" class="btn btn-sm btn-neutral" @Html.Raw(button.components)>
+                                    @Html.Raw(button.name)
+                                </a>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,308 @@
+﻿@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+
+<div class="row">
+    <!-- Total Orders -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">@Localizer["Total Orders"]</h5>
+                        <span class="h2 font-weight-bold mb-0">
+                            <span id="total-orders" style="display: none;">@ViewData["TotalOrders"]</span>
+                            <img id="loader-total-orders" src="~/uploads/loader.gif" />
+                        </span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="fi fi-rs-boxes mt-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Orders -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">@Localizer["Pending Orders"]</h5>
+                        <span class="h2 font-weight-bold mb-0">
+                            <span id="pending-orders" style="display: none;">@ViewData["PendingOrders"]</span>
+                            <img id="loader-pending-orders" src="~/uploads/loader.gif" />
+                        </span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="fi fi-rs-box-alt mt-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Open Supports -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">@Localizer["Open Supports"]</h5>
+                        <span class="h2 font-weight-bold mb-0">
+                            <span id="open-support" style="display: none;">@ViewData["OpenSupport"]</span>
+                            <img id="loader-open-support" src="~/uploads/loader.gif" />
+                        </span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="ni ni-calendar-grid-58"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Customers -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">@Localizer["Active Customers"]</h5>
+                        <span class="h2 font-weight-bold mb-0">
+                            <span id="active-customers" style="display: none;">@ViewData["ActiveUsers"]</span>
+                            <img id="loader-active-customers" src="~/uploads/loader.gif" />
+                        </span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="fi fi-rs-users-alt mt-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-9">
+        <div class="card">
+            <div class="card-header">
+                <h4>
+                    <i class="fi fi-rs-shopping-cart text-primary"></i> Overview Of Sales Value
+                </h4>
+                <div class="card-header-action dropdown">
+                    <a href="#" data-toggle="dropdown" class="btn btn-neutral btn-sm dropdown-toggle overview-target">
+                        Monthly
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-sm dropdown-menu-right">
+                        <li><a href="#" class="dropdown-item overview-list" data-type="Weekly">This Week</a></li>
+                        <li><a href="#" class="dropdown-item overview-list" data-type="Monthly">This Month</a></li>
+                        <li><a href="#" class="dropdown-item overview-list" data-type="Yearly">This Year</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="sales-chart" class="chart-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="col-sm-3">
+        <div class="card">
+            <div class="card-header card-bottom-min-25">
+                <h4><i class="fi fi-rs-chart-line-up text-primary"></i> <span class="ml-1">@Localizer["Statics"]</span></h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush list my--3">
+                    <li class="list-group-item px-0 ml-2">
+                        <div class="row align-items-center">
+                            <div class="col ml--2">
+                                <h4 class="mb-0 text-muted">
+                                    <i class="fi fi-rs-network-cloud text-primary"></i> @Localizer["WA Server Status"]
+                                </h4>
+                                <span id="server-status" style="display: none;">@ViewData["ServerStatus"]</span>
+                                <img id="loader-server-status" src="~/uploads/loader.gif" />
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item px-0 ml-2">
+                        <div class="row align-items-center">
+                            <div class="col ml--2">
+                                <h4 class="mb-0 text-muted">
+                                    <i class="fi fi-rs-devices text-primary"></i> @Localizer["Active Devices"]
+                                </h4>
+                                <span id="active-devices" style="display: none;">@ViewData["ActiveDevices"]</span>
+                                <img id="loader-active-devices" src="~/uploads/loader.gif" />
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item px-0 ml-2">
+                        <div class="row align-items-center">
+                            <div class="col ml--2">
+                                <h4 class="mb-0 text-muted">
+                                    <i class="fi fi-rs-trash text-primary"></i> @Localizer["Junk Devices"]
+                                </h4>
+                                <span id="junk-devices" style="display: none;">@ViewData["JunkDevices"]</span>
+                                <img id="loader-junk-devices" src="~/uploads/loader.gif" />
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item px-0 ml-2">
+                        <div class="row align-items-center">
+                            <div class="col ml--2">
+                                <h4 class="mb-0 text-muted">
+                                    <i class="fi fi-rs-headphones text-primary"></i> @Localizer["Pending Tickets"]
+                                </h4>
+                                <span id="pending-tickets" style="display: none;">@ViewData["PendingSupport"]</span>
+                                <img id="loader-pending-tickets" src="~/uploads/loader.gif" />
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item px-0 ml-2">
+                        <div class="row align-items-center">
+                            <div class="col ml--2">
+                                <h4 class="mb-0 text-muted">
+                                    <i class="fi fi-rs-comments text-primary"></i> @Localizer["Today's Messages"]
+                                </h4>
+                                <span id="todays-messages" style="display: none;">@ViewData["TodaysMessages"]</span>
+                                <img id="loader-todays-messages" src="~/uploads/loader.gif" />
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item px-0 ml-2">
+                        <div class="row align-items-center">
+                            <div class="col ml--2">
+                                <h4 class="mb-0 text-muted">
+                                    <i class="fi fi-rs-users-alt text-primary"></i> @Localizer["New Users"]
+                                </h4>
+                                <span id="new-users" style="display: none;">@ViewData["TodaysUsers"]</span>
+                                <img id="loader-new-users" src="~/uploads/loader.gif" />
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card">
+            <div class="card-header">
+                <h4>
+                    <i class="fi fi-rs-shopping-bag text-primary"></i>
+                    <span class="ml-1">Recent Orders</span>
+                </h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush list my--3 recent-order-list">
+                    <!-- Recent Orders List -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-8">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h2 class="h3 mb-0">
+                            <i class="fi-rs-hand-holding-box text-primary"></i>
+                            <span class="ml-2">Popular Plan</span>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <!-- Projects Table -->
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col-5 text-left">Plan</th>
+                            <th class="col-2 text-right">Active Users</th>
+                            <th class="col-2 text-right">Sales</th>
+                            <th class="col-3 text-right">Total Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="list popular-list">
+                        <!-- Popular Plan List -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+
+<!-- Hidden Fields -->
+<input type="hidden" id="static-data" value="@Url.Action("StaticData", "Dashboard")" />
+<input type="hidden" id="base_url" value="@Url.Content("~")" />
+<input type="hidden" id="amount_text" value="Amount" />
+
+@section Scripts {
+    <script src="~/assets/vendor/chart.js/dist/chart.min.js"></script>
+    <script src="~/assets/plugins/canvas-confetti/confetti.browser.min.js"></script>
+    <script src="~/assets/js/pages/admin/dashboard.js?v=1.1"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Delay for 1 minute (60,000 milliseconds), then replace loader with data
+            setTimeout(function () {
+                // Total Orders
+                document.getElementById("total-orders").style.display = 'inline';
+                document.getElementById("loader-total-orders").style.display = 'none';
+
+                // Pending Orders
+                document.getElementById("pending-orders").style.display = 'inline';
+                document.getElementById("loader-pending-orders").style.display = 'none';
+
+                // Open Support
+                document.getElementById("open-support").style.display = 'inline';
+                document.getElementById("loader-open-support").style.display = 'none';
+
+                // Active Customers
+                document.getElementById("active-customers").style.display = 'inline';
+                document.getElementById("loader-active-customers").style.display = 'none';
+
+                // Active Devices
+                document.getElementById("active-devices").style.display = 'inline';
+                document.getElementById("loader-active-devices").style.display = 'none';
+
+                // Junk Devices
+                document.getElementById("junk-devices").style.display = 'inline';
+                document.getElementById("loader-junk-devices").style.display = 'none';
+
+                // Pending Tickets
+                document.getElementById("pending-tickets").style.display = 'inline';
+                document.getElementById("loader-pending-tickets").style.display = 'none';
+
+                // Today's Messages
+                document.getElementById("todays-messages").style.display = 'inline';
+                document.getElementById("loader-todays-messages").style.display = 'none';
+
+                // New Users
+                document.getElementById("new-users").style.display = 'inline';
+                document.getElementById("loader-new-users").style.display = 'none';
+            }, 1000); // 60,000 milliseconds = 1 minute
+
+        setTimeout(function () {
+            document.getElementById("server-status").style.display = 'inline';
+            document.getElementById("loader-server-status").style.display = 'none';
+        }, 2000); // 2000 ms delay for WA Server Status
+        });
+    </script>
+}

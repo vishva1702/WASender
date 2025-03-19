@@ -1,0 +1,65 @@
+﻿@using System.Text.Json
+@model List<WASender.Models.Plan>
+
+<div id="price" class="tp-price__area tp-price__border pt-120 pb-90">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-10">
+                <div class="tp-price__section text-center pb-60 wow tpfadeUp" data-wow-duration=".9s" data-wow-delay=".3s">
+                    <h3 class="tp-section-title-sm pb-20">Pricing to suit all sizes of business</h3>
+                    <span>*We help companies of all sizes</span>
+                </div>
+            </div>
+        </div>
+        <div class="row g-0 align-items-end align-items-lg-center">
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var plan in Model)
+                {
+                    <div class="col-xl-4 col-lg-4 col-md-6 mb-30 wow tpfadeLeft" data-wow-duration=".9s" data-wow-delay=".5s">
+                        <div class="tp-price__item @(plan.IsRecommended == 1 ? "tp-price__active z-index" : "")">
+                            <div class="tp-price__icon d-flex justify-content-between align-items-center">
+                                <span class="icon @plan.Labelcolor"><i class="@plan.Iconname"></i></span>
+                                <span>@plan.Title</span>
+                            </div>
+                            <h3 class="tp-price__title">
+                                @plan.Price?.ToString("C")
+                                <small class="tp-price__small_title">@(plan.Days == 30 ? "/month" : "/year")</small>
+                            </h3>
+                            <div class="tp-price__list">
+                                <ul>
+                                    @if (!string.IsNullOrEmpty(plan.Data))
+                                    {
+                                        try
+                                        {
+                                            var planFeatures = JsonSerializer.Deserialize<Dictionary<string, object>>(plan.Data);
+                                            @foreach (var feature in planFeatures)
+                                            {
+                                                var featureKey = feature.Key.Replace("_", " ");
+                                                var featureValue = feature.Value?.ToString();
+                                                var isBoolean = bool.TryParse(featureValue, out var boolValue);
+                                                if (!(isBoolean && !boolValue)) // Hide only if it's a false boolean
+                                                {
+                                                    <li><strong>@featureKey</strong>: @featureValue</li>
+                                                }
+                                            }
+                                        }
+                                        catch
+                                        {
+                                            <li>Error parsing plan data</li>
+                                        }
+                                    }
+                                </ul>
+                            </div>
+                            <div class="tp-price__btn">
+                                <a href="@Url.Action("Index", "Register", new { id = plan.Id })" class="btn btn-primary">
+                                    @(plan.IsTrial == 1 ? $"Free {plan.TrialDays} days trial" : "Sign Up Now")
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

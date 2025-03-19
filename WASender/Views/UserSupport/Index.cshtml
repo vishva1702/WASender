@@ -1,0 +1,174 @@
+﻿@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Title"] = "Support Tickets";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Create Support Request", url = Url.Action("Create", "UserSupport"), is_button = false, components = "" }
+    };
+    var supports = ViewData["Supports"] as List<WASender.Models.Support>;
+    var total = ViewData["Total"] as int? ?? 0;
+    var openSupport = ViewData["OpenSupport"] as int? ?? 0;
+    var pendingSupport = ViewData["PendingSupport"] as int? ?? 0;
+    var page = ViewData["Page"] as int? ?? 1;
+    var pageSize = ViewData["PageSize"] as int? ?? 20;
+}
+@await Html.PartialAsync("_HeaderSection")
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row d-flex justify-content-between flex-wrap">
+            <!-- Total Tickets -->
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers">
+                                    @total
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-tickets-airline mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Total Tickets</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Open Tickets -->
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers">
+                                    @openSupport <!-- Ensure this displays open tickets -->
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-ticket-airline mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Open Tickets</h5>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Pending Supports -->
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 completed-transfers">
+                                    @pendingSupport
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-ticket-alt mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Pending Supports</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support Tickets List -->
+        @if (supports != null && supports.Any())
+        {
+            <div class="card mt-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Conversations</th>
+                                    <th>Status</th>
+                                    <th>Created At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var support in supports)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a class="text-dark" asp-action="Show" asp-route-id="@support.Id">
+                                                @support.Subject
+                                            </a>
+                                        </td>
+                                        <td class="text-center">
+                                            @(support.Supportlogs?.Count ?? 0)
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-@(
+                                                support.Status == 2 ? "warning" :
+                                                (support.Status == 1 ? "success" : "danger")
+                                            )">
+                                                @(
+                                                    support.Status == 2 ? "Pending" :
+                                                    (support.Status == 1 ? "Open" : "Closed")
+                                                    )
+                                            </span>
+                                        </td>
+                                        <td>@support.CreatedAt?.ToString("dd MMM yy")</td>
+                                        <td>
+                                            <a asp-action="Show" asp-route-id="@support.Id" class="btn btn-neutral btn-sm">
+                                                View Ticket
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <!-- Pagination -->
+                        <div class="d-flex justify-content-center">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                    @for (var i = 1; i <= Math.Ceiling((double)total / pageSize); i++)
+                                    {
+                                        <li class="page-item @(i == page ? "active" : "")">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert bg-gradient-primary text-white mt-4">
+                <span>No support tickets available...</span>
+            </div>
+        }
+    </div>
+</div>

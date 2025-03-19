@@ -1,0 +1,24 @@
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using Microsoft.AspNetCore.Identity
+
+@{
+    var user = HttpContextAccessor.HttpContext?.User;
+    var isAuthenticated = user?.Identity?.IsAuthenticated ?? false;
+    var isAdmin = user?.IsInRole("admin") ?? false;
+}
+
+@if (!isAuthenticated)
+{
+    // Redirecting unauthenticated users to the login page
+    <script>
+        window.location.href = "/Login/Index";
+    </script>
+}
+else if (isAdmin)
+{
+    <partial name="~/Views/Shared/_Admin_Sidebar.cshtml" />
+}
+else
+{
+    <partial name="~/Views/Shared/_User_Sidebar.cshtml" />
+}

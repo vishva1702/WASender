@@ -1,0 +1,68 @@
+﻿@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Title"] = "Create Support Ticket";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Back to Dashboard", url = Url.Action("Dashboard", "User"), is_button = false, components = "" }
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card">
+            <!-- Card Header -->
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Create Ticket</h4>
+                </div>
+            </div>
+
+            <!-- Display Error Message -->
+            @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+            {
+                    <div class="alert alert-danger">
+                    @ViewBag.ErrorMessage
+                    </div>
+            }
+
+            @if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
+            {
+                    <div class="alert alert-success">
+                    @ViewBag.SuccessMessage
+                    </div>
+            }
+
+            <!-- Card Body -->
+            <div class="card-body">
+                <form asp-action="Store" asp-controller="UserSupport" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Subject -->
+                    <div class="form-group row mb-4">
+                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Subject</label>
+                        <div class="col-sm-12 col-md-7">
+                            <input type="text" name="subject" maxlength="100" required class="form-control" placeholder="Enter subject" />
+                        </div>
+                    </div>
+
+                    <!-- Message -->
+                    <div class="form-group row mb-4">
+                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Message</label>
+                        <div class="col-sm-12 col-md-7">
+                            <textarea class="form-control h-200" name="message" required maxlength="1000" placeholder="Enter your message"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-group row mb-4">
+                        <div class="col-md-7 offset-md-3">
+                            <button type="submit" class="btn btn-outline-primary submit-btn">Create Now</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

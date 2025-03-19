@@ -1,0 +1,28 @@
+﻿@using Newtonsoft.Json.Linq;
+
+
+@model JObject
+
+@if (Model != null)
+{
+    var text = Model["text"]?.ToString() ?? "Unnamed";
+    var href = Model["href"]?.ToString() ?? "#";
+    var target = Model["target"]?.ToString() ?? "_self";
+    var children = Model["children"] as JArray;
+
+    <li>
+        <a href="@Url.Content(href)" target="@target">@text</a>
+        @if (children != null && children.Count > 0)
+        {
+            <ul class="submenu">
+                @foreach (var child in children)
+                {
+                    if (child is JObject)
+                    {
+                        @await Html.PartialAsync("Submenu", child)
+                    }
+                }
+            </ul>
+        }
+    </li>
+}

@@ -1,0 +1,101 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="csrf-token" content="@Html.AntiForgeryToken()">
+
+    <title>@ViewData["Title"] - WASender</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="@(ViewData["Favicon"] ?? "/default-favicon.png")" type="image/png">
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="~/assets/vendor/nucleo/css/nucleo.css" asp-append-version="true">
+    <link rel="stylesheet" href="@Url.Content("~/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css")" asp-append-version="true">
+    <link rel="stylesheet" href="~/assets/css/uicons-regular-straight.css" asp-append-version="true">
+
+    <!-- Argon CSS -->
+    <link rel="stylesheet" href="~/assets/css/argon.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/assets/css/custom.css" asp-append-version="true">
+
+    <link rel="stylesheet" href="~/assets/plugins/toastify-js/src/toastify.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/assets/plugins/pace/pace-theme-default.min.css" asp-append-version="true">
+
+    @RenderSection("Styles", required: false)
+</head>
+
+<body>
+
+    <!-- Sidenav -->
+    <nav class="sidenav navbar navbar-vertical fixed-left navbar-expand-xs navbar-light bg-white" id="sidenav-main">
+        <div class="scrollbar-inner">
+            <!-- Brand -->
+            <div class="sidenav-header d-flex align-items-center">
+                <a class="navbar-brand" href="@Url.Action("Login", "Account")">
+                    <img src="@ViewData["logo"]" alt="Logo" class="navbar-brand-img" alt="...">
+                </a>
+                <div class="ml-auto">
+                    <!-- Sidenav toggler -->
+                    <div class="sidenav-toggler d-none d-xl-block" data-action="sidenav-unpin" data-target="#sidenav-main">
+                        <div class="sidenav-toggler-inner">
+                            <i class="sidenav-toggler-line"></i>
+                            <i class="sidenav-toggler-line"></i>
+                            <i class="sidenav-toggler-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="navbar-inner">
+                <div class="collapse navbar-collapse" id="sidenav-collapse-main">
+                    @await Html.PartialAsync("_Sidebar")
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <div class="main-content" id="panel">
+        <!-- Topnav -->
+             @await Html.PartialAsync("_UserHeader")
+ 
+        <!-- Page content -->
+        <div class="container-fluid mt--6">
+            @RenderBody()
+        </div>
+
+    </div>
+
+    <!-- Logout Form -->
+    <form id="logout-form" asp-controller="Account" asp-action="Logout" method="post">
+        @Html.AntiForgeryToken()
+    </form>
+
+    <!-- Scripts -->
+    <script src="~/assets/vendor/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="~/assets/vendor/js-cookie/js.cookie.js" asp-append-version="true"></script>
+    <script src="~/assets/vendor/jquery.scrollbar/jquery.scrollbar.min.js" asp-append-version="true"></script>
+    <script src="~/assets/vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js" asp-append-version="true"></script>
+    <script src="~/assets/plugins/sweetalert/sweetalert2.all.min.js" asp-append-version="true"></script>
+    <script src="~/assets/plugins/jquery-validation/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/assets/plugins/toastify-js/src/toastify.js" asp-append-version="true"></script>
+    <script src="~/assets/plugins/form.js" asp-append-version="true"></script>
+    <script src="~/assets/plugins/pace/pace.min.js" asp-append-version="true"></script>
+    <script src="~/assets/js/argon.js" asp-append-version="true"></script>
+
+    @RenderSection("Scripts", required: false)
+
+    @if (Context.Request.Path.StartsWithSegments("/user"))
+    {
+        <script src="@Url.Content("~/assets/js/pages/notifications.js")"></script>
+    }
+</body>
+</html>

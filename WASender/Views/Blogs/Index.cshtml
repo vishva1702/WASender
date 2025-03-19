@@ -1,0 +1,194 @@
+﻿@await Html.PartialAsync("_Header2")
+
+@{
+    ViewData["Title"] = "Blog";
+    var blogs = ViewData["Blogs"] as List<Post>;
+    var recentBlogs = ViewData["RecentBlogs"] as List<Post>;
+    var categories = ViewData["Categories"] as List<Category>;
+    var tags = ViewData["Tags"] as List<Category>;
+}
+
+<main>
+    <!-- Breadcrumb Area Start -->
+    <div class="breadcrumb__area breadcrumb-height p-relative grey-bg"
+         style="background-image: url('/assets/frontend/img/breadcrumb/breadcrumb.jpg');">
+        <div class="breadcrumb__scroll-bottom smooth">
+            <a href="#Blog-Details">
+                <i class="far fa-arrow-down"></i>
+            </a>
+        </div>
+        <div class="container text-center">
+            <h3 class="breadcrumb__title">Recent Blogs</h3>
+            <div class="breadcrumb__list">
+                <span><a href="/">Home</a></span>
+                <span class="dvdr"><i class="fa fa-angle-right"></i></span>
+                <span>Blog</span>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb Area End -->
+    <!-- Postbox Area Start -->
+    <div class="postbox__area pt-120 pb-120">
+        <div class="container">
+            <div class="row">
+                <!-- Blog Details Section -->
+                <div class="col-lg-8">
+                    <div id="Blog-Details" class="postbox_wrapper postbox_p-right">
+                        @if (!string.IsNullOrEmpty(ViewBag.BlogNotFoundMessage))
+                        {
+                            <div class="alert alert-danger" >
+                                @ViewBag.BlogNotFoundMessage
+                            </div>
+                        }
+                        
+                        @if (blogs != null && blogs.Any())
+                        {
+                            @foreach (var blog in blogs)
+                            {
+                                var previewImage = blog.Postmetas.FirstOrDefault(m => m.Key == "preview")?.Value ?? "";
+                                var shortDescription = blog.Postmetas.FirstOrDefault(m => m.Key == "short_description")?.Value ?? "";
+
+                                <article class="postbox__item format-image mb-50 transition-3">
+                                    <div class="postbox__thumb w-img">
+                                        <a href="/blogs/details/@blog.Slug">
+                                            <img src="@previewImage" alt="Blog Image">
+                                        </a>
+                                    </div>
+                                    <div class="postbox__content">
+                                        <div class="postbox__meta">
+                                            <span>
+                                                <a href="/blogs">
+                                                    <i class="fal fa-user-circle"></i> Admin
+                                                </a>
+                                            </span>
+                                            <span>
+                                                <a href="/blogs?date=@blog.CreatedAt?.ToString("dd-MM-yyyy")">
+                                                    <i class="fal fa-clock"></i> @blog.CreatedAt?.ToString("MMMM d, yyyy")
+                                                </a>
+                                            </span>
+                                        </div>
+                                        <h3 class="postbox__title">
+                                            <a href="/blog/@blog.Slug">@blog.Title</a>
+                                        </h3>
+                                        <div class="postbox__text">
+                                            <p>@Html.Raw(shortDescription?.Length > 200 ? shortDescription.Substring(0, 200) + "..." : shortDescription)</p>
+                                        </div>
+                                        <div class="post__button">
+                                            <a href="@Url.Action("Details", "Blogs", new { slug = blog.Slug })" class="btn btn-primary">
+                                                Read More
+                                            </a>
+
+                                        </div>
+                                    </div>
+                                </article>
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning" role="alert">
+                                Oops! There is no blog post available.
+                            </div>
+                        }
+
+                        <!-- Pagination -->
+                        @*  <div class="basic-pagination">
+                        @Html.PagedListPager(
+                        (IPagedList)ViewData["PagedBlogs"],
+                        page => Url.Action("Index", new { page }),
+                        new PagedListRenderOptions
+                        {
+                        DisplayLinkToPreviousPage = true,
+                        DisplayLinkToNextPage = true
+                        }
+                        )
+                        </div> *@
+                    </div>
+                </div>
+
+                <!-- Sidebar Section -->
+                <div class="col-lg-4">
+                    <div class="sidebar__wrapper">
+                        <!-- Search Widget -->
+                        <div class="sidebar__widget mb-40">
+                            <h3 class="sidebar__widget-title">Search Here</h3>
+                            <div class="sidebar__search">
+                                <form action="/blogs" method="get">
+                                    <div class="sidebar__search-input-2">
+                                        <input type="text" name="search" placeholder="Search your keyword..." value="@ViewBag.Search">
+                                        <button type="submit"><i class="far fa-search"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Recent Posts Widget -->
+                        @if (recentBlogs != null && recentBlogs.Any())
+                        {
+                            <div class="sidebar__widget mb-40">
+                                <h3 class="sidebar__widget-title">Recent Posts</h3>
+                                <div class="sidebar__widget-content">
+                                    @foreach (var recentBlog in recentBlogs)
+                                    {
+                                        var recentPreview = recentBlog.Postmetas.FirstOrDefault(m => m.Key == "preview")?.Value ?? "";
+                                        var trimmedTitle = recentBlog.Title.Length > 35
+                                        ? $"{recentBlog.Title.Substring(0, 35)}..."
+                                        : recentBlog.Title;
+
+                                        <div class="rc__post mb-20 d-flex">
+                                            <div class="rc__post-thumb mr-20">
+                                                <a href="@Url.Action("Details", "Blogs", new { slug = recentBlog.Slug })">
+                                                    <img src="@recentPreview" alt="Recent Post" />
+                                                </a>
+                                            </div>
+                                            <div class="rc__post-content">
+                                                <span>@recentBlog.CreatedAt?.ToString("d MMMM, yyyy")</span>
+                                                <h3 class="rc__post-title">
+                                                    <a href="@Url.Action("Details", "Blogs", new { slug = recentBlog.Slug })">
+                                                        @trimmedTitle
+                                                    </a>
+                                                </h3>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Categories Widget -->
+                        @if (categories != null && categories.Any())
+                        {
+                            <div class="sidebar__widget mb-40">
+                                <h3 class="sidebar__widget-title">Categories</h3>
+                                <ul>
+                                    @foreach (var category in categories)
+                                    {
+                                        <li>
+                                            <a href="@Url.Action("Category", "Blogs", new { slug = category.Slug })">@category.Title</a>
+
+                                        </li>
+                                    }
+
+                                </ul>
+                            </div>
+                        }
+
+
+                        <!-- Tags Widget -->
+                        @if (tags != null && tags.Any())
+                        {
+                            <div class="sidebar__widget mb-40">
+                                <h3 class="sidebar__widget-title">Tags</h3>
+                                <div class="tagcloud">
+                                    @foreach (var tag in tags)
+                                    {
+                                        <a href="@Url.Action("Tag", "Blogs", new { slug = tag.Slug })">@tag.Title</a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

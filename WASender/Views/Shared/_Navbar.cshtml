@@ -1,0 +1,108 @@
+﻿<header>
+    <!-- Header Start -->
+    <div id="header-sticky" class="tp-header__area tp-header__space-2 tp-header__transparent tp-header__menu-space">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-xl-2 col-lg-2 col-md-6 col-6">
+                    <div class="tp-header__logo">
+                        <a asp-controller="Home" asp-action="Index">
+                            <img src="@ViewData["Logo"]" alt="">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-xl-7 col-lg-7 d-none d-lg-block">
+                    <div class="tp-header__main-menu tp-header__black-menu">
+                        <nav id="mobile-menu">
+                            <ul>
+                                @await Component.InvokeAsync("MainMenu")
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-6 col-6">
+                    <div class="tp-header__right-two d-flex align-items-center justify-content-end">
+                        @if (!User.Identity.IsAuthenticated)
+                        {
+                            <a class="tp-header__login d-none d-lg-block" asp-controller="Account" asp-action="Login">
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="..." fill="currentColor" />
+                                </svg>
+                                <span>Login</span>
+                            </a>
+                        }
+                        <a class="tp-btn-blue d-none d-md-block" asp-controller="@(User.Identity.IsAuthenticated ? "Dashboard" : "Pricing")" asp-action="Index">
+                            <span>@(User.Identity.IsAuthenticated ? "Dashboard" : "Get Started")</span>
+                        </a>
+                        <a class="tp-header__bars tp-menu-bar d-lg-none" href="#"><i class="far fa-bars"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Header End -->
+</header>
+
+<div class="tp-offcanvas-area">
+    <div class="tpoffcanvas">
+        <div class="tpoffcanvas__close-btn">
+            <button class="close-btn"><i class="fal fa-times"></i></button>
+        </div>
+        <div class="tpoffcanvas__logo">
+            <a asp-controller="Home" asp-action="Index">
+                <img src="@ViewData["FooterLogo"]" alt="">
+            </a>
+        </div>
+
+        <div class="mobile-menu"></div>
+        <div class="tpoffcanvas__info">
+            <h3 class="offcanva-title">Get In Touch</h3>
+            <div class="tp-info-wrapper mb-20 d-flex align-items-center">
+                <div class="tpoffcanvas__info-icon">
+                    <a href="#"><i class="fal fa-envelope"></i></a>
+                </div>
+                <div class="tpoffcanvas__info-address">
+                    <span>Email</span>
+                    <a href="mailto:@ViewData["ContactEmail"]">@ViewData["ContactEmail"]</a>
+                </div>
+            </div>
+            <div class="tp-info-wrapper mb-20 d-flex align-items-center">
+                <div class="tpoffcanvas__info-icon">
+                    <a href="#"><i class="fal fa-phone-alt"></i></a>
+                </div>
+                <div class="tpoffcanvas__info-address">
+                    <span>Phone</span>
+                    <a href="tel:@ViewData["ContactPhone"]">@ViewData["ContactPhone"]</a>
+                </div>
+            </div>
+            <div class="tp-info-wrapper mb-20 d-flex align-items-center">
+                <div class="tpoffcanvas__info-icon">
+                    <a href="#"><i class="fas fa-map-marker-alt"></i></a>
+                </div>
+                <div class="tpoffcanvas__info-address">
+                    <span>Location</span>
+                    <a href="#" target="_blank">@ViewData["Address"]</a>
+                </div>
+            </div>
+        </div>
+        <div class="tpoffcanvas__social">
+            <div class="social-icon">
+                @if (!string.IsNullOrEmpty(ViewData["Facebook"]?.ToString()))
+                {
+                    <a href="@ViewData["Facebook"]"><i class="fab fa-facebook-square"></i></a>
+                }
+                @if (!string.IsNullOrEmpty(ViewData["Twitter"]?.ToString()))
+                {
+                    <a href="@ViewData["Twitter"]"><i class="fab fa-twitter"></i></a>
+                }
+                @if (!string.IsNullOrEmpty(ViewData["Instagram"]?.ToString()))
+                {
+                    <a href="@ViewData["Instagram"]"><i class="fab fa-instagram"></i></a>
+                }
+                @if (!string.IsNullOrEmpty(ViewData["LinkedIn"]?.ToString()))
+                {
+                    <a href="@ViewData["LinkedIn"]"><i class="fab fa-linkedin"></i></a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
