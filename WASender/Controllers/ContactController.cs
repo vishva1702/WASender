@@ -44,7 +44,6 @@ namespace WASender.Controllers
                 string subject = form["subject"];
                 string message = form["message"];
 
-                // Fetch SMTP settings from appsettings.json
                 string fromEmail = _configuration["SmtpSettings:FromEmail"];
                 string fromName = _configuration["SmtpSettings:FromName"];
                 string toEmail = _configuration["SmtpSettings:ToEmail"];

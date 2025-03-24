@@ -1,6 +1,7 @@
 ﻿@{
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
+@await Html.PartialAsync("_HeaderSection")
 
 @inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
 
@@ -299,10 +300,10 @@
                 document.getElementById("loader-new-users").style.display = 'none';
             }, 1000); // 60,000 milliseconds = 1 minute
 
-        setTimeout(function () {
-            document.getElementById("server-status").style.display = 'inline';
-            document.getElementById("loader-server-status").style.display = 'none';
-        }, 2000); // 2000 ms delay for WA Server Status
+            setTimeout(function () {
+                document.getElementById("server-status").style.display = 'inline';
+                document.getElementById("loader-server-status").style.display = 'none';
+            }, 2000); // 2000 ms delay for WA Server Status
         });
     </script>
 }

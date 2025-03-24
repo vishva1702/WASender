@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -7,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Org.BouncyCastle.Asn1.Ocsp;
 using WASender.Controllers;
 using WASender.Models;
 using WASender.Services;
@@ -26,10 +29,12 @@ public class LoginController : BaseController
     }
 
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
+        await LoadGlobalDataAsync();
         return View();
     }
+
 
     [HttpPost]
     public async Task<IActionResult> Login(string email, string password)
@@ -54,11 +59,13 @@ public class LoginController : BaseController
         var role = await _loginService.GetUserRoleAsync(email);
         var token = await _loginService.GenerateJwtTokenAsync(email);
 
+        // IMPORTANT: Add ClaimTypes.NameIdentifier so that TemplateController can get the user id.
         var claims = new List<Claim>
         {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, email),
-            new Claim(ClaimTypes.Role, role),
-            new Claim("UserId", user.Id.ToString()) // Ensure UserId claim exists
+            new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", CultureInfo.CurrentCulture.TextInfo.ToTitleCase(role))
+            // Optionally add additional claims if needed
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -68,21 +75,43 @@ public class LoginController : BaseController
             new AuthenticationProperties
             {
                 IsPersistent = true,
-                ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
+                ExpiresUtc = DateTime.UtcNow.AddMinutes(120)
             });
 
+        // Set the JWT token in a cookie (if needed)
         Response.Cookies.Append("authkey", token, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = true, // Set to true if using HTTPS
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddMinutes(30)
+            Expires = DateTime.UtcNow.AddMinutes(120)
         });
 
         _logger.LogInformation("Login successful for {Email}, role: {Role}", email, role);
         await LoadGlobalDataAsync();
 
-        return role == "admin" ? RedirectToAction("Dashboard", "Admin") : RedirectToAction("Index", "UserHome");
+        return role.Equals("Admin", StringComparison.OrdinalIgnoreCase)
+            ? RedirectToAction("Index", "AdminHome")
+            : RedirectToAction("Index", "UserHome");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Logout()
+    {
+        // Sign out the user from cookie authentication
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+        // Remove the authkey cookie if it exists
+        if (Request.Cookies.ContainsKey("authkey"))
+        {
+            Response.Cookies.Delete("authkey");
+        }
+
+        // Optionally clear the session if used
+        HttpContext.Session.Clear();
+
+        return RedirectToAction("Index", "Login"); // Redirect to login page after logout
     }
 
     [HttpPost]
@@ -109,22 +138,4 @@ public class LoginController : BaseController
         _logger.LogInformation("API Login successful for {Email}, role: {Role}", email, role);
         return Ok(new { Token = token, Role = role });
     }
-
-    [HttpGet]
-    public async Task<IActionResult> Logout()
-    {
-        _logger.LogInformation("User logged out.");
-
-        // Clear authentication session
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-        // Remove all cookies
-        foreach (var cookie in Request.Cookies.Keys)
-        {
-            Response.Cookies.Delete(cookie);
-        }
-
-        return RedirectToAction("Index", "Home");
-    }
-
 }

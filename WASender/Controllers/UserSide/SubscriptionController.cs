@@ -19,11 +19,10 @@ public class SubscriptionController : Controller
 
     public async Task<IActionResult> Index()
     {
-        // Get user's PlanId from claims
+
         var userPlanId = _httpContextAccessor.HttpContext?.User?.FindFirst("PlanId")?.Value;
         int.TryParse(userPlanId, out int currentPlanId);
 
-        // Get active plans from service
         var plans = await _planService.GetActivePlansAsync(currentPlanId);
 
         return View(plans);

@@ -5,13 +5,12 @@ using WASender.Services;
 
 namespace WASender.Controllers.UserSide
 {
-    [Authorize(Roles = "user")] // 🔒 Ensures only logged-in users can access this controller
-    [Route("UserHome")]
+    [Authorize(Roles = "user, User")] 
     public class UserHomeController : BaseController
     {
 
         public UserHomeController(IGlobalDataService globalDataService, ILogger<FeaturesController> logger)
-             : base(globalDataService, logger) // Pass both required parameters to BaseController
+             : base(globalDataService, logger) 
         { }
 
         public async Task<IActionResult> Index()

@@ -120,10 +120,10 @@ app.UseCors("AllowAll");
 
 // 🔹 Enable session, authentication, and authorization
 app.UseSession();
-app.UseAuthentication(); // ✅ Ensure this comes before authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
-// 🔹 Middleware to redirect unauthorized users to login
+// Middleware to redirect unauthorized users AFTER authentication runs
 app.Use(async (context, next) =>
 {
     if ((context.Request.Path.StartsWithSegments("/Admin") || context.Request.Path.StartsWithSegments("/UserHome"))
