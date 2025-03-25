@@ -6,27 +6,34 @@
     ViewData["Title"] = "Edit Profile";
     ViewData["Buttons"] = new List<dynamic>
     {
-        new { name = "Back to Dashboard", url = Url.Action("Index", "UserHome"), is_button = false, components = "" }
+        new { name = "Back to Dashboard", url = Url.Action("Index", "AdminHome"), is_button = false, components = "" }
     };
 }
 
 @await Html.PartialAsync("_HeaderSection")
 
-<div class="clearfix"></div> <!-- Add this line -->
-<!-- General Settings -->
-@if (TempData["Error"] != null)
+<div class="clearfix"></div>
+
+@if (!string.IsNullOrEmpty(ViewBag.Success))
 {
-    <div class="alert alert-danger">
-        @TempData["Error"]
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @ViewBag.Success
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
 }
 
-@if (TempData["Success"] != null)
+@if (!string.IsNullOrEmpty(ViewBag.Error))
 {
-    <div class="alert alert-success">
-        @TempData["Success"]
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @ViewBag.Error
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
 }
+
 
 <div class="row">
     <div class="col-lg-5 mt-5">
@@ -34,7 +41,7 @@
         <p>Edit your basic credentials</p>
     </div>
     <div class="col-lg-7 mt-5">
-        <form class="ajaxform" method="post" enctype="multipart/form-data" asp-action="Update" asp-controller="UserProfile">
+        <form class="ajaxform" method="post" enctype="multipart/form-data" asp-action="Update" asp-controller="AdminProfile">
             <input type="hidden" name="type" value="general" />
             <div class="card">
                 <div class="card-body">
@@ -86,7 +93,7 @@
         <p>Change Your Password</p>
     </div>
     <div class="col-lg-7">
-        <form class="ajaxform_reset_form" method="post" asp-action="Update" asp-controller="UserProfile">
+        <form class="ajaxform_reset_form" method="post" asp-action="Update" asp-controller="AdminProfile">
             <input type="hidden" name="type" value="password" />
             <div class="card">
                 <div class="card-body">

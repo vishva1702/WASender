@@ -23,8 +23,8 @@
                                 <li><a href="@Url.Action("Index", "Home")">Home</a></li>
                                 <li><a href="@Url.Action("Index", "Pricing")">Pricing</a></li>
                                 <li><a href="@Url.Action("Index", "About")">About</a></li>
-                                <li><a href="@Url.Action("List", "Features")">Features</a></li>
-                                <li><a href="@Url.Action("Index", "Blog")">Blogs</a></li>
+                                <li><a href="@Url.Action("Index", "Features")">Features</a></li>
+                                <li><a href="@Url.Action("Index", "Blogs")">Blogs</a></li>
                                 <li><a href="@Url.Action("Index", "Contact")">Contact</a></li>
                             </ul>
                         </nav>
@@ -34,14 +34,20 @@
                     <div class="tp-header__right">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            @*                             <span class="tp-user-name">Welcome, @User.Identity.Name</span>
- *@                            <a class="tp-btn d-none d-md-block" href="@Url.Action("Index", "UserHome")">
-                                <span>Dashboard</span>
-                            </a>
-                            <a class="tp-btn d-none d-md-block" href="@Url.Action("Logout", "Login")">
-                                <span>Logout</span>
-                            </a>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a class="tp-btn d-none d-md-block" href="@Url.Action("Index", "AdminHome")">
+                                    <span>Admin Dashboard</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="tp-btn d-none d-md-block" href="@Url.Action("Index", "UserHome")">
+                                    <span>User Dashboard</span>
+                                </a>
+                            }
                         }
+
                         else
                         {
                             <a class="tp-btn d-none d-md-block" href="@Url.Action("Index", "Login")">

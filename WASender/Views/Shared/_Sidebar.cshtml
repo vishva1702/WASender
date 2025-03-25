@@ -4,7 +4,7 @@
 @{
     var user = HttpContextAccessor.HttpContext?.User;
     var isAuthenticated = user?.Identity?.IsAuthenticated ?? false;
-    var isAdmin = user?.IsInRole("admin") ?? false;
+    var isAdmin = user?.IsInRole("Admin") ?? false;
 }
 
 @if (!isAuthenticated)
