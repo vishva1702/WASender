@@ -8,7 +8,7 @@ public partial class User
 {
     public ulong Id { get; set; }
 
-    public string Name { get; set; } = null!;
+    public string? Name { get; set; } = null!;
 
     public string? Avatar { get; set; }
 
@@ -18,7 +18,7 @@ public partial class User
 
     public string? Role { get; set; } = null!;
 
-    public string Email { get; set; } = null!;
+    public string? Email { get; set; } = null!;
 
     public string? Phone { get; set; }
 
@@ -26,7 +26,7 @@ public partial class User
 
     public DateTime? EmailVerifiedAt { get; set; }
 
-    public string Password { get; set; } = null!;
+    public string? Password { get; set; } = null!;
 
     public int? Status { get; set; }
 
@@ -43,6 +43,8 @@ public partial class User
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    public virtual ICollection<Plan> Plans { get; set; } = new List<Plan>();// Navigation property
 
     public virtual ICollection<App> Apps { get; set; } = new List<App>();
 

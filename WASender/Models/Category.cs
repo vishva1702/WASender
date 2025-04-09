@@ -13,7 +13,7 @@ public partial class Category
 
     public string Type { get; set; } = null!;
 
-    public int Status { get; set; }
+    public int Status { get; set; } 
 
     public int IsFeatured { get; set; }
 

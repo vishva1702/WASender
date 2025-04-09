@@ -1,0 +1,81 @@
+﻿@model WASender.Models.Post
+@{
+    ViewData["Title"] = "Create Page";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+
+@await Html.PartialAsync("_HeaderSection")
+
+<form asp-action="Create" method="post" class="ajaxform_instant_reload">
+    
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10 card-wrapper">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Create Custom Page</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Page Title</label>
+                        <input asp-for="Title" class="form-control" required />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Page Description</label>
+                        <textarea name="description" class="form-control summernote" required></textarea>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label>SEO Meta Title</label>
+                        <input type="text" name="meta_title" class="form-control" required />
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label>SEO Meta Description</label>
+                        <textarea name="meta_description" class="form-control" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label>SEO Meta Tags</label>
+                        <input type="text" name="meta_tags" class="form-control" required />
+                    </div>
+                    <div class="d-flex align-items-center mt-3">
+                        <div class="custom-toggle custom-toggle-primary">
+                            <input type="checkbox" name="status" value="1" id="statusSwitch" class="custom-control-inpu" />
+                            <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                        </div>
+                        <label for="publishToggle" class="ml-2 mt-1"><h4>Make it publish?</h4></label>
+                    </div>
+                    <div class="form-group mt-4 d-flex align-items-center">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" name="status" value="1" class="custom-control-input" id="statusSwitch">
+                            <label class="custom-control-label" for="statusSwitch"><h4 class="ml-2">Make it publish?</h4></label>
+                        </div>
+                    </div><div class="form-group mt-4 d-flex align-items-center">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" name="status" value="1" class="custom-control-input" id="statusSwitch">
+                            <label class="custom-control-label" for="statusSwitch"><h4 class="ml-2">Make it publish?</h4></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <button type="submit" class="btn btn-primary submit-button">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="~/assets/plugins/summernote/summernote-bs4.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.summernote').summernote({
+                height: 250
+            });
+        });
+    </script>
+}

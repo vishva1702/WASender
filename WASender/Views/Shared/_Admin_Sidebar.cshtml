@@ -10,7 +10,7 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @currentPath.StartsWithSegments("/admin/order") ? " active" : "" )" asp-area="Admin" asp-controller="Order" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/order") ? "active" : "")" asp-area="Admin" asp-controller="Order" asp-action="Index">
             <i class="fi fi-rs-boxes"></i>
             <span class="nav-link-text">Orders</span>
         </a>
@@ -22,7 +22,7 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/admin/customer") ? "active" : "")" asp-area="Admin" asp-controller="Customer" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/customer") ? "active" : "")" asp-area="Admin" asp-controller="AdminCustomer" asp-action="Index">
             <i class="fi fi-rs-users-alt"></i>
             <span class="nav-link-text">Customers</span>
         </a>
@@ -34,7 +34,7 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @currentPath.StartsWithSegments("/admin/cron-job") ? " active" : "" )" asp-area="Admin" asp-controller="CronJob" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/cron-job") ? "active" : "")" asp-area="Admin" asp-controller="CronJob" asp-action="Index">
             <i class="fi fi-rs-calendar-clock"></i>
             <span class="nav-link-text">Cron Jobs</span>
         </a>
@@ -124,9 +124,13 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link logout-button" href="#">
+        <a class="nav-link logout-button" href="#" onclick="document.getElementById('logout-form').submit();">
             <i class="ni ni-button-power"></i>
             <span class="nav-link-text">Logout</span>
         </a>
     </li>
 </ul>
+
+<form id="logout-form" method="post" asp-area="Admin" asp-controller="Account" asp-action="Logout">
+    @Html.AntiForgeryToken()
+</form>
