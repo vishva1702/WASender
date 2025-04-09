@@ -1,0 +1,181 @@
+﻿@{
+    var plan = ViewBag.Plan as WASender.Models.Plan;
+    var planData = ViewBag.PlanData as Dictionary<string, string>;
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    // Set Header Section Data
+    ViewData["Title"] = "Edit Plan";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Back", url = Url.Action("Index", "AdminHome"), is_button = false, components = "" }
+    };
+}
+@await Html.PartialAsync("_HeaderSection")
+
+<h2>Edit Plan</h2>
+
+<div class="row">
+    <div class="col-lg-7 mt-5">
+        <form asp-action="Update" asp-route-id="@plan.Id" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Plan Name</label>
+                        <input type="text" name="Title" required class="form-control" value="@plan.Title">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Duration</label>
+                        <select class="form-control" name="Days">
+                            <option value="30" selected="@(plan.Days == 30)">Monthly</option>
+                            <option value="365" selected="@(plan.Days == 365)">Yearly</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="number" name="Price" step="any" required class="form-control" value="@plan.Price">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Label Color</label>
+                        <select class="form-control" name="LabelColor">
+                            <option value="price-color-1" selected="@(plan.Labelcolor == "price-color-1")">Pink Color</option>
+                            <option value="price-color-2" selected="@(plan.Labelcolor == "price-color-2")">Sky Color</option>
+                            <option value="price-color-3" selected="@(plan.Labelcolor == "price-color-3")">Yellow Color</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Monthly Messages Limit</label>
+                        <input type="number" name="PlanData[messages_limit]" required class="form-control" value="@(planData.ContainsKey("messages_limit") ? planData["messages_limit"] : "")">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contacts Limit</label>
+                        <input type="number" name="PlanData[contact_limit]" required class="form-control" value="@(planData.ContainsKey("contact_limit") ? planData["contact_limit"] : "")">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Device Limit</label>
+                        <input type="number" name="PlanData[device_limit]" required class="form-control" value="@(planData.ContainsKey("device_limit") ? planData["device_limit"] : "")">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Template Limit</label>
+                        <input type="number" name="PlanData[template_limit]" required class="form-control" value="@(planData.ContainsKey("template_limit") ? planData["template_limit"] : "")">
+                    </div>
+
+                    <div class="form-group">
+                        <label>App Limit</label>
+                        <input type="number" name="PlanData[apps_limit]" required class="form-control" value="@(planData.ContainsKey("apps_limit") ? planData["apps_limit"] : "")">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Chatbot (Automatic Reply)</label>
+                        <select class="form-control" name="PlanData[chatbot]">
+                            <option value="true" selected="@(planData.ContainsKey("chatbot") && planData["chatbot"] == "true")">Enabled</option>
+                            <option value="false" selected="@(planData.ContainsKey("chatbot") && planData["chatbot"] == "false")">Disabled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bulk Message</label>
+                        <select class="form-control" name="PlanData[bulk_message]">
+                            <option value="true" selected="@(planData.ContainsKey("bulk_message") && planData["bulk_message"] == "true")">Enabled</option>
+                            <option value="false" selected="@(planData.ContainsKey("bulk_message") && planData["bulk_message"] == "false")">Disabled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Schedule Message</label>
+                        <select class="form-control" name="PlanData[schedule_message]">
+                            <option value="true" selected="@(planData.ContainsKey("schedule_message") && planData["schedule_message"] == "true")">Enabled</option>
+                            <option value="false" selected="@(planData.ContainsKey("schedule_message") && planData["schedule_message"] == "false")">Disabled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Chat List Access</label>
+                        <select class="form-control" name="PlanData[access_chat_list]">
+                            <option value="true" selected="@(planData.ContainsKey("access_chat_list") && planData["access_chat_list"] == "true")">Enabled</option>
+                            <option value="false" selected="@(planData.ContainsKey("access_chat_list") && planData["access_chat_list"] == "false")">Disabled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Group List Access</label>
+                        <select class="form-control" name="PlanData[access_group_list]">
+                            <option value="true" selected="@(planData.ContainsKey("access_group_list") && planData["access_group_list"] == "true")">Enabled</option>
+                            <option value="false" selected="@(planData.ContainsKey("access_group_list") && planData["access_group_list"] == "false")">Disabled</option>
+                        </select>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-sm-12 d-flex">
+                            <label class="custom-toggle custom-toggle-primary">
+                                <input type="checkbox" name="IsFeatured" id="is-featured" value="1" @(plan.IsFeatured == 1 ? "checked" : "")>
+                                <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                            </label>
+                            <label class="mt-1 ml-1" for="is-featured">
+                                <h4>&nbsp;Featured in Home Page?</h4>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-sm-12 d-flex">
+                            <label class="custom-toggle custom-toggle-primary">
+                                <input type="checkbox" name="IsRecommended" id="is-recommended" value="1" @(plan.IsRecommended == 1 ? "checked" : "")>
+                                <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                            </label>
+                            <label class="mt-1 ml-1" for="is-recommended">
+                                <h4>&nbsp;Is Recommended?</h4>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-sm-12 d-flex">
+                            <label class="custom-toggle custom-toggle-primary">
+                                <input type="checkbox" name="IsTrial" id="is-trial" data-target=".trial-days" value="1" @(plan.IsTrial == 1 ? "checked" : "")>
+                                <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                            </label>
+                            <label class="mt-1 ml-1" for="is-trial">
+                                <h4>&nbsp;Accept Trial?</h4>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2 trial-days @(plan.IsTrial == 1 ? "" : "d-none")">
+                        <label class="col-lg-12">Trial Days</label>
+                        <div class="col-lg-12">
+                            <input type="number" name="TrialDays" value="@plan.TrialDays" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-sm-12 d-flex">
+                            <label class="custom-toggle custom-toggle-primary">
+                                <input type="checkbox" name="Status" id="status" value="1" @(plan.Status == 1 ? "checked" : "")>
+                                <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                            </label>
+                            <label class="mt-1 ml-1" for="status">
+                                <h4>&nbsp;Activate This Plan?</h4>
+                            </label>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group row mt-3">
+                        <div class="col-lg-12">
+                            <button type="submit" class="btn btn-neutral submit-button btn-sm float-left">Update</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

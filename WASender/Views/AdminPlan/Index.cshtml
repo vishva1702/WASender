@@ -1,0 +1,112 @@
+﻿@using Newtonsoft.Json.Linq
+
+@{
+    var plans = ViewBag.Plans as List<Plan>;
+
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Title"] = "Plans";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Create A Plan", url = Url.Action("Create", "AdminPlan"), is_button = false, components = "" }
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row">
+    @if (plans != null && plans.Count > 0)
+    {
+        @foreach (var plan in plans)
+        {
+            <div class="col-md-6 col-lg-3 text-center">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="pricing-green">@plan.Title</h2>
+                        <h1>@((Convert.ToDecimal(plan.Price)).ToString("C", System.Globalization.CultureInfo.CurrentCulture))</h1>
+                        @if (plan.Days == 30)
+                        {
+                            <span>Per month</span>
+                        }
+                        else
+                        {
+                            <span>Per year</span>
+                        }
+                        <br>
+                        <span class="text-muted">Active Users (@(plan.Orders?.Count ?? 0))</span>
+                        <hr>
+                        @if (!string.IsNullOrEmpty(plan.Data))
+                        {
+                            var jsonData = JObject.Parse(plan.Data);
+                            foreach (var item in jsonData)
+                            {
+                                <div class="mt-2 text-left">
+                                    @if (bool.TryParse(item.Value.ToString(), out bool result))
+                                    {
+                                        <i class="@(result ? "far text-success fa-check-circle" : "fas text-danger fa-times-circle")"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="far text-success fa-check-circle"></i>
+                                    }
+                                    @item.Key.Replace("_", " ")
+                                </div>
+                            }
+                        }
+                        <hr>
+                        <div class="mt-2">
+                            <div class="text-center">
+                                <a class="btn btn-sm btn-neutral text-left" href="@Url.Action("Edit", "AdminPlan", new { id = plan.Id })">
+                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                </a>
+
+                                <!-- Delete Button -->
+                                <a href="javascript:void(0);" class="delete-btn" data-id="@plan.Id">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert bg-gradient-primary text-white col-sm-12">
+            <span class="text-left">Oops, you have not created any plans....</span>
+        </div>
+    }
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(".delete-btn").click(function () {
+            var planId = $(this).data("id");
+
+            if (!confirm("Are you sure you want to delete this plan?")) {
+                return;
+            }
+
+            $.ajax({
+                url: "/AdminPlan/Delete/" + planId,
+                type: "POST",
+                headers: {
+                    "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (response) {
+                    alert(response.message);
+                    if (response.success) {
+                        location.reload(); // Refresh the page after deletion
+                    }
+                },
+                error: function () {
+                    alert("An error occurred while deleting.");
+                }
+            });
+        });
+    });
+</script>
+
