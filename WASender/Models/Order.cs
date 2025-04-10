@@ -21,7 +21,7 @@ public partial class Order
 
     public double? Tax { get; set; }
 
-    public int Status { get; set; }
+    public int? Status { get; set; } 
 
     public DateOnly? WillExpire { get; set; }
 

@@ -1,0 +1,389 @@
+﻿@model List<WASender.Models.Order>
+
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Orders</h3>
+    <div>
+        <button class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#createorder" id="create_order">
+            <i class="fi fi-rs-box-check mt-2"></i>&nbsp;&nbsp;Create Order
+        </button>
+
+        <!-- Create Order Modal -->
+        <div class="modal fade" id="createorder" tabindex="-1" aria-labelledby="createOrderLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createOrderLabel">Create Order</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="createOrderForm">
+                            <div class="form-group">
+                                <label for="userEmail">User Email</label>
+                                <input type="email" class="form-control" id="userEmail" name="UserEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="plan">Select Plan</label>
+                                <select class="form-control" id="plan" name="PlanId">
+                                    @foreach (var plan in ViewBag.Plans)
+                                    {
+                                        <option value="@plan.Id">@plan.Title</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="gateway">Select Gateway</label>
+                                <select class="form-control" id="gateway" name="GatewayId">
+                                    @foreach (var gateway in ViewBag.Gateways)
+                                    {
+                                        <option value="@gateway.Id">@gateway.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="paymentId">Payment ID</label>
+                                <input type="text" class="form-control" id="paymentId" name="PaymentId">
+                            </div>
+                            <div class="form-group">
+                                <label for="amount">Amount</label>
+                                <input type="number" class="form-control" id="amount" name="Amount">
+                            </div>
+                            <div class="form-group">
+                                <label for="tax">Tax</label>
+                                <input type="number" class="form-control" id="tax" name="Tax">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Script for AJAX Submission -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $("#createOrderForm").submit(function (e) {
+                    e.preventDefault();
+
+                    var formData = {
+                        UserEmail: $("#userEmail").val(),
+                        PlanId: parseInt($("#plan").val()), // Convert to integer
+                        GatewayId: parseInt($("#gateway").val()), // Convert to integer
+                        PaymentId: $("#paymentId").val(),
+                        Amount: parseFloat($("#amount").val()) || 0, // Convert to float, handle NaN
+                        Tax: parseFloat($("#tax").val()) || 0 // Convert to float, handle NaN
+                    };
+
+                    console.log("Sending Data:", formData); // Debugging
+
+                    $.ajax({
+                        url: '/Admin/AdminOrder/CreateOrder',
+                        type: 'POST',
+                        contentType: 'application/x-www-form-urlencoded',
+                        data: formData,
+                        success: function (response) {
+                            console.log("Server Response:", response);
+                            if (response.success) {
+                                alert('Order Created Successfully!');
+
+                                // Update Order Table Without Reload
+                                var newRow = `<tr>
+                                    <td>${response.orders[response.orders.length - 1].id}</td>
+                                    <td>${formData.UserEmail}</td>
+                                    <td>${$("#plan option:selected").text()}</td>
+                                    <td>${$("#gateway option:selected").text()}</td>
+                                    <td>${formData.PaymentId}</td>
+                                    <td>${formData.Amount}</td>
+                                    <td>${formData.Tax}</td>
+                                    <td>Pending</td>
+                                </tr>`;
+                                $("#orderTable tbody").append(newRow); // Append new row in table
+
+                                $("#createOrderForm")[0].reset(); // Clear Form
+                                $("#createorder").modal("hide"); // Hide Modal
+                            } else {
+                                alert('Error: ' + response.message);
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log("AJAX Error:", xhr.responseText);
+                            alert("An error occurred while creating the order.");
+                        }
+                    });
+                });
+            });
+
+        </script>
+
+        <button class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#invoiceSettingsModal" id="invoice_settings">
+            <i class="fi fi-rs-file-invoice-dollar"></i>&nbsp;&nbsp;Invoice Settings
+        </button>
+
+        <!-- Invoice Settings Modal -->
+        <div class="modal fade" id="invoiceSettingsModal" tabindex="-1" aria-labelledby="invoiceSettingsLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="invoiceSettingsLabel">Edit Invoice Information</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="invoiceSettingsForm">
+                            <div class="form-group">
+                                <label>Company Name</label>
+                                <input type="text" class="form-control" id="companyName" name="CompanyName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Company Address</label>
+                                <input type="text" class="form-control" id="companyAddress" name="CompanyAddress" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Company City</label>
+                                <input type="text" class="form-control" id="companyCity" name="CompanyCity" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Post Code</label>
+                                <input type="text" class="form-control" id="postCode" name="PostCode" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Country</label>
+                                <input type="text" class="form-control" id="country" name="Country" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                // Load existing invoice settings when modal opens
+                $("#invoice_settings").click(function () {
+                    $.ajax({
+                        url: '/Admin/Invoice/GetSettings',
+                        type: 'GET',
+                        success: function (data) {
+                            $("#companyName").val(data.CompanyName);
+                            $("#companyAddress").val(data.CompanyAddress);
+                            // Remove extra fields that are not in the User model
+                        },
+                        error: function () {
+                            alert("Failed to load invoice settings.");
+                        }
+                    });
+                });
+
+                // Handle form submission
+                $("#invoiceSettingsForm").submit(function (e) {
+                    e.preventDefault();
+                    var formData = {
+                        Name: $("#companyName").val(),  // Must match User model field
+                        Address: $("#companyAddress").val() // Must match User model field
+                    };
+
+                    $.ajax({
+                        url: '/Admin/Invoice/SaveSettings',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(formData),
+                        success: function (response) {
+                            alert("Invoice settings updated successfully!");
+                            $("#invoiceSettingsModal").modal('hide');
+                        },
+                        error: function () {
+                            alert("Failed to update settings.");
+                        }
+                    });
+                });
+            });
+        </script>
+
+        <button class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#currency" id="edit_currency">
+            <i class="fi fi-rs-money-check-edit"></i>&nbsp;&nbsp;Currency Settings
+        </button>
+        <button class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#tax" id="edit_tax">
+            <i class="fi fi-rs-bank"></i>&nbsp;&nbsp;Tax Settings
+        </button>
+    </div>
+</div>
+
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row d-flex justify-content-between flex-wrap">
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0" id="total-device">
+                                    @ViewBag.TotalOrders
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-boxes mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Total Orders</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0" id="total-active">
+                                    @ViewBag.TotalCompleteOrders
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-box-check mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Completed Orders</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0" id="total-inactive">
+                                    @ViewBag.TotalPendingOrders
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-calendar-clock mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Pending Orders</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0" id="total-inactive">
+                                    @ViewBag.TotalDeclinedOrders
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-calendar-clock mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Rejected Orders</h5>
+                    </div>
+                </div> 
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                <h3 class="mb-0">Orders</h3>
+                <form method="post" class="card-header-form">
+                    <div class="input-group">
+                        <input type="text" name="search" value="@ViewBag.SearchQuery" class="form-control" placeholder="Search...">
+                        <select class="form-control" name="type">
+                            <option value="email" selected="@(ViewBag.SearchType == "email" ? "selected" : null)">User Email</option>
+                            <option value="invoice_no" selected="@(ViewBag.SearchType == "invoice_no" ? "selected" : null)">Invoice No</option>
+                        </select>
+                        <div class="input-group-btn">
+                            <button class="btn btn-neutral btn-icon"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Order No</th>
+                            <th>Plan Name</th>
+                            <th>Payment Mode</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>User</th>
+                            <th>Created At</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var order in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <a href="@Url.Action("Show", "Order", new { id = order.Id })" class="text-dark">
+                                            @order.InvoiceNo
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a class="text-dark" href="@Url.Action("Edit", "Plan", new { id = order.PlanId })">
+                                            @(order.Plan?.Title ?? "N/A")
+                                        </a>
+                                    </td>
+                                    <td>@(order.Gateway?.Name ?? "N/A")</td>
+                                    <td class="text-center">@((order.Amount ?? 0).ToString("F2"))</td>
+                                    <td>
+                                        <span class="badge badge-@(order.Status == 2 ? "warning" : (order.Status == 1 ? "success" : "danger"))">
+                                            @(order.Status == 2 ? "Pending" : (order.Status == 1 ? "Approved" : "Declined"))
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("Show", "Customer", new { id = order.UserId })" class="text-dark">
+                                            @(order.User?.Name ?? "N/A")
+                                        </a>
+                                    </td>
+                                    <td class="text-center">@order.CreatedAt?.ToString("dd MMM yy") ?? "N/A"</td>
+                                    <td>
+                                        <a href="@Url.Action("Show", "Order", new { id = order.Id })" class="btn btn-neutral btn-sm">View</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    <div class="alert bg-gradient-primary text-white">
+                                        <span class="text-left">!Oops no orders found</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer py-4">
+                <!-- Pagination placeholder -->
+            </div>
+        </div>
+    </div>
+</div>

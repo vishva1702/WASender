@@ -1,0 +1,159 @@
+﻿@{
+    ViewData["Title"] = "Edit About Page";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    var about = ViewData["about"] as string;
+    var counterSection = ViewData["counter_section"] as string;
+    var languages = ViewData["languages"] as string;
+
+    var aboutOptions = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(about ?? "{}");
+    var counterOptions = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(counterSection ?? "{}");
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4>About Us</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <ul class="nav nav-pills flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#aboutSection">About Us Section</a>
+                            </li>
+                            <li class="nav-item mt-2">
+                                <a class="nav-link" data-toggle="tab" href="#counterSection">Counter Area Section</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="tab-content">
+                            <!-- About Us Section -->
+                            <div class="tab-pane fade show active" id="aboutSection">
+                                @using (Html.BeginForm("Store", "AdminAbout", FormMethod.Post, new { enctype = "multipart/form-data", @class = "ajaxform" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="Type" value="about">
+                                    <input type="hidden" name="Lang" value="en">
+
+                                    <div class="form-group">
+                                        <label>Breadcrumb Title:</label>
+                                        <input type="text" name="about_breadcrumb_title" class="form-control"
+                                               value="@aboutOptions.GetValueOrDefault("about_breadcrumb_title")" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Section Title:</label>
+                                        <input type="text" name="about_section_title" class="form-control"
+                                               value="@aboutOptions.GetValueOrDefault("about_section_title")" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>About Image 1:</label>
+                                        <input type="file" name="about_image_1" class="form-control" accept="image/*">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>About Image 2:</label>
+                                        <input type="file" name="about_image_2" class="form-control" accept="image/*">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Experience:</label>
+                                        <input type="number" name="about_experience" class="form-control"
+                                               value="@aboutOptions.GetValueOrDefault("about_experience")">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Experience Title:</label>
+                                        <input type="text" name="about_experience_title" class="form-control"
+                                               value="@aboutOptions.GetValueOrDefault("about_experience_title")" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>About Description:</label>
+                                        <textarea name="about_description" class="form-control" required>@aboutOptions.GetValueOrDefault("about_description")</textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Section Button Name:</label>
+                                        <input type="text" name="about_button_title" class="form-control"
+                                               value="@aboutOptions.GetValueOrDefault("about_button_title")">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Section Button Link:</label>
+                                        <input type="text" name="about_button_link" class="form-control"
+                                               value="@aboutOptions.GetValueOrDefault("about_button_link")">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Introducing Video Link (YouTube):</label>
+                                        <input type="text" name="about_introducing_video" class="form-control"
+                                               value="@aboutOptions.GetValueOrDefault("about_introducing_video")" placeholder="https://www.youtube.com/watch?v=...">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Facilities:</label>
+                                        <textarea name="about_facilities" class="form-control" placeholder="example1, example2">@aboutOptions.GetValueOrDefault("about_facilities")</textarea>
+                                        <small>Use comma (,) for line break</small>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button class="btn btn-neutral submit-button" type="submit">Update</button>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Counter Section -->
+                            <div class="tab-pane fade" id="counterSection">
+                                @using (Html.BeginForm("Store", "AdminAbout", FormMethod.Post, new { @class = "ajaxform" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="Type" value="counter">
+                                    <input type="hidden" name="Lang" value="en">
+
+                                    <div class="form-group">
+                                        <label>Years of Experience:</label>
+                                        <input type="text" name="counter_experience" class="form-control"
+                                               value="@counterOptions.GetValueOrDefault("counter_experience")"
+                                               placeholder="12+" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Active Customers:</label>
+                                        <input type="text" name="counter_active_customers" class="form-control"
+                                               value="@counterOptions.GetValueOrDefault("counter_active_customers")"
+                                               placeholder="900+" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Positive Reviews:</label>
+                                        <input type="text" name="counter_positive_reviews" class="form-control"
+                                               value="@counterOptions.GetValueOrDefault("counter_positive_reviews")"
+                                               placeholder="200+" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Satisfied Clients:</label>
+                                        <input type="text" name="counter_satisfied_customers" class="form-control"
+                                               value="@counterOptions.GetValueOrDefault("counter_satisfied_customers")"
+                                               placeholder="600+" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button class="btn btn-neutral submit-button" type="submit">Update</button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

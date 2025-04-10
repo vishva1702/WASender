@@ -1,0 +1,219 @@
+﻿@{
+    ViewData["Title"] = "Page Settings";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    string GetJsonValue(string key)
+    {
+        if (ViewBag.PrimaryData is System.Text.Json.JsonElement jsonElement &&
+            jsonElement.TryGetProperty(key, out System.Text.Json.JsonElement val))
+        {
+            return val.GetString();
+        }
+        return "";
+    }
+
+    string GetJsonNestedValue(string parent, string child)
+    {
+        if (ViewBag.PrimaryData is System.Text.Json.JsonElement jsonElement &&
+            jsonElement.TryGetProperty(parent, out System.Text.Json.JsonElement parentProp) &&
+            parentProp.ValueKind == System.Text.Json.JsonValueKind.Object &&
+            parentProp.TryGetProperty(child, out System.Text.Json.JsonElement childProp))
+        {
+            return childProp.GetString();
+        }
+        return "";
+    }
+
+    string themePath = ViewBag.ThemePath ?? "";
+
+    string currentHash = Context.Request.QueryString.ToString();
+    string activeTabId = Context.Request.Path.ToString().Split('#').LastOrDefault()?.ToLower() ?? "";
+    Func<string, string> IsActiveTab = id => id == activeTabId || (string.IsNullOrEmpty(activeTabId) && id == "home4") ? "active show" : "";
+    Func<string, string> IsActiveLink = id => id == activeTabId || (string.IsNullOrEmpty(activeTabId) && id == "home4") ? "active" : "";
+
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row">
+    <div class="col-12 col-sm-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4>Page Settings</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-4">
+                        <ul class="nav nav-pills flex-column" id="myTab4" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#home4" role="tab">Primary Settings</a>
+                            </li>
+                            <li class="nav-item mt-2">
+                                <a class="nav-link" data-bs-toggle="tab" href="#header-footer" role="tab">Header Footer Settings</a>
+                            </li>
+                            <li class="nav-item mt-2">
+                                <a class="nav-link" data-bs-toggle="tab" href="#why-choose" role="tab">Why Choose Settings</a>
+                            </li>
+                            <li class="nav-item mt-2">
+                                <a class="nav-link" data-bs-toggle="tab" href="#home-page" role="tab">Home Page</a>
+                            </li>
+                            <li class="nav-item mt-2">
+                                <a class="nav-link" data-bs-toggle="tab" href="#contact-page" role="tab">Contact Page</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="col-12 col-sm-12 col-md-8">
+                        <div class="tab-content no-padding" id="myTab2Content">
+                            <div class="tab-pane fade show active" id="home4" role="tabpanel">
+                                <form asp-action="Update" asp-route-id="primary_data" method="post" enctype="multipart/form-data" class="ajaxform">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="_method" value="PUT" />
+
+                                    <div class="form-group">
+                                        <label>Site Logo - Deep Colour</label>
+                                        <input type="file" accept="image/*" name="logo" class="form-control" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Site Logo - Light Colour</label>
+                                        <input type="file" accept="image/*" name="footer_logo" class="form-control" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Favicon</label>
+                                        <input type="file" accept="image/*" name="favicon" class="form-control" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Theme</label>
+                                        <select class="form-control" name="theme_path">
+                                            <option value="frontend.index" selected="@(themePath == "frontend.index")">Theme 1</option>
+                                            <option value="frontend.index-1" selected="@(themePath == "frontend.index-1")">Theme 2</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Contact Email Address</label>
+                                        <input type="email" name="contact_email" class="form-control" value="@GetJsonValue("contact_email")" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Contact Phone</label>
+                                        <input type="number" name="contact_phone" class="form-control" value="@GetJsonValue("contact_phone")" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Office Location</label>
+                                        <input type="text" name="address" class="form-control" value="@GetJsonValue("address")" required />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Facebook Profile Link</label>
+                                        <input type="url" name="socials.facebook" class="form-control" value="@GetJsonNestedValue("socials", "facebook")" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>YouTube Profile Link</label>
+                                        <input type="url" name="socials.youtube" class="form-control" value="@GetJsonNestedValue("socials", "youtube")" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Twitter Profile Link</label>
+                                        <input type="url" name="socials.twitter" class="form-control" value="@GetJsonNestedValue("socials", "twitter")" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Instagram Profile Link</label>
+                                        <input type="url" name="socials.instagram" class="form-control" value="@GetJsonNestedValue("socials", "instagram")" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>LinkedIn Profile Link</label>
+                                        <input type="url" name="socials.linkedin" class="form-control" value="@GetJsonNestedValue("socials", "linkedin")" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button class="btn btn-neutral submit-button">Update</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Footer - Header Section -->
+                            <div class="tab-pane fade @IsActiveTab("header-footer")" id="header-footer" role="tabpanel">
+                                <form asp-action="Update" asp-route-id="header_footer" method="post" enctype="multipart/form-data" class="ajaxform">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="_method" value="PUT" />
+
+                                    <div class="form-row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Header announcement type</label>
+                                                <input type="text" name="header[announcement_type]" class="form-control" value="@GetJsonNestedValue("header", "announcement_type")" placeholder="Example: NOW HIRING">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Header announcement title</label>
+                                                <input type="text" name="header[announcement_title]" class="form-control" value="@GetJsonNestedValue("header", "announcement_title")" placeholder="Example: Are You A Driven And Motivated 1st Line IT Support Engineer?">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label>Header announcement link</label>
+                                                <input type="text" name="header[announcement_link]" class="form-control" value="@GetJsonNestedValue("header", "announcement_link")">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Footer title</label>
+                                        <input type="text" name="footer[title]" class="form-control" value="@GetJsonNestedValue("footer", "title")" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Footer Description</label>
+                                        <input type="text" name="footer[description]" class="form-control" value="@GetJsonNestedValue("footer", "description")" required>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Footer Button Left Image</label>
+                                                <input type="file" accept="image/*" name="footer_button_image" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Button Link</label>
+                                                <input type="url" name="footer[right_image_link]" class="form-control" value="@GetJsonNestedValue("footer", "right_image_link")" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Footer Button Right Image</label>
+                                                <input type="file" accept="image/*" name="footer_left_button_image" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label>Button Link</label>
+                                                <input type="url" name="footer[left_image_link]" class="form-control" value="@GetJsonNestedValue("footer", "left_image_link")" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button class="btn btn-neutral submit-button">Update</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="tab-pane fade @IsActiveTab("why-choose")" id="why-choose" role="tabpanel">
+                                Coming soon...
+                            </div>
+                            <div class="tab-pane fade @IsActiveTab("home-page")" id="home-page" role="tabpanel">
+                                Coming soon...
+                            </div>
+                            <div class="tab-pane fade @IsActiveTab("contact-page")" id="contact-page" role="tabpanel">
+                                Coming soon...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

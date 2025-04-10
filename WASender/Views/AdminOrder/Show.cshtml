@@ -1,0 +1,138 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+@{
+    var buttons = new List<object>
+    {
+        new { Name = "Orders", Url = Url.Action("Index", "Order") }
+    };
+}
+
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="invoice">
+                    <div class="invoice-print">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="invoice-title">
+                                    <span class="badge badge-@(Model.Order.Status == 2 ? "warning" : (Model.Order.Status == 1 ? "success" : "danger")) float-right">
+                                        @(Model.Order.Status == 2 ? "Pending" : (Model.Order.Status == 1 ? "Approved" : "Declined"))
+                                    </span>
+                                    <h2>Invoice</h2>
+                                    <div class="invoice-number">Order @Model.Order.InvoiceNo</div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <address>
+                                            <strong>Billed To:</strong><br>
+                                            Name: @Model.Order.User?.Name<br>
+                                            Address: @Model.Order.User?.Address<br>
+                                            Email: @Model.Order.User?.Email<br>
+                                            Phone: @Model.Order.User?.Phone
+                                        </address>
+                                    </div>
+                                    <div class="col-md-6 text-md-right">
+                                        <address>
+                                            <strong>Billed From:</strong><br>
+                                            @Model.InvoiceData.CompanyName<br>
+                                            @Model.InvoiceData.Address<br>
+                                            @Model.InvoiceData.City<br>
+                                            @Model.InvoiceData.PostCode<br>
+                                            @Model.InvoiceData.Country
+                                        </address>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <address>
+                                            <strong>Payment Method:</strong><br>
+                                            Name: @Model.Order.Gateway?.Name<br>
+                                            Pay Id: @Model.Order.PaymentId
+                                        </address>
+                                    </div>
+                                    <div class="col-md-6 text-md-right">
+                                        <address>
+                                            <strong>Order Date:</strong> @Model.Order.CreatedAt.ToString("MMMM dd yyyy")<br>
+                                            <strong>Expire Date:</strong> @Model.Order.WillExpire.ToString("MMMM dd yyyy")
+                                        </address>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover table-md">
+                                        <tbody>
+                                            <tr>
+                                                <td class="col-9">Subscription Plan Name</td>
+                                                <td class="col-3 text-right">Amount</td>
+                                            </tr>
+                                            <tr>
+                                                <td>- @Model.Order.Plan?.Title</td>
+                                                <td class="text-right">@Model.Order.Amount.ToString("C")</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-lg-8">
+                                        @if (Model.Order.Meta != null)
+                                        {
+                                            <div class="section-title">Payment Info:</div>
+                                            <br>
+                                            <p class="section-lead">@Model.Order.Meta.Comment</p>
+                                            <p class="section-lead"><a target="_blank" href="@Model.Order.Meta.Screenshot">Attachment</a></p>
+                                        }
+                                    </div>
+                                    <div class="col-lg-4 text-right">
+                                        <div class="invoice-detail-item">
+                                            <div class="invoice-detail-name">Subtotal: @Model.Order.Amount.ToString("C")</div>
+                                        </div>
+                                        <div class="invoice-detail-item">
+                                            <div class="invoice-detail-name">Tax: @Model.Order.Tax.ToString("C")</div>
+                                        </div>
+                                        <hr class="mt-2 mb-2">
+                                        <div class="invoice-detail-item">
+                                            <div class="invoice-detail-value invoice-detail-value-lg">Total: @(Model.Order.Amount + Model.Order.Tax).ToString("C")</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="text-md-right">
+                        <form method="post" asp-action="Update" asp-route-id="@Model.Order.Id">
+                            <div class="row">
+                                <div class="form-group col-sm-3">
+                                    <label class="float-left">Order Status</label>
+                                    <select class="form-control" name="Status">
+                                        <option value="1" selected="@(Model.Order.Status == 1 ? "selected" : null)">Approved</option>
+                                        <option value="2" selected="@(Model.Order.Status == 2 ? "selected" : null)">Pending</option>
+                                        <option value="0" selected="@(Model.Order.Status == 0 ? "selected" : null)">Rejected</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-3">
+                                    <label class="float-left">Assign This Plan?</label>
+                                    <select class="form-control" name="AssignOrder">
+                                        <option value="yes">Yes</option>
+                                        <option value="no" selected>No</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <br>
+                                    <button class="btn btn-neutral btn-icon icon-left mt-2 submit-btn" type="submit">Update</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

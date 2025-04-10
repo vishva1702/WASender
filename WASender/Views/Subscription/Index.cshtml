@@ -1,132 +1,73 @@
 ﻿@model List<WASender.Models.Plan>
 @using Microsoft.AspNetCore.Http
-@using System.Globalization
-@using System.Text.Json
+@using Newtonsoft.Json
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    Layout = "~/Views/Shared/_UserLayout.cshtml";
-
     ViewData["Title"] = "Subscription Plan";
-    var userPlanId = HttpContextAccessor.HttpContext?.User?.FindFirst("PlanId")?.Value;
-    int.TryParse(userPlanId, out int currentPlanId);
+    var userPlanId = User.Claims.FirstOrDefault(c => c.Type == "PlanId")?.Value;
 }
 
-<style>
-    .plan-card {
-        background: white;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        transition: 0.3s ease-in-out;
-        border: 1px solid #ddd;
-    }
+@if (TempData["saas_error"] != null)
+{
+    <div class="col-sm-12">
+        <div class="alert bg-gradient-danger text-white alert-dismissible fade show" role="alert">
+            <span class="alert-icon"><i class="fi fi-rs-info"></i></span>
+            <span class="alert-text"><strong>!Opps </strong> @TempData["saas_error"]</span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+    </div>
+}
 
-        .plan-card:hover {
-            transform: scale(1.02);
-        }
+<div class="row">
+    @foreach (var plan in Model)
+    {
+        <div class="col-sm-4 text-center">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="pricing-green">@plan.Title</h2>
+                    <h1>@plan.Price?.ToString("C")</h1>
+                    @(plan.Days == 30 ? "Per month" : "Per year")
+                    <hr>
 
-    .plan-title {
-        font-size: 20px; /* Match Screenshot */
-        font-weight: 600;
-        color: #333; /* Darker Text */
-        text-transform: uppercase;
-    }
-
-    .plan-price {
-        font-size: 22px; /* Bigger and Bolder */
-        font-weight: bold;
-        color: #0056b3; /* Dark Blue */
-    }
-
-    .plan-duration {
-        font-size: 14px;
-        color: #666;
-    }
-
-    .feature-list {
-        list-style: none;
-        padding-left: 0;
-    }
-
-        .feature-list li {
-            display: flex;
-            align-items: center;
-            font-size: 16px;
-            margin-bottom: 8px;
-            color: #333; /* Dark Gray */
-        }
-
-        .feature-list i {
-            margin-right: 8px;
-            font-size: 18px;
-        }
-
-        .feature-list .fa-check-circle {
-            color: #28a745; /* Green */
-        }
-
-        .feature-list .fa-times-circle {
-            color: #dc3545; /* Red */
-        }
-
-    .btn-subscribe {
-        display: block;
-        width: 100%;
-        padding: 12px;
-        border-radius: 10px;
-        font-size: 16px;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-    }
-
-    .btn-success {
-        background-color: #28a745;
-        border-color: #28a745;
-    }
-</style>
-
-
-<div class="container mt-4">
-    <nav class="breadcrumb">
-        <a class="breadcrumb-item text-primary" href="#"><i class="fa fa-home"></i> Subscription Plan</a>
-        <span class="breadcrumb-item active">User - Subscription</span>
-    </nav>
-
-    <div class="row justify-content-center">
-        @foreach (var plan in Model)
-        {
-            <div class="col-md-5 mx-2 mb-4">
-                <div class="plan-card text-center">
-                    <h4 class="plan-title">@plan.Title</h4>
-                    <h2 class="plan-price">@plan.Price?.ToString("C", CultureInfo.CurrentCulture)</h2>
-                    <p class="plan-duration">@(plan.Days == 30 ? "Per month" : "Per year")</p>
-                    <hr />
-                    <ul class="feature-list text-left">
-                        @if (!string.IsNullOrEmpty(plan.Data))
+                    @if (!string.IsNullOrEmpty(plan.Data))
+                    {
+                        var planData = JsonConvert.DeserializeObject<Dictionary<string, object>>(plan.Data);
+                        if (planData != null)
                         {
-                            var parsedData = JsonSerializer.Deserialize<Dictionary<string, string>>(plan.Data);
-                            @foreach (var entry in parsedData)
+                            foreach (var item in planData)
                             {
-                                <li class="d-flex align-items-center">
-                                    <i class="@(entry.Value.ToLower() == "true" ? "fa fa-check-circle text-success me-2" : "fa fa-times-circle text-danger me-2")"></i>
-                                    <span>@entry.Key.Replace("_", " ") <strong>@(entry.Value.ToLower() != "true" && entry.Value.ToLower() != "false" ? $"({entry.Value})" : "")</strong></span>
-                                </li>
+                                var key = item.Key;
+                                var data = item.Value;
+                                bool isBoolean = data is bool;
+                                bool value = isBoolean && (bool)data;
+                                string title = key.Replace("_", " ");
+
+                                <div class="mt-2 text-left">
+                                    @if (isBoolean)
+                                    {
+                                        <i class="@(value ? "far text-success fa-check-circle" : "fas text-danger fa-times-circle")"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="far text-success fa-check-circle"></i>
+                                    }
+                                    @title
+                                </div>
                             }
                         }
-                    </ul>
-                    <hr />
-                    <a class="btn btn-subscribe @(currentPlanId == (int)plan.Id ? "btn-success" : "btn-primary")" asp-action="Show" asp-route-id="@plan.Id">
-                        <i class="@(currentPlanId == (int)plan.Id ? "fa fa-check" : "fa fa-plus-circle")"></i>
-                        @(currentPlanId == (int)plan.Id ? "Activated" : "Subscribe")
+                    }
+
+                    <hr>
+
+                    <a class="btn btn-block btn-neutral" href="@Url.Action("Show", "Subscription", new { id = plan.Id })">
+                        <i class="@(userPlanId == plan.Id.ToString() ? "fa fa-check" : "fa fa-plus-circle")"></i>
+                        @(userPlanId == plan.Id.ToString() ? "Activated" : "Subscribe")
                     </a>
                 </div>
             </div>
-        }
-    </div>
+        </div>
+    }
 </div>

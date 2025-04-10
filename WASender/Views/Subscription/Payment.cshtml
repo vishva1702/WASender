@@ -1,0 +1,47 @@
+﻿@* @model WASender.Models.Plan
+
+@{
+    ViewBag.Title = "Payment";
+    var gateways = ViewBag.Gateways as List<YourNamespace.Models.Gateway>;
+    var tax = ViewBag.Tax;
+    var total = ViewBag.Total;
+}
+
+<h2>Payment for @Model.Name</h2>
+<p>Price: @Model.Price.ToString("C")</p>
+<p>Tax: @tax.ToString("C")</p>
+<p>Total: @total.ToString("C")</p>
+
+@if (gateways != null && gateways.Any())
+{
+        <form action="@Url.Action("Subscribe", "Subscription")" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="planId" value="@Model.Id" />
+            <div class="form-group">
+                <label for="gatewayId">Select Payment Gateway</label>
+                <select name="gatewayId" class="form-control">
+                @foreach (var gateway in gateways)
+                {
+                            <option value="@gateway.Id">@gateway.Name</option>
+                }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="text" name="phone" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label for="image">Upload Payment Proof</label>
+                <input type="file" name="image" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="comment">Comment</label>
+                <textarea name="comment" class="form-control"></textarea>
+            </div>
+            <button type="submit" class="btn btn-success">Pay Now</button>
+        </form>
+}
+else
+{
+        <p>No payment gateways available.</p>
+}
+ *@
