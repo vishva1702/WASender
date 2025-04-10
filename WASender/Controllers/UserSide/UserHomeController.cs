@@ -5,7 +5,7 @@ using WASender.Services;
 
 namespace WASender.Controllers.UserSide
 {
-    [Authorize(Roles = "user")] // 🔒 Ensures only logged-in users can access this controller
+    [Authorize(Roles = "user, User")] // 🔒 Ensures only logged-in users can access this controller
     [Route("UserHome")]
     public class UserHomeController : BaseController
     {

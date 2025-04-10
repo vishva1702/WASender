@@ -10,19 +10,19 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @currentPath.StartsWithSegments("/admin/order") ? " active" : "" )" asp-area="Admin" asp-controller="Order" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/order") ? "active" : "")" asp-area="Admin" asp-controller="Order" asp-action="Index">
             <i class="fi fi-rs-boxes"></i>
             <span class="nav-link-text">Orders</span>
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/admin/plan") ? "active" : "")" asp-area="Admin" asp-controller="Plan" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/plan") ? "active" : "")" asp-area="Admin" asp-controller="AdminPlan" asp-action="Index">
             <i class="fi fi-rs-light-switch"></i>
             <span class="nav-link-text">Subscriptions</span>
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/admin/customer") ? "active" : "")" asp-area="Admin" asp-controller="Customer" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/customer") ? "active" : "")" asp-area="Admin" asp-controller="AdminCustomer" asp-action="Index">
             <i class="fi fi-rs-users-alt"></i>
             <span class="nav-link-text">Customers</span>
         </a>
@@ -34,7 +34,7 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @currentPath.StartsWithSegments("/admin/cron-job") ? " active" : "" )" asp-area="Admin" asp-controller="CronJob" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/cron-job") ? "active" : "")" asp-area="Admin" asp-controller="CronJob" asp-action="Index">
             <i class="fi fi-rs-calendar-clock"></i>
             <span class="nav-link-text">Cron Jobs</span>
         </a>
@@ -71,7 +71,7 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/admin/template") ? "active" : "")" asp-area="Admin" asp-controller="Template" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/template") ? "active" : "")" asp-area="Admin" asp-controller="AdminTemplate" asp-action="Index">
             <i class="fi fi-rs-template-alt"></i>
             <span class="nav-link-text">Templates</span>
         </a>
@@ -82,6 +82,18 @@
             <span class="nav-link-text">Schedules</span>
         </a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/message-transactions") ? "active" : "")" asp-area="Admin" asp-controller="Schedules" asp-action="Index">
+            <i class="ni ni-calendar-grid-58"></i>
+            <span class="nav-link-text">Messages</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/notification") ? "active" : "")" asp-area="Admin" asp-controller="notification" asp-action="Index">
+            <i class="ni ni-calendar-grid-58"></i>
+            <span class="nav-link-text">Notifications</span>
+        </a>
+    </li>
 </ul>
 
 <!-- Heading -->
@@ -90,15 +102,82 @@
 <!-- Navigation -->
 <ul class="navbar-nav">
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/admin/blog") ? "active" : "")" asp-area="Admin" asp-controller="Blog" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/blog") || currentPath.StartsWithSegments("/admin/category") || currentPath.StartsWithSegments("/admin/tag") ? "active" : "")" data-toggle="collapse" href="#navbar-forms" role="button" aria-expanded="false" aria-controls="navbar-forms">
             <i class="fi fi-rs-blog-text"></i>
             <span class="nav-link-text">Blogs</span>
         </a>
+        <div class="collapse" id="navbar-forms">
+            <ul class="nav nav-sm flex-column">
+                <li class="nav-item">
+                    <a asp-area="Admin" asp-controller="Blog" asp-action="Index" class="nav-link">Blogs</a>
+                </li>
+                <li class="nav-item">
+                    <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="nav-link">Category</a>
+                </li>
+                <li class="nav-item">
+                    <a asp-area="Admin" asp-controller="Tag" asp-action="Index" class="nav-link">Tags</a>
+                </li>
+            </ul>
+        </div>
     </li>
     <li class="nav-item">
         <a class="nav-link @(currentPath.StartsWithSegments("/admin/faq") ? "active" : "")" asp-area="Admin" asp-controller="Faq" asp-action="Index">
             <i class="fi fi-rs-comments-question-check"></i>
             <span class="nav-link-text">FAQ</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/features") ? "active" : "")" asp-area="Admin" asp-controller="Features" asp-action="Index">
+            <i class="fi fi-rs-dice-alt"></i>
+            <span class="nav-link-text">Features</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/testimonials") ? "active" : "")" asp-area="Admin" asp-controller="Testimonial" asp-action="Index">
+            <i class="fi fi-rs-comment-quote"></i>
+            <span class="nav-link-text">Testimonials</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/team") ? "active" : "")" asp-area="Admin" asp-controller="AdminTeam" asp-action="Index">
+            <i class="fi fi-rs-users-alt"></i>
+            <span class="nav-link-text">Team</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/about") ? "active" : "")" asp-area="Admin" asp-controller="About" asp-action="Index">
+            <i class="fi fi-rs-comment-question"></i>
+            <span class="nav-link-text">About Us</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/partner") ? "active" : "")" asp-area="Admin" asp-controller="Partner" asp-action="Index">
+            <i class="fi fi-rs-animated-icon"></i>
+            <span class="nav-link-text">Partners</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/language") ? "active" : "")" asp-area="Admin" asp-controller="Language" asp-action="Index">
+            <i class="fi fi-rs-globe"></i>
+            <span class="nav-link-text">Language</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/menu") ? "active" : "")" asp-area="Admin" asp-controller="AdminMenu" asp-action="Index">
+            <i class="fi fi-rs-chart-tree"></i>
+            <span class="nav-link-text">Menu</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/page") ? "active" : "")" asp-area="Admin" asp-controller="Page" asp-action="Index">
+            <i class="fi fi-rs-desktop-wallpaper"></i>
+            <span class="nav-link-text">Custom Pages</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/seo") ? "active" : "")" asp-area="Admin" asp-controller="Seo" asp-action="Index">
+            <i class="fi fi-rs-chart-line-up"></i>
+            <span class="nav-link-text">SEO Settings</span>
         </a>
     </li>
 </ul>
@@ -112,6 +191,49 @@
             <span class="nav-link-text">Page Settings</span>
         </a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/developer-settings") ? "active" : "")"
+           href="#dev-settings"
+           data-toggle="collapse"
+           role="button"
+           aria-expanded="false"
+           aria-controls="navbar-forms">
+            <i class="fi fi-rs-settings"></i>
+            <span class="nav-link-text">Developer Settings</span>
+        </a>
+        <div class="collapse" id="dev-settings">
+            <ul class="nav nav-sm flex-column">
+
+                <li class="nav-item">
+                    <a href="@Url.Action("Show", "DeveloperSettings", new { id = "app-settings" })" class="nav-link">
+                        App Settings
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item">
+                    <a href="@Url.Action("Show", "DeveloperSettings", new { id = "mail-settings" })" class="nav-link">
+                        SMTP Settings
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="@Url.Action("Show", "DeveloperSettings", new { id = "wa-settings" })" class="nav-link">
+                        Whatsapp Server
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="@Url.Action("Show", "DeveloperSettings", new { id = "storage-settings" })" class="nav-link">
+                        Storage Settings
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </li>
+
 </ul>
 
 <!-- My Settings -->
@@ -124,9 +246,13 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link logout-button" href="#">
+        <a class="nav-link logout-button" href="#" onclick="document.getElementById('logout-form').submit();">
             <i class="ni ni-button-power"></i>
             <span class="nav-link-text">Logout</span>
         </a>
     </li>
 </ul>
+
+<form id="logout-form" method="post" asp-area="Admin" asp-controller="Account" asp-action="Logout">
+    @Html.AntiForgeryToken()
+</form>

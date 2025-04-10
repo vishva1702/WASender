@@ -1,13 +1,178 @@
 ﻿@{
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
+@await Html.PartialAsync("_HeaderSection")
 
 @section Styles {
     <link rel="stylesheet" href="custom-style.css">
 }
 
-<h1>Welcome to the Dashboard</h1>
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Total Devices</h5>
+                        <img src="~/uploads/loader.gif" class="loader" />
+                        <span class="h2 font-weight-bold mb-0 data-text" style="display: none;">@ViewData["TotalDevices"]</span>
+                    </div>
 
-@section Scripts {
-    <script src="custom-script.js"></script>
-}
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="fas fa-server"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Messages -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Total Messages</h5>
+                        <img src="~/uploads/loader.gif" class="loader" />
+                        <span class="h2 font-weight-bold mb-0 data-text" style="display: none;">@ViewData["TotalMessages"]</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="ni ni-spaceship"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Schedules -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Pending Schedules</h5>
+                        <img src="~/uploads/loader.gif" class="loader" />
+                        <span class="h2 font-weight-bold mb-0 data-text" style="display: none;">@ViewData["PendingSchedules"]</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="ni ni-calendar-grid-58"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Contacts -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Total Contacts</h5>
+                        <img src="~/uploads/loader.gif" class="loader" />
+                        <span class="h2 font-weight-bold mb-0 data-text" style="display: none;">@ViewData["TotalContacts"]</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="ni ni-collection"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert bg-gradient-success text-white alert-dismissible fade show success-alert" role="alert">
+            <span class="alert-icon">
+                <img src="~/uploads/firework.png" alt="" />
+            </span>
+            <span class="alert-text">
+                <strong>Congratulations </strong> @TempData["Success"]
+            </span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+    }
+
+    @if (TempData["SaasError"] != null)
+    {
+        <div class="alert bg-gradient-primary text-white alert-dismissible fade show" role="alert">
+            <a href="@Url.Action("Subscription", "User")">
+                <span class="alert-icon"><i class="fi fi-rs-info text-white"></i></span>
+            </a>
+            <span class="alert-text">
+                <strong>!Oops </strong>
+                <a class="text-white" href="@Url.Action("Subscription", "User")">
+                    @TempData["SaasError"]
+                </a>
+            </span>
+        </div>
+    }
+
+    <!-- Charts -->
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-header bg-transparent">
+                    <h4 class="card-header-title">Messages Transaction</h4>
+                    <div class="card-header-action">
+                        <select class="form-control" id="period">
+                            <option value="7">Last 7 Days</option>
+                            <option value="1">Today</option>
+                            <option value="30">Last 30 Days</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="chart-sales" class="chart-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="h3 mb-0 card-header-title">Automatic Replies</h4>
+                    <div class="card-header-action">
+                        <select class="form-control" id="automaticReply">
+                            <option value="7">Last 7 Days</option>
+                            <option value="1">Today</option>
+                            <option value="30">Last 30 Days</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="chart-bars" class="chart-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="static-data" value="@Url.Action("StaticData", "Dashboard")">
+    <input type="hidden" id="base_url" value="@Url.Content("~/")">
+
+    @section Scripts {
+        <script src="custom-script.js"></script>
+        <script src="~/assets/vendor/chart.js/dist/chart.min.js"></script>
+        <script src="~/assets/plugins/canvas-confetti/confetti.browser.min.js"></script>
+        <script src="~/assets/js/pages/user/dashboard.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                setTimeout(function () {
+                    document.querySelectorAll('.loader').forEach(loader => loader.style.display = 'none');
+                    document.querySelectorAll('.data-text').forEach(data => data.style.display = 'inline');
+                }, 2000); // 2 seconds delay
+            });
+        </script>
+
+    }

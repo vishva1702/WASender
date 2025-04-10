@@ -1,0 +1,205 @@
+﻿@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Title"] = "Templates";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "+ Template", url = Url.Action("Index", "AdminTemplate"), is_button = false, components = "" }
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row d-flex justify-content-between flex-wrap">
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0" id="total-device">
+                                    @ViewBag.TotalTemplates
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-layers mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Total Templates</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0" id="total-active">
+                                    @ViewBag.TotalActiveTemplates
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-template mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Active Templates</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0" id="total-inactive">
+                                    @ViewBag.TotalInactiveTemplates
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-sensor-alert mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Inactive Templates</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Form -->
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                <h3 class="mb-0">Templates</h3>
+                <form class="card-header-form">
+                    @Html.AntiForgeryToken()
+                    <div class="input-group">
+                        <input type="text" name="search" value="@Context.Request.Query["search"]" class="form-control" placeholder="Search...">
+                        <select class="form-control" name="type">
+                            <option value="email">User Email</option>
+                            <option value="title">Template Name</option>
+                            <option value="uuid">Template Id</option>
+                            <option value="type">Template Type</option>
+                        </select>
+                        <div class="input-group-btn">
+                            <button class="btn btn-neutral btn-icon"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>User</th>
+                            <th>Type</th>
+                            <th>Transactions</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var template in Model)
+                        {
+                            <tr>
+                                <td>@template.Title</td>
+                                <td>@template.UserName</td>
+                                <td>@template.Type</td>
+                                <td>@template.SmsTransactionCount</td>
+                                <td>
+                                    <span class="badge badge-@(template.Status == 1 ? "success" : "danger")">
+                                        @(template.Status == 1 ? "Active" : "Inactive")
+                                    </span>
+                                </td>
+                                <td>@template.CreatedAt?.ToString("dd-MMM-yyyy")</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <a class="btn btn-sm btn-icon-onlyb text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                            <a class="dropdown-item delete-confirm" href="#"
+                                               data-id="@template.Id">
+                                                Remove
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                @if (!(Model as IEnumerable<WASender.Models.Template>)?.Any() ?? true)
+                {
+                    <div class="text-center mt-2">
+                        <div class="alert bg-gradient-primary text-white">
+                            <span class="text-left">!Oops, no records found</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".delete-confirm").forEach(button => {
+                button.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const templateId = this.getAttribute("data-id");
+
+                    console.log("Attempting to delete template ID:", templateId); // Debugging
+
+                    // Get the anti-forgery token
+                    const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+                    if (!tokenElement) {
+                        console.error("CSRF Token not found.");
+                        return;
+                    }
+                    const token = tokenElement.value;
+
+                    fetch('@Url.Action("Delete", "AdminTemplate")', {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "RequestVerificationToken": token
+                        },
+                        body: JSON.stringify({ id: templateId })
+                    })
+                    .then(response => {
+                        console.log("Delete response status:", response.status); // Debugging
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Delete response data:", data); // Debugging
+
+                        if (data.success) {
+                            console.log("Template deleted successfully.");
+                            location.reload(); // Reload page to reflect changes
+                        } else {
+                            console.error("Error deleting template:", data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Fetch error:", error);
+                    });
+                });
+            });
+        });
+    </script>
+}

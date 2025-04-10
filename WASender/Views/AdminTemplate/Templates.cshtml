@@ -1,0 +1,167 @@
+﻿@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Title"] = "Templates";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "+ Template", url = Url.Action("Index", "AdminTemplate"), is_button = false, components = "" }
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row d-flex justify-content-between flex-wrap">
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers" id="total-device">
+                                    @ViewBag.TotalTemplates
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-layers mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Total Templates</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers" id="total-active">
+                                    @ViewBag.TotalActiveTemplates
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-template mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Active Templates</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 completed-transfers" id="total-inactive">
+                                    @ViewBag.TotalInactiveTemplates
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-sensor-alert mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Inactive Templates</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Form -->
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                <h3 class="mb-0">Templates</h3>
+                <form method="get">
+                    <div class="input-group">
+                        <input type="text" name="search" value="@ViewBag.SearchQuery" class="form-control" placeholder="Search......">
+                        <select class="form-control" name="type">
+                            <option value="email" selected="@(ViewBag.SearchType == "email" ? "selected" : null)">User Email</option>
+                            <option value="title" selected="@(ViewBag.SearchType == "title" ? "selected" : null)">Template Name</option>
+                            <option value="uuid" selected="@(ViewBag.SearchType == "uuid" ? "selected" : null)">Template Id</option>
+                            <option value="type" selected="@(ViewBag.SearchType == "type" ? "selected" : null)">Template Type</option>
+                        </select>
+                        <div class="input-group-btn">
+                            <button class="btn btn-neutral btn-icon"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col-2">Name</th>
+                            <th class="col-4">User</th>
+                            <th class="col-2">Type</th>
+                            <th class="col-1">Transactions</th>
+                            <th class="col-1">Status</th>
+                            <th class="col-1 text-left">Created At</th>
+                            <th class="col-1 text-left">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Count > 0)
+                        {
+                            @foreach (var template in Model)
+                            {
+                                <tr>
+                                    <td class="text-left">@template.Title</td>
+                                    <td>
+                                        <a class="text-dark" asp-controller="AdminCustomer" asp-action="Show" asp-route-id="@template.UserId">
+                                            @template.UserName
+                                        </a>
+                                    </td>
+                                    <td>@template.Type</td>
+                                    <td class="text-center">@template.SmsTransactionCount</td>
+                                    <td>
+                                        <span class="badge badge-@(template.Status == 1 ? "success" : "danger")">
+                                            @(template.Status == 1 ? "Active" : "Inactive")
+                                        </span>
+                                    </td>
+                                    <td class="text-center">@template.CreatedAt.ToString("dd-MMMM-yyyy")</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                <a class="dropdown-item delete-confirm" href="#" data-action="@Url.Action("Delete", "AdminTemplate", new { id = template.Id })">
+                                                    Remove
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    <div class="alert bg-gradient-primary text-white">
+                                        <span class="text-left">!Opps no records found</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="card-footer py-4">
+                @* Implement Pagination Here *@
+            </div>
+        </div>
+    </div>
+</div>

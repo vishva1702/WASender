@@ -46,7 +46,7 @@
     </li>
 
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/user/template") ? "active" : "")" asp-controller="UserTemplate" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/user/UserTemplate") ? "active" : "")" asp-controller="UserTemplate" asp-action="Index">
             <i class="fi fi-rs-template-alt"></i>
             <span class="nav-link-text">My Templates</span>
         </a>
@@ -123,6 +123,6 @@
     </li>
 </ul>
 
-<form id="logout-form" method="post" asp-controller="Account" asp-action="Logout">
+<form id="logout-form" method="post" asp-controller="Login" asp-action="Logout">
     @Html.AntiForgeryToken()
 </form>

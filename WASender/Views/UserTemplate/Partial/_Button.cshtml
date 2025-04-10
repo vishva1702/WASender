@@ -1,0 +1,102 @@
+﻿@model WASender.Models.Template
+@using Newtonsoft.Json
+
+@{
+    Layout = null; // Remove this if using a shared layout
+
+    // Parse the Body JSON
+    dynamic body = string.IsNullOrEmpty(Model.Body) ? new { text = "", footer = "", buttons = new List<dynamic>() } : JsonConvert.DeserializeObject<dynamic>(Model.Body);
+
+    // Extract values
+    string templateName = Model.Title ?? "";
+    string message = body?.text ?? "";
+    string footerText = body?.footer ?? "";
+    var buttons = body?.buttons ?? new List<dynamic>();
+}
+
+<form method="post" asp-action="Update" asp-route-id="@Model.Id" class="ajaxform">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="_method" value="PUT" />
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Template Name:</label>
+                <input type="text" name="template_name" required class="form-control" value="@templateName">
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Message Caption</label>
+                <textarea class="form-control h-200" name="message" required maxlength="1000">@message</textarea>
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Footer Text</label>
+                <input type="text" class="form-control" name="footer_text" required autofocus maxlength="100" value="@footerText" />
+            </div>
+        </div>
+
+        <div class="col-sm-12" id="list-button-appendarea">
+            @for (var i = 0; i < buttons.Count; i++)
+            {
+                var buttonText = buttons[i].buttonText.displayText ?? "";
+
+                if (i == 0)
+                {
+                    <div class="form-group plain_button_message_text">
+                        <div class="row">
+                            <div class="col-6">
+                                <label>Button 1 Text</label>
+                            </div>
+                            <div class="col-6">
+                                <a href="javascript:void(0)" id="add-more" class="btn btn-sm btn-primary btn-neutral float-right mb-1 @(buttons.Count == 3 ? "none" : "")">
+                                    <i class="fa fa-plus"></i>&nbsp;Add More
+                                </a>
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" name="buttons[]" required autofocus maxlength="50" value="@buttonText" />
+                    </div>
+                }
+                else
+                {
+                    <div class="plain_button_message_text exist_button@(i + 1)">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label>Button @(i + 1) Text</label>
+                                </div>
+                                <div class="col-6">
+                                    <a href="javascript:void(0)" data-target=".exist_button@(i + 1)" class="btn btn-sm btn-danger float-right mb-1 remove-button">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <input type="text" class="form-control" name="buttons[]" required autofocus maxlength="50" value="@buttonText">
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-sm-8 d-flex">
+                    <label class="custom-toggle custom-toggle-primary">
+                        <input type="checkbox" @(Model.Status == 1 ? "checked" : "") name="status" id="template-status">
+                        <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                    </label>
+                    <label class="mt-1 ml-1" for="template-status">
+                        <h4>Make it active template?</h4>
+                    </label>
+                </div>
+                <div class="col-sm-4">
+                    <button type="submit" class="btn btn-outline-primary submit-button float-right">Save Template</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

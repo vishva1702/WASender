@@ -12,7 +12,7 @@ public partial class Template
     public ulong? UserId { get; set; }
 
     public string? Title { get; set; }
-
+        
     public string? Body { get; set; }
 
     public string? Type { get; set; }

@@ -5,12 +5,16 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WASender.Controllers.AdminSide
 {
+    [Authorize(Roles = "admin,Admin")]
+
     public class AdminHomeController : Controller
     {
         private readonly ApplicationDbContext _context;
+
 
         // 🟢 Constructor Injection
         public AdminHomeController(ApplicationDbContext context)

@@ -1,0 +1,74 @@
+﻿@model Template
+@using System.Text.Json
+@using System.Collections.Generic
+
+@{
+    Dictionary<string, object>? bodyDict = null;
+    Dictionary<string, string>? locationDict = null;
+
+    try
+    {
+        // Deserialize Model.Body if it's not null or empty
+        if (!string.IsNullOrEmpty(Model.Body))
+        {
+            bodyDict = JsonSerializer.Deserialize<Dictionary<string, object>>(Model.Body);
+
+            if (bodyDict != null && bodyDict.ContainsKey("location") && bodyDict["location"] is JsonElement jsonElement)
+            {
+                // Convert JsonElement to a dictionary
+                locationDict = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonElement.GetRawText());
+            }
+        }
+    }
+    catch
+    {
+        bodyDict = new Dictionary<string, object>();
+        locationDict = new Dictionary<string, string>();
+    }
+
+    var latitude = locationDict != null && locationDict.ContainsKey("degreesLatitude") ? locationDict["degreesLatitude"] : "";
+    var longitude = locationDict != null && locationDict.ContainsKey("degreesLongitude") ? locationDict["degreesLongitude"] : "";
+}
+
+<form method="post" asp-action="Update" asp-route-id="@Model.Id" class="ajaxform">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="_method" value="PUT" />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Template Name</label>
+                <input type="text" name="template_name" class="form-control" value="@Model.Title">
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label>Latitude</label>
+                <input type="number" step="any" name="degreesLatitude" required class="form-control"
+                       placeholder="Example: 24.121231" value="@latitude">
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label>Longitude</label>
+                <input type="number" step="any" name="degreesLongitude" required class="form-control"
+                       placeholder="Example: 55.1121221" value="@longitude">
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-sm-8 d-flex">
+                    <label class="custom-toggle custom-toggle-primary">
+                        <input type="checkbox" name="status" id="template-status" @(Model.Status == 1 ? "checked" : "")>
+                        <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                    </label>
+                    <label class="mt-1 ml-1" for="template-status">
+                        <h4>Make it active template?</h4>
+                    </label>
+                </div>
+                <div class="col-sm-4">
+                    <button type="submit" class="btn btn-outline-primary submit-button float-right">Save Template</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
