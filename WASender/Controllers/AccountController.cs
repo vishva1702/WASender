@@ -20,6 +20,7 @@ namespace WASender.Controllers
         [HttpGet]
         public IActionResult ForgotPassword()
         {
+
             return View();
         }
 
@@ -77,7 +78,7 @@ namespace WASender.Controllers
             if (success)
             {
                 TempData["SuccessMessage"] = "Password has been reset successfully!";
-                return RedirectToAction("Index", "Login"); // Redirect to the login page
+                return RedirectToAction("Index", "Login"); 
             }
             else
             {

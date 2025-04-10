@@ -48,7 +48,6 @@ namespace WASender.Controllers.UserSide
             {
                 if (type == "password")
                 {
-                    // Password update logic
                     string oldPassword = form["oldpassword"];
                     string newPassword = form["password"];
                     string confirmPassword = form["password_confirmation"];
@@ -72,7 +71,6 @@ namespace WASender.Controllers.UserSide
                 }
                 else
                 {
-                    // General settings update logic
                     user.Name = form["name"];
                     user.Email = form["email"];
                     user.Phone = form["phone"];
@@ -80,7 +78,6 @@ namespace WASender.Controllers.UserSide
 
                     if (avatar != null)
                     {
-                        // Avatar upload logic
                         string userFolder = Path.Combine("wwwroot/uploads", user.Id.ToString(), DateTime.Now.ToString("yy/MM"));
                         Directory.CreateDirectory(userFolder);
                         string fileName = $"{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}{Path.GetExtension(avatar.FileName)}";
@@ -110,22 +107,21 @@ namespace WASender.Controllers.UserSide
         [HttpGet]
         public async Task<IActionResult> AuthKey()
         {
-            //await LoadGlobalDataAsync();
-            var userId = User.FindFirstValue("UserId"); // Get UserId from claims
+            var userId = User.FindFirstValue("UserId"); 
 
             if (string.IsNullOrEmpty(userId))
             {
                 return RedirectToAction("Login", "Account");
             }
 
-            var user = await _dbContext.Users.FindAsync(Convert.ToUInt64(userId)); // Fix: Use UInt64
+            var user = await _dbContext.Users.FindAsync(Convert.ToUInt64(userId)); 
 
             if (user == null)
             {
                 return RedirectToAction("Login", "Account");
             }
 
-            return View("AuthKey", user); // Pass user model to the view correctly
+            return View("AuthKey", user); 
 
         }
 
@@ -133,21 +129,20 @@ namespace WASender.Controllers.UserSide
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegenerateAuthKey()
         {
-            var userId = User.FindFirstValue("UserId"); // Get UserId from claims
+            var userId = User.FindFirstValue("UserId"); 
 
             if (string.IsNullOrEmpty(userId))
             {
                 return Json(new { success = false, message = "User not authenticated." });
             }
 
-            var user = await _dbContext.Users.FindAsync(Convert.ToUInt64(userId)); // Fix: Use UInt64
+            var user = await _dbContext.Users.FindAsync(Convert.ToUInt64(userId)); 
 
             if (user == null)
             {
                 return Json(new { success = false, message = "User not found." });
             }
 
-            // Generate new AuthKey
             user.Authkey = Guid.NewGuid().ToString();
 
             _dbContext.Users.Update(user);

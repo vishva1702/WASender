@@ -5,57 +5,49 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using WASender.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WASender.Controllers.AdminSide
 {
-    public class AdminHomeController : Controller
+    [Authorize(Roles = "admin,Admin")]
+    public class AdminHomeController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
-        // 🟢 Constructor Injection
-        public AdminHomeController(ApplicationDbContext context)
+        public AdminHomeController(IGlobalDataService globalDataService, ILogger<AdminHomeController> logger, ApplicationDbContext context)
+            : base(globalDataService, logger)
         {
             _context = context;
         }
 
-        // 🟢 Index Method (Dashboard)
         public async Task<IActionResult> Index()
         {
-            
-            // ✅ Total Orders
+            await LoadGlobalDataAsync();
+
             ViewData["TotalOrders"] = await _context.Orders.CountAsync();
 
-            // ✅ Pending Orders
             ViewData["PendingOrders"] = await _context.Orders.CountAsync(o => o.Status == 2);
 
-            // ✅ Open Support Tickets
             ViewData["OpenSupport"] = await _context.Supports.CountAsync(s => s.Status == 1);
 
-            // ✅ Pending Support Tickets
             ViewData["PendingSupport"] = await _context.Supports.CountAsync(s => s.Status == 2);
 
-            // ✅ Active Users
             ViewData["ActiveUsers"] = await _context.Users.CountAsync(u =>
                 u.Status == 1 && u.WillExpire > DateOnly.FromDateTime(DateTime.UtcNow));
 
-            // ✅ Active Devices
             ViewData["ActiveDevices"] = await _context.Devices.CountAsync(d => d.Status == 1 && d.Phone != null);
 
-            // ✅ Junk Devices
             ViewData["JunkDevices"] = await _context.Devices.CountAsync(d => d.Status == 0 && d.Phone == null);
 
-            // ✅ Today's Messages
             ViewData["TodaysMessages"] = await _context.Smstransactions
                 .CountAsync(st => st.CreatedAt.HasValue && st.CreatedAt.Value.Date == DateTime.UtcNow.Date);
 
-            // ✅ New Users (Today)
             ViewData["TodaysUsers"] = await _context.Users
                 .CountAsync(u => u.CreatedAt.HasValue && u.CreatedAt.Value.Date == DateTime.UtcNow.Date);
 
-            // ✅ WA Server Status
-            ViewData["ServerStatus"] = "Running"; // Set based on actual API or logic
+            ViewData["ServerStatus"] = "Running"; 
 
-            // ✅ Recent Orders
             ViewData["RecentOrders"] = await _context.Orders
                 .Where(o => o.User != null && o.Plan != null)
                 .OrderByDescending(o => o.CreatedAt)
@@ -74,7 +66,7 @@ namespace WASender.Controllers.AdminSide
                 })
                 .ToListAsync();
 
-            // ✅ Popular Plans
+
             ViewData["PopularPlans"] = await _context.Plans
                 .Where(p => p.Orders.Any())
                 .OrderByDescending(p => p.Orders.Count)
@@ -90,7 +82,6 @@ namespace WASender.Controllers.AdminSide
             return View();
         }
 
-        // 🟢 Sales Overview Method (API Call)
         [HttpPost]
         public async Task<JsonResult> SalesOverview([FromBody] SalesOverview request)
         {
@@ -157,7 +148,6 @@ namespace WASender.Controllers.AdminSide
         }
     }
 
-    // 🟢 SalesOverview Request Model
     public class SalesOverview
     {
         public string Type { get; set; }

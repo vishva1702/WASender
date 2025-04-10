@@ -1,0 +1,63 @@
+﻿@model WASender.Models.Support
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Title"] = "Support";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Back", url = Url.Action("Index", "AdminSupport"), is_button = false, components = "" }
+    };
+}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <div class="row">
+                        <h3 class="mb-0 font-weight-bolder">Subject: @Model.Subject</h3>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="timeline timeline-one-side" data-timeline-content="axis" data-timeline-axis-style="dashed">
+                        @foreach (var reply in Model.Supportlogs ?? new List<Supportlog>())
+                        {
+                            <div class="timeline-block">
+                                <span class="timeline-step badge-primary">
+                                    <i class="@(reply.IsAdmin == 0 ? "fi fi-rs-paper-plane" : "fi fi-rs-headset")"></i>
+                                </span>
+                                <div class="timeline-content">
+                                    <small class="text-xs">
+                                        @(reply.CreatedAt != null ? reply.CreatedAt.Value.ToString("dd MMM, yyyy - hh:mm tt") : "N/A")
+
+                                    </small>
+                                    <h5 class="mt-3 mb-0">@reply.Comment</h5>
+                                    <br>
+                                    <b class="text-sm tt-5">@(reply.IsAdmin == 1 ? "You" : Model.User.Name)</b>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-body">
+                    <form method="post" asp-action="Update" asp-route-id="@Model.Id">
+                        <div class="form-group">
+                            <label>Reply</label>
+                            <textarea class="form-control h-200" required name="message" maxlength="1000"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Support Status</label>
+                            <select class="form-control" name="status">
+                                <option value="1" selected="@(Model.Status == 1 ? "selected" : null)">Open</option>
+                                <option value="2" selected="@(Model.Status == 2 ? "selected" : null)">Pending</option>
+                                <option value="0" selected="@(Model.Status == 0 ? "selected" : null)">Closed</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-neutral" type="submit">Reply</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

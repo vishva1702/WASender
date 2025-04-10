@@ -1,0 +1,328 @@
+﻿@{
+    ViewData["Title"] = "Menu List";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new {
+            name = "<i class='fa fa-plus'></i>&nbsp;Create Menu",
+            url = "#",
+            is_button = true,
+            components = "data-toggle='modal' data-target='#addRecord' id='add_record'"
+        }
+    };
+}
+@await Html.PartialAsync("_HeaderSection")
+
+
+<!-- Table Section -->
+<div class="row justify-content-center">
+    <div class="col-12">    
+        <div class="row d-flex justify-content-between flex-wrap">
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers" id="total-device">
+                                    @ViewBag.TotalMenus
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-chart-tree mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Total Menus</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers" id="total-active">
+                                    @ViewBag.TotalActiveMenus
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-badge-check mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Active Menus</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 completed-transfers" id="total-inactive">
+                                    @ViewBag.TotalDraftMenus
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-box mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Draft Menus</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Menu List Table -->
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                <h3 class="mb-0">Menu List</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Menu Name</th>
+                            <th>Position</th>
+                            <th class="text-center">Language</th>
+                            <th>Status</th>
+                            <th>Last Update</th>
+                            <th class="text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Count > 0)
+                        {
+                            @foreach (var menu in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-action="Details" asp-route-id="@menu.Id">@menu.Name</a>
+                                    </td>
+                                    <td>@menu.Position</td>
+                                    <td class="text-center">@menu.Lang</td>
+                                    <td>
+                                        <span class="badge @(menu.Status == "1" ? "badge-success" : "badge-danger")">
+                                            @(menu.Status == "1" ? "Active" : "Draft")
+                                        </span>
+                                    </td>
+                                    <td>@menu.UpdatedAt?.ToString("MMMM-dd-yyyy")</td>
+                                    <td class="text-right">
+                                        <!-- Edit Menu -->
+                                        <a asp-action="Show" asp-route-id="@menu.Id" class="btn btn-neutral btn-sm" data-toggle="tooltip" data-placement="top" title="Edit Menu">
+                                            <i class="fi fi-rs-diagram-project mt-3 pt-3"></i>
+                                        </a>
+
+                                        <!-- Customize Menu Items -->
+                                        <a href="javascript:void(0)"
+                                           class="btn btn-sm btn-primary"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="Customize Menu Items"
+                                           data-target="#editModal"
+                                           onclick="
+       document.getElementById('editForm').action = '@Url.Action("Update", "AdminMenu", new { id = menu.Id })';
+       document.getElementById('menuId').value = '@menu.Id';
+       document.getElementById('editForm').elements['Name'].value = '@menu.Name';
+       document.getElementById('editForm').elements['Position'].value = '@menu.Position';
+       document.getElementById('editForm').elements['Lang'].value = '@menu.Lang';
+       document.getElementById('editForm').elements['Status'].value = '@menu.Status';
+       document.getElementById('menuData').value = '@menu.Data';
+           ">
+                                            <i class="fi fi-rs-edit"></i>
+                                        </a>
+
+
+
+                                        <!-- Delete Menu -->
+                                        <a href="#"
+                                           class="delete-confirm btn btn-sm btn-danger"
+                                           data-action="@Url.Action("Destroy", "AdminMenu", new { id = menu.Id })"
+                                           data-toggle="tooltip" data-placement="top" title="Delete Menu">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">No menus found.</td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Create Menu -->
+<div class="modal fade" id="addRecord" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="@Url.Action("Store", "AdminMenu")">
+                <div class="modal-header">
+                    <h3>Create Menu</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Menu Name</label>
+                        <input type="text" name="Name" class="form-control" required placeholder="Example">
+                    </div>
+                    <div class="form-group">
+                        <label>Select Menu Position</label>
+                        <select class="form-control" name="Position">
+                            @foreach (var position in ViewBag.Positions)
+                            {
+                                <option value="@position">@position</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Language</label>
+                        <select class="form-control" name="Lang">
+                            @foreach (var language in ViewBag.Languages)
+                            {
+                                <option value="@language">@language</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select class="form-control" name="Status">
+                            <option value="1">Active</option>
+                            <option value="0">Draft</option>
+                        </select>
+                    </div>
+
+                    <!-- ✅ Hidden Input for Data Field -->
+                    <input type="hidden" name="Data" value="[]" />
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editForm" method="post" asp-action="Update">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Menu</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="menuId" name="Id">
+                    <input type="hidden" name="Data" id="menuData">
+
+
+                    <div class="form-group">
+                        <label>Menu Name</label>
+                        <input type="text" name="Name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Position</label>
+                        <select name="Position" class="form-control">
+                            @foreach (var pos in ViewBag.Positions)
+                            {
+                                <option value="@pos">@pos</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Language</label>
+                        <select name="Lang" class="form-control">
+                            @foreach (var lang in ViewBag.Languages)
+                            {
+                                <option value="@lang">@lang</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="Status" class="form-control">
+                            <option value="1">Active</option>
+                            <option value="0">Draft</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/assets/js/pages/admin/menu-list.js"></script>
+
+
+    <script src="@Url.Content("~/assets/vendor/select2/dist/js/select2.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/pages/user/contact.js")"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+                                      document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".delete-confirm").forEach(button => {
+                button.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    let deleteUrl = this.getAttribute("data-action");
+
+                    if (!deleteUrl) {
+                        Swal.fire("Error!", "Invalid delete URL.", "error");
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You want to delete this member?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(deleteUrl, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-Requested-With": "XMLHttpRequest"
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire("Deleted!", data.message, "success").then(() => location.reload());
+                                } else {
+                                    Swal.fire("Error!", data.message, "error");
+                                }
+                            })
+                            .catch(error => Swal.fire("Error!", "Failed to delete: " + error.message, "error"));
+                        }
+                    });
+                });
+            });
+        });
+
+    </script>
+}
