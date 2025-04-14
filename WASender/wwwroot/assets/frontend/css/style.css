@@ -2716,11 +2716,11 @@ input[type=color] {
 /*  04. hero CSS START
 /*----------------------------------------*/
 .tp-hero__bg {
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  padding-top: 190px;
-  padding-bottom: 30px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    padding-top: 190px;
+    padding-bottom: 30px;
 }
 .tp-hero__bg-2 {
   padding-top: 170px;

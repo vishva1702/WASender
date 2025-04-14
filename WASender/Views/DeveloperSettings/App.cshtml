@@ -1,32 +1,38 @@
 ﻿@{
     Layout = "~/Views/Shared/_UserLayout.cshtml";
-
     ViewData["Title"] = "App Settings";
-    var appName = Environment.GetEnvironmentVariable("APP_NAME");
-    var appDebug = Environment.GetEnvironmentVariable("APP_DEBUG");
-}
+    var id = ViewBag.Id; // Assuming you pass it from controller
+    var tzlist = ViewBag.TimezoneList as List<string>;
+    var appName = ViewBag.AppName as string;
+    var appDebug = ViewBag.AppDebug as string;
+    var timeZone = ViewBag.TimeZone as string;
+        var languages = ViewBag.Languages as List<string> ?? new List<string>();
 
-@* Include header partial *@
-@await Html.PartialAsync("~/Views/Shared/_HeaderSection.cshtml", new
-    {
-        title = "App Settings",
-        buttons = new[] {
-        new { name = "Back to dashboard", url = Url.Action("Dashboard", "Admin") }
-    }
-    })
+}
+@await Html.PartialAsync("_HeaderSection")
+<!-- Header Section -->
+<div class="d-flex justify-content-end align-items-center mb-4">
+    <a href="/AdminHome/Index" class="btn btn-outline-primary btn-sm btn-icon">
+         Back to dashboard
+    </a>
+</div>
 <div class="row">
+    <!-- Left Info -->
     <div class="col-lg-5 mt-5">
         <strong>Application Settings</strong>
         <p>Edit your application global settings</p>
     </div>
+
+    <!-- Form -->
     <div class="col-lg-7 mt-5">
-        <form asp-action="Update" asp-controller="DeveloperSettings" asp-route-id="@ViewBag.Id" method="post" class="ajaxform">
+        <form asp-action="Update" asp-controller="DeveloperSettings" asp-route-id="@id" method="post" class="ajaxform">
             @Html.AntiForgeryToken()
             <input type="hidden" name="_method" value="PUT" />
-
+            
             <div class="card">
                 <div class="card-body">
 
+                    <!-- App Name -->
                     <div class="form-group row">
                         <label class="col-lg-12">Application Name</label>
                         <div class="col-lg-12">
@@ -34,30 +40,56 @@
                         </div>
                     </div>
 
-                    <div class="form-group row mt-2">
+                    <!-- Debug Mode -->
+                    <div class="form-group row mt-3">
                         <label class="col-lg-12">Visibility Of Site Error</label>
                         <div class="col-lg-12">
                             <select class="form-control" name="app_debug">
-                                <option value="true" selected="@(appDebug == "true")">Enable</option>
-                                <option value="false" selected="@(appDebug == "false")">Disable</option>
+                                <option value="true" selected="@(appDebug == "true" ? "selected" : null)">Enable</option>
+                                <option value="false" selected="@(appDebug == "false" ? "selected" : null)">Disable</option>
+
                             </select>
                         </div>
                     </div>
 
-                    <div class="form-group row mt-2">
+                    <!-- Timezone -->
+                    <div class="form-group row mt-3">
                         <label class="col-lg-12">Application Time Zone</label>
                         <div class="col-lg-12">
-                            <input type="text" name="timezone" class="form-control" placeholder="e.g., UTC, Asia/Kolkata" />
+                          <select class="form-control" name="timezone">
+                             @if (tzlist != null)
+                             {
+                             foreach (var timezone in tzlist)
+                             {
+                                 var isSelected = timeZone == timezone ? "selected" : "";
+                                 @:<option value="@timezone" @isSelected>@timezone</option>
+                             }
+                             }
+                             else
+                             {
+                                  <option disabled>No timezones available</option>
+    }
+                            </select>
+
+
                         </div>
                     </div>
 
+                    <div class="form-group row mt-3">
+                        <label class="col-lg-12">Application Default Language</label>
+                        <div class="col-lg-12">
+                            <select class="form-control" name="language">
+                             @foreach (var language in languages)
+                                {
+                                  <option value="@language">@language</option>
+                                }
+                             </select>
+                        </div>
+                    </div>
+                    
+
                 </div>
             </div>
-
-            <div class="mt-3">
-                <button type="submit" class="btn btn-primary">Save Settings</button>
-            </div>
-
         </form>
     </div>
 </div>

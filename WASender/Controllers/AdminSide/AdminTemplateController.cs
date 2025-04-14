@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WASender.Models;
 using WASender.Helpers;
+using WASender.Contracts.AdminSide;
 
 namespace WASender.Controllers.Admin
 {
@@ -14,11 +12,14 @@ namespace WASender.Controllers.Admin
     {
         private readonly ApplicationDbContext _context;
         private readonly NotificationHelper _notificationHelper;
+        private readonly IAdminTemplateService _adminTemplateService;
 
-        public AdminTemplateController(ApplicationDbContext context, NotificationHelper notificationHelper)
+        public AdminTemplateController(IAdminTemplateService adminTemplateService,ApplicationDbContext context, NotificationHelper notificationHelper)
         {
             _context = context;
             _notificationHelper = notificationHelper;
+            _adminTemplateService = adminTemplateService;
+
         }
         public async Task<IActionResult> Index(string search, string type)
         {
@@ -47,70 +48,26 @@ namespace WASender.Controllers.Admin
             ViewBag.SearchType = type;
             ViewBag.SearchQuery = search;
 
-            return View("Templates", templates);
+            return View(templates);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(ulong id, Template template)
+        public async Task<IActionResult> Delete(ulong id)
         {
-            try
+            var template = await _context.Templates.FindAsync(id);
+            if (template == null)
             {
-                var templte = await _context.Templates
-                    .Include(t => t.Replies)
-                    .Include(t => t.Schedulemessages)
-                    .Include(t => t.Smstransactions)
-                    .FirstOrDefaultAsync(t => t.Id == id);
-
-                if (template == null)
-                {
-                    return Json(new { success = false, message = "Template not found." });
-                }
-
-                // Remove related records
-                _context.Replies.RemoveRange(template.Replies);
-                _context.Schedulemessages.RemoveRange(template.Schedulemessages);
-                _context.Smstransactions.RemoveRange(template.Smstransactions);
-
-                _context.Templates.Remove(template);
-                await _context.SaveChangesAsync();
-
-                // Add notification if user exists
-                if (template.UserId > 0)
-                {
-                    var notification = new Notification
-                    {
-                        UserId = (ulong)template.UserId,
-                        Title = "Your template was removed by admin",
-                        Url = "/user/template",
-                        Seen = 0,
-                        IsAdmin = 1,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-
-                    await _notificationHelper.CreateNotification(notification);
-                }
-
-                return Json(new
-                {
-                    success = true,
-                    message = "Template removed successfully.",
-                    redirect = Url.Action("Index", "AdminTemplate")
-                });
+                TempData["Error"] = "Template not found.";
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = $"Error deleting template: {ex.Message}"
-                });
-            }
+
+            _context.Templates.Remove(template);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Template deleted successfully!";
+            return RedirectToAction(nameof(Index));
         }
-        public class DeleteRequest
-        {
-            public ulong Id { get; set; }
-        }
+
+
     }
-    }
+}

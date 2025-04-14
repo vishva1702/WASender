@@ -1,40 +1,42 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using WASender.Services.AdminSide;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using WASender.Helpers;
-using WASender.Contracts.AdminSide;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WASender.Controllers.Admin
 {
-    [Authorize]
+    
     public class DeveloperSettingsController : Controller
     {
-        private readonly IEnvService _envService;
+        private readonly IConfiguration _configuration;
 
-        public DeveloperSettingsController(IEnvService envService)
+        public DeveloperSettingsController(IConfiguration configuration)
         {
-            _envService = envService;
+            _configuration = configuration;
         }
 
-        [HttpGet("/admin/developer-settings/{id}")]
+        // GET: Admin/DeveloperSettings/Show/id
         public IActionResult Show(string id)
         {
             switch (id)
             {
                 case "app-settings":
+                    var tzlist = TimeZoneInfo.GetSystemTimeZones().Select(tz => tz.Id).ToList();
+                    var languages = GetOption("languages"); // Use your existing method to get from DB
                     ViewBag.Id = id;
-                    ViewBag.TimeZones = TimeZoneInfo.GetSystemTimeZones();
-                    ViewBag.Languages = _envService.GetOption("languages");
+                    ViewBag.Tzlist = tzlist;
+                    ViewBag.Languages = languages;
                     return View("App");
 
                 case "mail-settings":
+                    var mailDriver = _configuration["MAIL_DRIVER_TYPE"] == "MAIL_DRIVER"
+                        ? _configuration["MAIL_DRIVER"]
+                        : _configuration["MAIL_MAILER"];
                     ViewBag.Id = id;
-                    ViewBag.MailDriver = _envService.GetMailDriver();
+                    ViewBag.MailDriver = mailDriver;
                     return View("Smtp");
 
                 case "storage-settings":
@@ -50,41 +52,61 @@ namespace WASender.Controllers.Admin
             }
         }
 
-        [HttpPost("/admin/developer-settings/{id}")]
-        public IActionResult Update(string id, IFormCollection request)
+        // POST: Admin/DeveloperSettings/Update/id
+        [HttpPost]
+        public IActionResult Update(string id, IFormCollection form)
         {
             switch (id)
             {
                 case "app-settings":
-                    _envService.EditEnv("APP_NAME", Slugify(request["name"]));
-                    _envService.EditEnv("APP_DEBUG", request["app_debug"] == "true" ? "true" : "false");
-                    _envService.EditEnv("TIME_ZONE", request["timezone"]);
-                    _envService.EditEnv("DEFAULT_LANG", request["default_lang"].FirstOrDefault() ?? "en");
+                    EditEnv("APP_NAME", Slugify(form["name"]));
+                    EditEnv("APP_DEBUG", form["app_debug"] == "true" ? "true" : "false");
+                    EditEnv("TIME_ZONE", form["timezone"]);
+                    EditEnv("DEFAULT_LANG", string.IsNullOrEmpty(form["default_lang"]) ? "en" : form["default_lang"]);
                     return Json(new { message = "Global Settings Updated..." });
 
-                case "mail-settings":
-                    // You can continue mapping like your Laravel method
-                    break;
-
-                case "storage-settings":
-                    // Add storage settings logic
-                    break;
-
                 case "wa-settings":
-                    // Add WhatsApp settings logic
-                    break;
+                    var waServerUrl = form["wa_server_url"].ToString().Replace(" ", "");
+                    EditEnv("WA_SERVER_URL", waServerUrl);
+                    EditEnv("WA_SERVER_HOST", form["host"]);
+                    EditEnv("WA_SERVER_PORT", form["port"]);
+                    // Add more fields as per your original code...
+                    return Json(new { message = "WhatsApp Settings Updated..." });
 
                 default:
                     return NotFound();
             }
-
-            return Json(new { message = "Settings Updated." });
         }
 
-        private string Slugify(string input)
+        // Helper method to update .env values
+        private void EditEnv(string key, string value)
         {
-            return input.ToLower().Replace(" ", "-");
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+            if (!System.IO.File.Exists(filePath)) return;
+
+            var lines = System.IO.File.ReadAllLines(filePath);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (lines[i].StartsWith(key + "="))
+                {
+                    lines[i] = $"{key}={value}";
+                    break;
+                }
+            }
+            System.IO.File.WriteAllLines(filePath, lines);
+        }
+
+        private string Slugify(string value)
+        {
+            return value?.ToLower().Replace(" ", "-");
+        }
+
+        private List<string> GetOption(string key)
+        {
+            // ✅ You have existing models — fetch from DB
+            // Example:
+            // return _dbContext.Options.Where(x => x.Key == key).Select(x => x.Value).ToList();
+            return new List<string> { "en", "fr", "de" }; // Mocked for now
         }
     }
-
 }

@@ -1,0 +1,183 @@
+﻿@{
+    bool scheduleMessageAvailable = ViewBag.ScheduleMessageAvailable ?? false;
+    var posts = ViewBag.Posts as List<dynamic>; // Use your actual model type if possible
+}
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Title"] = "Schedule Message";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "+ Create Schedule", url = Url.Action("Create", "UserSchedule"), is_button = false, components = "" }
+    };
+}
+@await Html.PartialAsync("_HeaderSection")
+<!-- Content Section -->
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row d-flex justify-content-between flex-wrap">
+
+            <!-- Total Schedules Card -->
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers">
+                                    @string.Format("{0:N0}", ViewBag.TotalSchedule ?? 0)
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="ni ni-calendar-grid-58"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-sm">
+                        </p><h5 class="card-title text-muted mb-0">Total Schedules</h5>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Schedules Card -->
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers">
+                                    @string.Format("{0:N0}", ViewBag.PendingSchedule ?? 0)
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-calendar-clock mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-sm">
+                        </p><h5 class="card-title text-muted mb-0">Total Pending Schedules</h5>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedules Executed Card -->
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 completed-transfers">
+                                    @string.Format("{0:N0}", ViewBag.DeliveredSchedule ?? 0)
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-rocket-lunch mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-sm">
+                        </p><h5 class="card-title text-muted mb-0">Schedules Executed</h5>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Failed Schedules Card -->
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers">
+                                    @string.Format("{0:N0}", ViewBag.FailedSchedule ?? 0)
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-calendar-xmark mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-sm">
+                        </p><h5 class="card-title text-muted mb-0"> Failed Schedules</h5>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+       </div>
+
+        <!-- Table Section -->
+        @if (!scheduleMessageAvailable)
+        {
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="alert bg-gradient-primary text-white alert-dismissible fade show" role="alert">
+                        <span class="alert-icon"><i class="fi fi-rs-info text-white"></i></span>
+                        <span class="alert-text">
+                            <strong>!Opps </strong>
+                            Schedule Message feature is not available in your subscription plan
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (posts != null && posts.Count > 0)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h3>Schedules</h3>
+                    <div class="row">
+                        <div class="col-sm-12 table-responsive">
+                            <table class="table col-12">
+                                <thead>
+                                    <tr>
+                                        <th class="col-3">Send From</th>
+                                        <th class="col-4">Title</th>
+                                        <th class="col-1">Message Type</th>
+                                        <th class="col-1">Status</th>
+                                        <th class="col-1">Delivery Date</th>
+                                        <th class="col-2">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var post in posts)
+                                    {
+                                        <tr>
+                                            <td>@(post.device?.phone ?? "")</td>
+                                            <td>@(post.title != null ? (post.title.Length > 90 ? post.title.Substring(0, 90) + "..." : post.title) : "")</td>
+                                            <td class="text-center">@(post.body != null ? "Plain Text" : "Template")</td>
+                                            <td>
+                                                <span class="badge @(post.statusClass)">
+                                                    @post.status
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @TimeZoneInfo.ConvertTimeFromUtc(post.schedule_at, TimeZoneInfo.FindSystemTimeZoneById(post.zone)).ToString("MMMM d, yyyy  h:mm tt")
+                                            </td>
+                                            <td>
+                                                <div class="btn-group mb-2">
+                                                    <button class="btn btn-neutral btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        Action
+                                                    </button>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="@Url.Action("Edit", "Schedule", new { id = post.id })">Edit</a>
+                                                        <a class="dropdown-item text-danger" href="@Url.Action("Delete", "Schedule", new { id = post.id })">Delete</a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text.RegularExpressions;
 
-
 namespace WASender.Helpers
 {
     public class DotenvService
@@ -14,6 +13,7 @@ namespace WASender.Helpers
             _envFilePath = Path.Combine(AppContext.BaseDirectory, ".env");
         }
 
+        // ✅ Public method to edit .env file
         public bool EditEnv(string key, string value, bool isBool = false)
         {
             if (!File.Exists(_envFilePath))
@@ -22,14 +22,15 @@ namespace WASender.Helpers
             }
 
             var envText = File.ReadAllText(_envFilePath);
-            var currentEnvValue = GetCurrentEnvValue(envText, key);
+            var currentEnvValue = GetEnv(key);
 
-            string newText;
+            string newText = envText;
 
             if (isBool)
             {
                 string boolKey = $"{key}={(currentEnvValue == "true" ? "true" : "false")}";
                 string boolValue = $"{key}={(value == "true" ? "true" : "false")}";
+
                 newText = envText.Contains(boolKey)
                     ? envText.Replace(boolKey, boolValue)
                     : $"{envText}\n{boolValue}";
@@ -47,20 +48,45 @@ namespace WASender.Helpers
                 }
             }
 
+            // ✅ Write back to file
             File.WriteAllText(_envFilePath, newText);
 
             return true;
         }
 
-        private string GetCurrentEnvValue(string envText, string key)
+        // ✅ Public method to get env value
+        public string GetEnv(string key)
         {
+            if (!File.Exists(_envFilePath))
+            {
+                return null;
+            }
+
+            var envText = File.ReadAllText(_envFilePath);
             var match = Regex.Match(envText, @$"^{Regex.Escape(key)}=(.*)$", RegexOptions.Multiline);
             return match.Success ? match.Groups[1].Value.Trim() : null;
         }
 
-        private string RemoveEmptySpace(string value)
+        // ✅ Utility to remove spaces
+        public string RemoveEmptySpace(string value)
         {
             return Regex.Replace(value ?? string.Empty, @"\s+", "");
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -67,14 +67,14 @@
     </li>
 
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/user/logs") ? "active" : "")" asp-controller="UserLogs" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/user/logs") ? "active" : "")" asp-controller="Log" asp-action="Index">
             <i class="ni ni-ui-04"></i>
             <span class="nav-link-text">Message Log</span>
         </a>
     </li>
 
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/user/webhooks") ? "active" : "")" asp-controller="UserWebhooks" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/user/webhooks") ? "active" : "")" asp-controller="Webhook" asp-action="Index">
             <i class="fi fi-rs-chart-connected"></i>
             <span class="nav-link-text">Webhook Logs</span>
         </a>
