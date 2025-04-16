@@ -53,11 +53,12 @@
     </li>
 
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/user/bulk-message") ? "active" : "")" asp-controller="UserMessage" asp-action="BulkSend">
+        <a class="nav-link @(currentPath.StartsWithSegments("/user/bulk-message") ? "active" : "")" asp-controller="Bulk" asp-action="Index">
             <i class="fi fi-rs-rocket-lunch"></i>
             <span class="nav-link-text">Send Bulk Message</span>
         </a>
     </li>
+
 
     <li class="nav-item">
         <a class="nav-link @(currentPath.StartsWithSegments("/user/schedule-message") ? "active" : "")" asp-controller="UserSchedule" asp-action="Index">

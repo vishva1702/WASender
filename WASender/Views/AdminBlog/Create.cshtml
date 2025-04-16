@@ -1,5 +1,16 @@
 ﻿@model WASender.Models.Post
 @using WASender.Models
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
 @{
     Layout = "~/Views/Shared/_UserLayout.cshtml";
     ViewData["Title"] = "Create a Blog";
@@ -10,10 +21,10 @@
 
 @await Html.PartialAsync("_HeaderSection")
 
-    <link rel="stylesheet" href="~/assets/plugins/select2/select2.min.css" />
-    <link rel="stylesheet" href="~/assets/plugins/summernote/summernote-bs4.css" />
+<link rel="stylesheet" href="~/assets/plugins/select2/select2.min.css" />
+<link rel="stylesheet" href="~/assets/plugins/summernote/summernote-bs4.css" />
 
-<form asp-action="Create" enctype="multipart/form-data" method="post">
+<form asp-action="Store" enctype="multipart/form-data" method="post">
     <div class="row justify-content-center">
         <div class="col-lg-10">
             <div class="card">
@@ -91,14 +102,29 @@
                         <input type="text" name="meta_tags" class="form-control" required />
                     </div>
 
-                    <div class="form-group mt-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="Featured" value="1" id="featuredSwitch">
-                            <label class="form-check-label" for="featuredSwitch">Make it featured?</label>
+                    <div class="form-group row mt-3">
+                        <div class="col-lg-12 d-flex">
+                            <label class="custom-toggle custom-toggle-primary">
+                                <input type="checkbox" name="featured" value="1" id="plain-text-with-featured" data-target=".plain-title-with-featured" class="save-template" />
+                                <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                            </label>
+                            <label class="mt-1 ml-1" for="plain-text-with-featured">
+                                <h4>Make it featured?</h4>
+                            </label>
                         </div>
-                        <div class="form-check form-switch mt-2">
-                            <input class="form-check-input" type="checkbox" name="Status" value="1" id="statusSwitch">
-                            <label class="form-check-label" for="statusSwitch">Make it publish?</label>
+
+                        <div class="col-lg-12 d-flex">
+                            <!-- Hidden fallback input if checkbox is unchecked -->
+                            <input type="hidden" name="status" value="0" />
+
+                            <!-- Actual toggle checkbox -->
+                            <label class="custom-toggle custom-toggle-primary">
+                                <input type="checkbox" name="status" value="1" id="plain-text-with-button" data-target=".plain-title-with-button" class="save-template" />
+                                <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                            </label>
+                            <label class="mt-1 ml-1" for="plain-text-with-button">
+                                <h4>Make it publish?</h4>
+                            </label>
                         </div>
                     </div>
 

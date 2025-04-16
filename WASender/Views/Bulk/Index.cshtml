@@ -1,0 +1,137 @@
+﻿@model YourProjectNamespace.ViewModels.BulkMessageIndexViewModel
+@{
+    ViewData["Title"] = "Transaction History";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/assets/vendor/select2/dist/css/select2.min.css" />
+}
+
+<partial name="_HeaderSection" model="new HeaderSectionModel {
+    Title = " Transaction History",
+         Buttons=new List<ButtonModel> {
+        new ButtonModel { Name = "<i class=\"ni ni-send\"></i>&nbsp;Send Bulk Message", Url = Url.Action("Create", "BulkMessage"), IsButton = false },
+        new ButtonModel { Name = "<i class=\"ni ni-send\"></i>&nbsp;Send Bulk Message With Template", Url = "#", Components = "data-toggle=\"modal\" data-target=\"#send-template-bulk\"", IsButton = true }
+    }
+}" />
+
+<div class="modal fade" id="send-template-bulk" tabindex="-1" aria-labelledby="send-template-label" aria-hidden="true">
+    <div class="modal-dialog">
+                @if (Model.Templates.Any() && Model.Groups.Any())
+                {
+                <div class="modal-content">
+                    <form asp-action="SendTemplateBulk" method="post" class="ajaxform_instant_reload">
+                        <input type="hidden" name="page_url" value="@Context.Request.Path + Context.Request.QueryString" />
+                        <div class="modal-header">
+                            <h5 class="modal-title">Send Bulk Message With Template</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Select Template</label>
+                                <select class="form-control" name="template">
+                                        @foreach (var template in Model.Templates)
+                                        {
+                                            <option value="@template.Id">@template.Title</option>
+                                        }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Device</label>
+                                <select class="form-control" name="device">
+                                        @foreach (var device in Model.Devices)
+                                        {
+                                            <option value="@device.Id">@device.Name - @device.Phone</option>
+                                        }
+                                </select>
+                            </div>
+                            <div class="form-group receivers">
+                                <label>Select Group</label>
+                                <select class="form-control select2" name="group">
+                                        @foreach (var group in Model.Groups)
+                                        {
+                                            <option value="@group.Id">@group.Name</option>
+                                        }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-neutral float-right">Send Now</button>
+                        </div>
+                    </form>
+                </div>
+                }
+                else
+                {
+                <div class="alert bg-gradient-primary text-white">Create some template and contacts</div>
+                }
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row d-flex justify-content-between flex-wrap">
+            <div class="col">
+                <partial name="_CardStats" model="new CardStatsModel { Title = \"Total Messages Sent\", Value = Model.Total, Icon = \"fi fi-rs-rocket-lunch\" }" />
+            </div>
+            <div class="col">
+                <partial name="_CardStats" model="new CardStatsModel { Title = \"Last 30 days Messages\", Value = Model.Last30Messages, Icon = \"ni ni-calendar-grid-58\" }" />
+            </div>
+            <div class="col">
+                <partial name="_CardStats" model="new CardStatsModel { Title = \"Today's Transaction\", Value = Model.TodayTransaction, Icon = \"fi fi-rs-calendar-day\" }" />
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                            @if (Model.Posts.Any())
+                            {
+                            <div class="col-sm-12">
+                                <h4>Transaction History</h4>
+                            </div>
+                            <div class="col-sm-12 table-responsive">
+                                <table class="table col-12">
+                                    <thead>
+                                        <tr>
+                                            <th>Message From</th>
+                                            <th>Message To</th>
+                                            <th>Message Type</th>
+                                            <th>Template name</th>
+                                            <th class="text-right">Requested At</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                            @foreach (var log in Model.Posts)
+                                            {
+                                                <tr>
+                                                    <td>@log.From</td>
+                                                    <td>@log.To</td>
+                                                    <td>@(log.Template != null ? "Template" : "Plain Text")</td>
+                                                    <td>@log.Template?.Title</td>
+                                                    <td class="text-right">@log.CreatedAt.ToString("dd MMMM yyyy")</td>
+                                                </tr>
+                                            }
+                                    </tbody>
+                                </table>
+                                <div class="d-flex justify-content-center">
+                                        @Html.Partial("_Pagination", Model.Posts)
+                                </div>
+                            </div>
+                            }
+                            else
+                            {
+                            <div class="btn btn-neutral col-12 text-center">No Transaction Found</div>
+                            }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        @section Scripts {
+        <script src="~/assets/vendor/select2/dist/js/select2.min.js"></script>
+        <script src="~/assets/js/pages/user/wa-bulk-index.js?v=1"></script>
+        }
