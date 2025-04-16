@@ -2,20 +2,24 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WASender.Models;
+using WASender.Services;
 
 namespace WASender.Controllers.AdminSide
 {
-    public class AdminFeaturesController : Controller
+    public class AdminFeaturesController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
-        public AdminFeaturesController(ApplicationDbContext context)
+        public AdminFeaturesController(IGlobalDataService globalDataService, ILogger<AdminHomeController> logger, ApplicationDbContext context)
+            : base(globalDataService, logger)
         {
             _context = context;
         }
 
         public async Task<IActionResult> Index()
         {
+            await LoadGlobalDataAsync();
+
             // Get features
             var posts = await _context.Posts
                 .Where(p => p.Type == "feature")
@@ -37,8 +41,10 @@ namespace WASender.Controllers.AdminSide
 
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+             await LoadGlobalDataAsync();
+
             var languages = GetOption("languages");
             ViewBag.Languages = languages;
             return View();
@@ -173,6 +179,8 @@ namespace WASender.Controllers.AdminSide
 
         public async Task<IActionResult> Edit(ulong id)
         {
+            await LoadGlobalDataAsync();
+
             var post = await _context.Posts
                 .Include(p => p.Postmetas)
                 .FirstOrDefaultAsync(p => p.Id == id && p.Type == "feature");

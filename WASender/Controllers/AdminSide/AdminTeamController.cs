@@ -1,24 +1,28 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using WASender.Models;
+using WASender.Services;
 
 namespace WASender.Controllers.AdminSide
 {
-    public class AdminTeamController : Controller
+    public class AdminTeamController : BaseController
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _env;
 
-
-        public AdminTeamController(ApplicationDbContext context, IWebHostEnvironment env)
+        public AdminTeamController(IGlobalDataService globalDataService,ILogger<BaseController> logger,ApplicationDbContext context,IWebHostEnvironment env)
+          : base(globalDataService, logger) 
         {
             _context = context;
             _env = env;
         }
 
+
         public async Task<IActionResult> Index()
         {
+            await LoadGlobalDataAsync();
             try
             {
                 // Check database connectivity
@@ -52,8 +56,10 @@ namespace WASender.Controllers.AdminSide
 
 
         // Create Method (Display the form)
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+           await LoadGlobalDataAsync();
+
             var post = new Post
             {
                 Status = 0  // Default to inactive status
@@ -128,6 +134,8 @@ namespace WASender.Controllers.AdminSide
         // GET: Edit Team Member
         public async Task<IActionResult> Edit(ulong id)
         {
+            await LoadGlobalDataAsync();
+
             var post = await _context.Posts
                 .Where(p => p.Id == id && p.Type == "team") // Ensure fetching the correct type
                 .Include(p => p.Postmetas)

@@ -108,7 +108,7 @@ namespace WASender.Controllers.AdminSide
                 ViewBag.Error = "An error occurred while updating your profile.";
             }
 
-            return await Index(); // Return view instead of redirecting
+            return await Index(); 
         }
 
     }

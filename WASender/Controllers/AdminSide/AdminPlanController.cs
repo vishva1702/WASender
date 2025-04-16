@@ -7,23 +7,27 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WASender.Models;
+using WASender.Services;
 
 namespace WASender.Controllers.AdminSide
 {
     [Authorize(Roles = "admin,Admin")]
 
-    public class AdminPlanController : Controller
+    public class AdminPlanController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
-        public AdminPlanController(ApplicationDbContext context)
+        public AdminPlanController(IGlobalDataService globalDataService, ILogger<AdminHomeController> logger, ApplicationDbContext context)
+             : base(globalDataService, logger)
         {
             _context = context;
         }
 
         // GET: Admin/Plan
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+           await LoadGlobalDataAsync();
+
             var plans = _context.Plans
                 .Include(p => p.Orders)
                 .OrderByDescending(p => p.CreatedAt)
@@ -38,8 +42,10 @@ namespace WASender.Controllers.AdminSide
 
 
         // GET: Admin/Plan/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+             await LoadGlobalDataAsync();
+
             return View();
         }
 
@@ -101,8 +107,10 @@ namespace WASender.Controllers.AdminSide
 
 
         // GET: Admin/Plan/Edit/5
-        public IActionResult Edit(ulong id)
+        public async Task<IActionResult> Edit(ulong id)
         {
+            await LoadGlobalDataAsync();
+
             var plan = _context.Plans.Find(id);
             if (plan == null) return NotFound();
 

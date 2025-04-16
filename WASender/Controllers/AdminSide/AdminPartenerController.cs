@@ -1,21 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WASender.Models;
 using Microsoft.EntityFrameworkCore;
+using WASender.Services;
 
 
 namespace WASender.Controllers.AdminSide
 {
-    public class AdminPartenerController : Controller
+    public class AdminPartenerController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
-        public AdminPartenerController(ApplicationDbContext context)
+        public AdminPartenerController(IGlobalDataService globalDataService, ILogger<AdminHomeController> logger, ApplicationDbContext context)
+            : base(globalDataService, logger)
         {
             _context = context;
         }
 
         public async Task<IActionResult> Index(int page = 1)
         {
+            await LoadGlobalDataAsync();
             int pageSize = 10;
 
             var brands = await _context.Categories
