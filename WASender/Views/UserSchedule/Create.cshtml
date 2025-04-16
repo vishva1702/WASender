@@ -13,54 +13,40 @@
         <div class="card">
             <div class="card-header row">
                 <h4 class="text-left col-6">Create Scheduled Message</h4>
+                <div class="col-6 text-right">
+                    <a href="@Url.Action("Index", "ScheduleMessage")" class="btn btn-outline-secondary">Back</a>
+                </div>
             </div>
             <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
-    
-
+                <form asp-action="Create" asp-controller="ScheduleMessage" method="post" enctype="multipart/form-data" class="ajaxform_reset_form">
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="form-group">
-                                <label>@("Scheduled Name")</label>
+                                <label>Scheduled Name</label>
                                 <input type="text" name="Title" class="form-control" required />
                             </div>
                         </div>
+
                         <div class="col-sm-6">
                             <div class="form-group">
-                                <label>@("Select Number")</label>
+                                <label>Select Number</label>
                                 <select name="Device" class="form-control" required>
-                                    @foreach (var device in ViewBag.Devices as List<Device>)
+                                    @foreach (var device in ViewBag.Devices)
                                     {
                                         <option value="@device.Id">@device.Phone</option>
                                     }
                                 </select>
                             </div>
                         </div>
+
                         <div class="col-sm-6">
                             <div class="form-group">
-                                <label>@("Receiver Group")</label>
-                                <select name="Group" class="form-control" required>
-                                    
-                                    @if (groups != null && groups.Any())
+                                <label>Receiver Group</label>
+                                <select name="Group" class="form-control select2">
+                                    @foreach (var group in ViewBag.Groups)
                                     {
-                                        foreach (var groupViewModel in groups)
-                                        {
-                                            var group = groupViewModel?.Group;
-                                            var contacts = groupViewModel?.Contacts;
-                                            var contactsCount = contacts != null ? contacts.Count : 0;
-
-                                            if (group != null)
-                                            {
-                                                <option value="@group.Id">@group.Name - (@contactsCount @("Contacts"))</option>
-                                            }
-                                        }
+                                        <option value="@group.Id">@group.Name - (@group.ContactsCount Contacts)</option>
                                     }
-                                    else
-                                    {
-                                        <option disabled>No groups available</option>
-                                    }
-
-
                                 </select>
                             </div>
                         </div>
@@ -68,15 +54,15 @@
 
                     <div class="row">
                         <div class="col-sm-6">
-                            <label>@("Delivery date and time")</label>
+                            <label>Delivery date and time</label>
                             <div class="input-group">
-                                <input type="datetime-local" name="Date" class="form-control" required min="@DateTime.Now.ToString("yyyy-MM-dd")">
+                                <input type="datetime-local" name="Date" class="form-control" required min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
                                 <div class="input-group-append">
                                     <select name="Timezone" class="form-control" required>
-                                        <option value="" disabled selected>@("Select Timezone")</option>
+                                        <option value="" disabled selected>Select Timezone</option>
                                         @foreach (var timezone in TimeZoneInfo.GetSystemTimeZones())
                                         {
-                                            <option value="@timezone.Id">@timezone.DisplayName</option>
+                                            <option value="@timezone.Id">@timezone.Id</option>
                                         }
                                     </select>
                                 </div>
@@ -85,29 +71,29 @@
 
                         <div class="col-sm-6">
                             <div class="form-group">
-                                <label>@("Messaging Type")</label>
-                                <select name="MessageType" class="form-control" required>
-                                    <option value="text">@("Text Message")</option>
-                                    <option value="template">@("Template Message")</option>
+                                <label>Messaging Type</label>
+                                <select name="MessageType" class="form-control message_type" required>
+                                    <option value="text">Text Message</option>
+                                    <option value="template">Template Message</option>
                                 </select>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row" id="plain-text">
+                    <div class="row plain-text">
                         <div class="col-sm-12">
                             <div class="form-group">
-                                <label>@("Message")</label>
-                                <textarea name="Message" class="form-control" required maxlength="1000" placeholder="@("Note: {name} write the name according to the recipient.")"></textarea>
+                                <label>Message</label>
+                                <textarea name="Message" class="form-control h-200" required maxlength="1000" placeholder="note : {name} write the name according to the recipient."></textarea>
                             </div>
                         </div>
                     </div>
 
                     <div class="templates-list none">
                         <div class="form-group">
-                            <label>@("Select Template")</label>
+                            <label>Select Template</label>
                             <select name="Template" class="form-control">
-                                @foreach (var template in ViewBag.Templates as List<Template>)
+                                @foreach (var template in ViewBag.Templates)
                                 {
                                     <option value="@template.Id">@template.Title</option>
                                 }
@@ -115,11 +101,17 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-outline-primary">@("Create Schedule")</button>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <button type="submit" class="btn btn-outline-primary submit-button">Create Schedule</button>
+                        </div>
+                    </div>
                 </form>
-
-                <script src="@Url.Content("~/assets/js/pages/user/schedule-create.js")"></script>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/assets/js/pages/user/schedule-create.js"></script>
+}

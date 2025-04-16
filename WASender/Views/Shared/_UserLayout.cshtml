@@ -94,11 +94,7 @@
 
     </div>
 
-     <footer>
-        @await Html.PartialAsync("_Footer")
-    </footer> 
-
-
+    
     <!-- Logout Form -->
     <form id="logout-form" asp-controller="Login" asp-action="Logout" method="post">
         @Html.AntiForgeryToken()

@@ -6,20 +6,24 @@ using WASender.Contracts;
 
 namespace WASender.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         private readonly IForgotPasswordService _forgotPasswordService;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(IForgotPasswordService forgotPasswordService, ILogger<AccountController> logger)
+        public AccountController(
+            IGlobalDataService globalDataService,
+            IForgotPasswordService forgotPasswordService,
+            ILogger<AccountController> logger)
+            : base(globalDataService, logger)
         {
             _forgotPasswordService = forgotPasswordService;
-            _logger = logger;
         }
 
         [HttpGet]
-        public IActionResult ForgotPassword()
+        public async Task<IActionResult> ForgotPasswordAsync()
         {
+            await LoadGlobalDataAsync();
             return View();
         }
 
@@ -27,6 +31,7 @@ namespace WASender.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(string email)
         {
+
             if (string.IsNullOrEmpty(email))
             {
                 ModelState.AddModelError("", "Email is required.");

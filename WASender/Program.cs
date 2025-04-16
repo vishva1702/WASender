@@ -111,8 +111,7 @@ builder.Services.AddScoped<IUserTemplateService, UserTemplateService>();
 builder.Services.AddScoped<ITestimonialService, TestimonialService>();
 builder.Services.AddScoped<IEnvService, EnvService>();
 builder.Services.AddScoped<IAdminTemplateService, AdminTemplateService>();
-
-
+builder.Services.AddScoped<IAdminScheduleService, AdminScheduleService>();
 
 
 
