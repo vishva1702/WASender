@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WASender.Models;
 using WASender.Services;
 
 namespace WASender.Controllers.AdminSide
 {
+    [Authorize(Roles = "admin,Admin")]
     public class AdminRoleController : BaseController
     {
         private readonly ApplicationDbContext _context;

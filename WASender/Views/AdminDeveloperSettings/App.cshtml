@@ -1,0 +1,92 @@
+﻿@{
+    ViewData["Title"] = "App Settings";
+    var id = ViewBag.Id as string;
+    var tzlist = ViewBag.TzList as IEnumerable<TimeZoneInfo>;
+    var languages = ViewBag.Languages as Dictionary<string, string>;
+    var appName = ViewBag.AppName as string;
+    var appDebug = ViewBag.AppDebug as string;
+    var timeZone = ViewBag.TimeZone as string;
+    var defaultLang = ViewBag.DefaultLang as string;
+}
+
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Title"] = "Admins";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Back To Dashboard", url = Url.Action("Index", "AdminDeveloperSettings"), is_button = false, components = "" }
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row ">
+    <div class="col-lg-5 mt-5">
+        <strong>Application Settings</strong>
+        <p>Edit your application global settings</p>
+    </div>
+    <div class="col-lg-7 mt-5">
+        <form method="post" asp-action="Update" asp-route-id="@id" class="ajaxform">
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="form-group row">
+                        <label class="col-lg-12">Application Name</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="name" value="@appName" required class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Visibility Of Site Error</label>
+                        <div class="col-lg-12">
+                            <select class="form-control" name="app_debug">
+                                <option value="true" selected="@(appDebug == "true")">Enable</option>
+                                <option value="false" selected="@(appDebug == "false")">Disable</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Application Time Zone</label>
+                        <div class="col-lg-12">
+                            <select class="form-control" name="timezone">
+                                @foreach (var timezone in tzlist)
+                                {
+                                    <option value="@timezone.Id" selected="@(timeZone == timezone.Id)">
+                                        @timezone.DisplayName
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Application Default Language</label>
+                        <div class="col-lg-12">
+                            <select class="form-control" name="default_lang">
+                                @if (languages != null)
+                                {
+                                    foreach (var lang in languages)
+                                    {
+                                        <option value="@lang.Key" selected="@(defaultLang == lang.Key)">
+                                            @lang.Value
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-3">
+                        <div class="col-lg-12">
+                            <button class="btn btn-neutral submit-button btn-sm float-left">Update Settings</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

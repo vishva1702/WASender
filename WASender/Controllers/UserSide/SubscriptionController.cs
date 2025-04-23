@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using WASender.Models;
 using Microsoft.AspNetCore.Authorization;
 
-[Authorize]
+[Authorize(Roles = "user,User")]
 public class SubscriptionController : Controller
 {
     private readonly IPlanService _planService;

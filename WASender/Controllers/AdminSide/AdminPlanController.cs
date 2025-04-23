@@ -12,7 +12,6 @@ using WASender.Services;
 namespace WASender.Controllers.AdminSide
 {
     [Authorize(Roles = "admin,Admin")]
-
     public class AdminPlanController : BaseController
     {
         private readonly ApplicationDbContext _context;

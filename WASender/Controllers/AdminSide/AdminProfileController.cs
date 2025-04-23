@@ -9,9 +9,11 @@ using WASender.Models;
 using Microsoft.Extensions.Logging;
 using WASender.Controllers.AdminSide;
 using WASender.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WASender.Controllers.AdminSide
 {
+    [Authorize(Roles = "admin,Admin")]
     public class AdminProfileController : BaseController
     {
         private readonly ApplicationDbContext _context;

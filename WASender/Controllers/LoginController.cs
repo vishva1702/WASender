@@ -61,12 +61,14 @@ public class LoginController : BaseController
 
         // IMPORTANT: Add ClaimTypes.NameIdentifier so that TemplateController can get the user id.
         var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, email),
-            new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", CultureInfo.CurrentCulture.TextInfo.ToTitleCase(role))
-            // Optionally add additional claims if needed
-        };
+{
+    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+    new Claim("UserId", user.Id.ToString()), // Add this
+    new Claim("Avatar", user.Avatar ?? ""), // Add this if Avatar exists in user
+    new Claim(ClaimTypes.Name, email),
+    new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", CultureInfo.CurrentCulture.TextInfo.ToTitleCase(role))
+};
+
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);

@@ -11,7 +11,7 @@
     </li>
 
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/user/device") ? "active" : "")" asp-controller="UserDevice" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/UserDevice/Index") ? "active" : "")" asp-controller="UserDevice" asp-action="Index">
             <i class="fi-rs-sensor-on"></i>
             <span class="nav-link-text">My Devices</span>
         </a>

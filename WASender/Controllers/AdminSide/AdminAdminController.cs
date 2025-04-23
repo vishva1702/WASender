@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -7,6 +8,7 @@ using WASender.Services;
 
 namespace WASender.Controllers.AdminSide
 {
+    [Authorize(Roles = "admin,Admin")]
     public class AdminAdminController : BaseController
     {
         private readonly ApplicationDbContext _context;

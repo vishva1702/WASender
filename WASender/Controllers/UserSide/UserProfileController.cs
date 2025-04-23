@@ -7,9 +7,12 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using WASender.Models;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WASender.Controllers.UserSide
 {
+    [Authorize(Roles = "user,User")]
     public class UserProfileController : Controller
     {
         private readonly ApplicationDbContext _dbContext;

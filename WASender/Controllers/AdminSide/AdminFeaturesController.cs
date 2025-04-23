@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WASender.Models;
@@ -6,6 +7,7 @@ using WASender.Services;
 
 namespace WASender.Controllers.AdminSide
 {
+    [Authorize(Roles = "admin,Admin")]
     public class AdminFeaturesController : BaseController
     {
         private readonly ApplicationDbContext _context;

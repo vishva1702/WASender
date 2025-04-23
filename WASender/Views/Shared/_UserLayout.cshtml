@@ -30,7 +30,9 @@
     <link rel="stylesheet" href="~/assets/plugins/pace/pace-theme-default.min.css" asp-append-version="true">
 
     @RenderSection("Styles", required: false)
+    @RenderSection("Head", required: false)  <!-- ✅ Add this line -->
 </head>
+
 
 <body>
 
@@ -39,7 +41,7 @@
         <div class="scrollbar-inner">
             <!-- Brand -->
             <div class="sidenav-header d-flex align-items-center">
-                <a class="navbar-brand" href="@Url.Action("Login", "Account")">
+                <a class="navbar-brand" href="@Url.Action("Index", "Login")">
                     <img src="@ViewData["logo"]" alt="Logo" class="navbar-brand-img" alt="...">
                 </a>
                 <div class="ml-auto">

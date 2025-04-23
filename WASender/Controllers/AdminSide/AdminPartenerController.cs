@@ -2,10 +2,12 @@
 using WASender.Models;
 using Microsoft.EntityFrameworkCore;
 using WASender.Services;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace WASender.Controllers.AdminSide
 {
+    [Authorize(Roles = "admin,Admin")]
     public class AdminPartenerController : BaseController
     {
         private readonly ApplicationDbContext _context;

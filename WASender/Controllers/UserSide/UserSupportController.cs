@@ -12,7 +12,7 @@ using WASender.Services;
 
 namespace WASender.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "user,User")]
     public class UserSupportController : BaseController
     {
         private readonly ApplicationDbContext _context;
