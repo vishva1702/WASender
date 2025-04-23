@@ -20,6 +20,7 @@ namespace WASender.Controllers.UserSide
         }
 
 
+        [HttpGet("")]
 
         public async Task<IActionResult> Index()
         {
@@ -33,8 +34,8 @@ namespace WASender.Controllers.UserSide
 
                 if (user?.WillExpire != null)
                 {
-                    var today = DateOnly.FromDateTime(DateTime.Now);
-                    var nextWeek = today.AddDays(7);
+                    //var today = DateOnly.FromDateTime(DateTime.Now);
+                    //var nextWeek = today.AddDays(7);
 
                     if (user.WillExpire <= today)
                     {
@@ -52,6 +53,7 @@ namespace WASender.Controllers.UserSide
             return View("~/Views/UserHome/Index.cshtml");
         }
 
+        [HttpGet("dashboard-data")]
         public IActionResult DashboardData()
         {
             var userId = ulong.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
