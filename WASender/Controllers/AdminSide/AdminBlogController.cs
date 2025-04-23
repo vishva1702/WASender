@@ -1,26 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WASender.Models;
+using WASender.Helpers;
 
-namespace WASender.Controllers.AdminSide
+namespace WASender.Controllers.Admin
 {
+    [Route("admin/[controller]")]
     public class AdminBlogController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly BlogHelper _blogHelper;
 
-        public AdminBlogController(ApplicationDbContext context)
+        public AdminBlogController(ApplicationDbContext context, BlogHelper blogHelper)
         {
             _context = context;
+            _blogHelper = blogHelper;
         }
 
-        public async Task<IActionResult> Index(string? search)
+        // GET: admin/blogs
+        [HttpGet]
+        public async Task<IActionResult> Index(string search = "", string type = "")
         {
-            var postsQuery = _context.Posts
-                .Include(p => p.Postmetas)
-                .Where(p => p.Type == "blog")
-                .AsQueryable();
+            var postsQuery = _context.Posts.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -28,189 +33,52 @@ namespace WASender.Controllers.AdminSide
             }
 
             var posts = await postsQuery
+                .Where(p => p.Type == "blog")
+                .Include(p => p.Postmetas) // 🛟 Make sure Postmetas are included
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
 
             ViewBag.TotalPosts = await _context.Posts.CountAsync(p => p.Type == "blog");
             ViewBag.TotalActivePosts = await _context.Posts.CountAsync(p => p.Type == "blog" && p.Status == 1);
-            ViewBag.TotalInActivePosts = await _context.Posts.CountAsync(p => p.Type == "blog" && p.Status == 0);
+            ViewBag.TotalInactivePosts = await _context.Posts.CountAsync(p => p.Type == "blog" && p.Status == 0);
+            ViewBag.Search = search;
 
-            // Check for success/error messages
-            if (TempData["SuccessMessage"] != null)
-            {
-                ViewBag.SuccessMessage = TempData["SuccessMessage"].ToString();
-            }
-            if (TempData["ErrorMessage"] != null)
-            {
-                ViewBag.ErrorMessage = TempData["ErrorMessage"].ToString();
-            }
-
-            return View(posts);
+            return View("Index", posts);
         }
 
-         
-        // GET: admin/blog/create
+
+
+
+        // GET: admin/blogs/create
+        [HttpGet("create")]
         public async Task<IActionResult> Create()
         {
-            ViewBag.Tags = await _context.Categories
-                .Where(c => c.Type == "tags")
-                .ToListAsync();
+            ViewBag.Tags = await _context.Categories.Where(c => c.Type == "tags").ToListAsync();
+            ViewBag.Categories = await _context.Categories.Where(c => c.Type == "blog_category" && c.Status == 1).ToListAsync();
+            ViewBag.Languages = new[] { "en", "fr", "es" };
 
-            ViewBag.Categories = await _context.Categories
-                .Where(c => c.Type == "blog_category" && c.Status == 1)
-                .ToListAsync();
-
-            // You can replace this with your actual settings logic
-            ViewBag.Languages = new Dictionary<string, string>
-{
-    { "en", "English" },
-    
-};
-
-
-            return View();
+            return View("Create");
         }
 
-        // POST: admin/blog/store
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-       
-        public async Task<IActionResult> Store(Post post, IFormFile preview, IFormFile meta_image)
+        // POST: admin/blogs
+        [HttpPost("store")]
+        public async Task<IActionResult> Store([FromForm] IFormCollection request)
         {
             try
             {
-                if (ModelState.IsValid)
-                {
-                    // Set basic post properties
-                    post.Type = "blog";
-                    post.Status = Request.Form["status"] == "1" ? 1 : 0;
-                    post.Featured = Request.Form["featured"] == "1" ? 1 : 0;
-                    post.CreatedAt = DateTime.Now;
-
-                    // Generate slug if empty
-                    if (string.IsNullOrEmpty(post.Slug))
-                    {
-                        post.Slug = GenerateSlug(post.Title);
-                    }
-
-                    _context.Add(post);
-                    await _context.SaveChangesAsync();
-
-                    // Handle file uploads and metadata
-                    var metas = new List<Postmeta>
-            {
-                new Postmeta { PostId = post.Id, Key = "short_description", Value = Request.Form["short_description"] },
-                new Postmeta { PostId = post.Id, Key = "main_description", Value = Request.Form["main_description"] },
-                new Postmeta { PostId = post.Id, Key = "meta_title", Value = Request.Form["meta_title"] },
-                new Postmeta { PostId = post.Id, Key = "meta_description", Value = Request.Form["meta_description"] },
-                new Postmeta { PostId = post.Id, Key = "meta_tags", Value = Request.Form["meta_tags"] }
-            };
-
-                    // Upload preview image
-                    if (preview != null && preview.Length > 0)
-                    {
-                        var previewPath = await UploadFile(preview, "blog/preview");
-                        metas.Add(new Postmeta { PostId = post.Id, Key = "preview", Value = previewPath });
-                    }
-
-                    // Upload meta image
-                    if (meta_image != null && meta_image.Length > 0)
-                    {
-                        var metaImagePath = await UploadFile(meta_image, "blog/meta");
-                        metas.Add(new Postmeta { PostId = post.Id, Key = "meta_image", Value = metaImagePath });
-                    }
-
-                    // Handle categories and tags
-                    var categoryIds = Request.Form["categories"].ToList();
-                    if (categoryIds.Any())
-                    {
-                        metas.Add(new Postmeta
-                        {
-                            PostId = post.Id,
-                            Key = "category_ids",
-                            Value = string.Join(",", categoryIds)
-                        });
-                    }
-
-                    var tagIds = Request.Form["tags"].ToList();
-                    if (tagIds.Any())
-                    {
-                        metas.Add(new Postmeta
-                        {
-                            PostId = post.Id,
-                            Key = "tag_ids",
-                            Value = string.Join(",", tagIds)
-                        });
-                    }
-
-                    await _context.Postmetas.AddRangeAsync(metas);
-                    await _context.SaveChangesAsync();
-
-                    TempData["SuccessMessage"] = "Blog post created successfully!";
-                    return RedirectToAction(nameof(Index));
-                }
-
-                // If we got this far, something failed
-                ViewBag.Tags = await _context.Categories
-                    .Where(c => c.Type == "tags")
-                    .ToListAsync();
-
-                ViewBag.Categories = await _context.Categories
-                    .Where(c => c.Type == "blog_category" && c.Status == 1)
-                    .ToListAsync();
-
-                ViewBag.Languages = new Dictionary<string, string> { { "en", "English" } };
-
-                return View("Create", post);
+                await _blogHelper.CreateAsync(request);
+                TempData["Success"] = "Blog Created Successfully";
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                // Log the exception
-                TempData["ErrorMessage"] = "An error occurred while creating the blog post.";
-                return RedirectToAction(nameof(Create));
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Create");
             }
         }
 
-        private async Task<string> UploadFile(IFormFile file, string folder)
-        {
-            var uploadsFolder = Path.Combine("wwwroot", "uploads", folder);
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
-            var uniqueFileName = $"{Guid.NewGuid()}_{file.FileName}";
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(fileStream);
-            }
-
-            return Path.Combine("uploads", folder, uniqueFileName);
-        }
-
-        private string GenerateSlug(string title)
-        {
-            var slug = title.ToLowerInvariant()
-                .Replace(" ", "-")
-                .Replace(".", "-")
-                .Replace(",", "-");
-
-            // Remove invalid chars
-            slug = Regex.Replace(slug, @"[^a-z0-9\s-]", "");
-
-            // Convert multiple spaces into one space
-            slug = Regex.Replace(slug, @"\s+", " ").Trim();
-
-            // Replace spaces with hyphens
-            slug = Regex.Replace(slug, @"\s", "-");
-
-            return slug;
-        }
-
-        // GET: admin/blog/edit/5
-        [HttpGet]
+        // GET: admin/blogs/{id}/edit
+        [HttpGet("edit/{id}")]
         public async Task<IActionResult> Edit(ulong id)
         {
             var post = await _context.Posts
@@ -218,106 +86,63 @@ namespace WASender.Controllers.AdminSide
                 .FirstOrDefaultAsync(p => p.Id == id && p.Type == "blog");
 
             if (post == null)
-                return NotFound();
-
-            // Convert Postmetas to Dictionary
-            var metaDict = post.Postmetas.ToDictionary(pm => pm.Key, pm => pm.Value);
-
-            ViewBag.ShortDescription = metaDict.ContainsKey("short_description") ? metaDict["short_description"] : "";
-            ViewBag.LongDescription = metaDict.ContainsKey("long_description") ? metaDict["long_description"] : "";
-
-            ViewBag.Seo = new Dictionary<string, string>
-    {
-        { "title", metaDict.ContainsKey("meta_title") ? metaDict["meta_title"] : "" },
-        { "description", metaDict.ContainsKey("meta_description") ? metaDict["meta_description"] : "" },
-        { "tags", metaDict.ContainsKey("meta_tags") ? metaDict["meta_tags"] : "" }
-    };
-
-            // Selected Categories and Tags from postmeta
-            ViewBag.SelectedCategoryIds = metaDict.ContainsKey("category_ids")
-                ? metaDict["category_ids"].Split(',').Select(ulong.Parse).ToList()
-                : new List<ulong>();
-
-            ViewBag.SelectedTagIds = metaDict.ContainsKey("tag_ids")
-                ? metaDict["tag_ids"].Split(',').Select(ulong.Parse).ToList()
-                : new List<ulong>();
-
-            // Dropdown data
-            ViewBag.Tags = (await _context.Categories
-                .Where(c => c.Type == "tags")
-                .ToDictionaryAsync(c => c.Id, c => c.Title));
-
-            ViewBag.Categories = (await _context.Categories
-                .Where(c => c.Type == "blog_category" && c.Status == 1)
-                .ToDictionaryAsync(c => c.Id, c => c.Title));
-
-            ViewBag.Languages = new Dictionary<string, string>
-    {
-        { "en", "English" },
-        { "gu", "Gujarati" },
-        { "hi", "Hindi" }
-    };
-
-            return View(post);
-        }
-
-
-        // POST: admin/blog/update/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(ulong id, Post updatedPost)
-        {
-            var post = await _context.Posts.FindAsync(id);
-
-            if (post == null)
-                return NotFound();
-
-            if (ModelState.IsValid)
             {
-                post.Title = updatedPost.Title;
-                post.Status = updatedPost.Status;
-                post.Slug = updatedPost.Slug;
-                // ... update other fields
-
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
+
+            ViewBag.Tags = await _context.Categories.Where(c => c.Type == "tags").ToListAsync();
+            ViewBag.Categories = await _context.Categories.Where(c => c.Type == "blog_category").ToListAsync();
+
+            ViewBag.SelectedCategories = post.Postmetas
+                .Where(m => m.Key == "categories")
+                .Select(m => m.Value)
+                .ToList();
+
+            var seoMeta = post.Postmetas.FirstOrDefault(m => m.Key == "seo");
+            ViewBag.Seo = seoMeta != null
+                ? Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(seoMeta.Value)
+                : new Dictionary<string, string>();
+
+            ViewBag.Languages = new[] { "en", "fr", "es" };
 
             return View("Edit", post);
         }
 
-        // POST: admin/blog/delete/5
-        [HttpPost]
-        public async Task<IActionResult> Destroy(ulong id)
+        // PUT: admin/blogs/{id}
+        [HttpPost("update/{id}")]
+        public async Task<IActionResult> Update(ulong id, [FromForm] IFormCollection request)
         {
-            var post = await _context.Posts
-                .Include(p => p.Postmetas)
-                .FirstOrDefaultAsync(p => p.Id == id && p.Type == "blog");
-
-            if (post == null)
-                return NotFound();
-
-            _context.Posts.Remove(post);
-            await _context.SaveChangesAsync();
-
-            return Json(new { message = "Blog deleted successfully." });
+            try
+            {
+                await _blogHelper.UpdateAsync(request, id);
+                TempData["Success"] = "Blog Updated Successfully";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Edit", new { id });
+            }
         }
 
-        // POST: admin/blog/massdestroy
-        [HttpPost]
-        public async Task<IActionResult> MassDestroy(ulong[] ids)
+        // POST: admin/blogs/mass-destroy
+        [HttpPost("mass-destroy")]
+        public async Task<IActionResult> MassDestroy([FromForm] List<ulong> ids)
         {
-            var posts = await _context.Posts
-                .Where(p => ids.Contains(p.Id) && p.Type == "blog")
-                .ToListAsync();
+            try
+            {
+                var posts = await _context.Posts.Where(p => ids.Contains(p.Id)).ToListAsync();
+                _context.Posts.RemoveRange(posts);
+                await _context.SaveChangesAsync();
 
-            _context.Posts.RemoveRange(posts);
-            await _context.SaveChangesAsync();
-
-            return Json(new { message = "Selected blogs deleted successfully." });
+                TempData["Success"] = "Selected Blog Posts Deleted Successfully";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Index");
+            }
         }
-
     }
 }
-
-   

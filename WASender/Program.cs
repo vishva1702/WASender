@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WASender.Contracts;
 using WASender.Contracts.AdminSide;
+using WASender.Helpers;
 using WASender.Models;
 using WASender.Services;
 using WASender.Services.AdminSide;
@@ -88,7 +89,8 @@ builder.Services.AddSession(options =>
 // 🔹 Register Services (Dependency Injection)
 builder.Services.AddScoped<IFaqService, FaqService>();
 builder.Services.AddScoped<ISeoService, SeoService>();
-
+builder.Services.AddScoped<UploaderHelper>();
+builder.Services.AddScoped<BlogHelper>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IGlobalDataService, GlobalDataService>();
 builder.Services.AddScoped<ILoginService, LoginService>();

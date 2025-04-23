@@ -1,137 +1,178 @@
-﻿@model YourProjectNamespace.ViewModels.BulkMessageIndexViewModel
+﻿@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+
 @{
     ViewData["Title"] = "Transaction History";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/assets/vendor/select2/dist/css/select2.min.css" />
 }
 
-<partial name="_HeaderSection" model="new HeaderSectionModel {
-    Title = " Transaction History",
-         Buttons=new List<ButtonModel> {
-        new ButtonModel { Name = "<i class=\"ni ni-send\"></i>&nbsp;Send Bulk Message", Url = Url.Action("Create", "BulkMessage"), IsButton = false },
-        new ButtonModel { Name = "<i class=\"ni ni-send\"></i>&nbsp;Send Bulk Message With Template", Url = "#", Components = "data-toggle=\"modal\" data-target=\"#send-template-bulk\"", IsButton = true }
-    }
-}" />
 
-<div class="modal fade" id="send-template-bulk" tabindex="-1" aria-labelledby="send-template-label" aria-hidden="true">
+
+<!-- Modal -->
+<div class="modal fade" id="send-template-bulk" tabindex="-1" aria-labelledby="editModal" aria-hidden="true">
     <div class="modal-dialog">
-                @if (Model.Templates.Any() && Model.Groups.Any())
-                {
-                <div class="modal-content">
-                    <form asp-action="SendTemplateBulk" method="post" class="ajaxform_instant_reload">
-                        <input type="hidden" name="page_url" value="@Context.Request.Path + Context.Request.QueryString" />
-                        <div class="modal-header">
-                            <h5 class="modal-title">Send Bulk Message With Template</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+        @if (Model.Templates.Any() && Model.Groups.Any())
+        {
+            <div class="modal-content">
+                <form asp-action="SendTemplateBulk" asp-controller="Contact" asp-area="User" method="post" class="ajaxform_instant_reload">
+                    <input type="hidden" name="page_url" value="@Context.Request.Path + Context.Request.QueryString" />
+                    <div class="modal-header">
+                        <h5 class="modal-title">@Localizer["Send Bulk Message With Template"]</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>@Localizer["Select Template"]</label>
+                            <select name="template" class="form-control">
+                                @foreach (var template in Model.Templates)
+                                {
+                                    <option value="@template.Id">@template.Title</option>
+                                }
+                            </select>
                         </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label>Select Template</label>
-                                <select class="form-control" name="template">
-                                        @foreach (var template in Model.Templates)
-                                        {
-                                            <option value="@template.Id">@template.Title</option>
-                                        }
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Select Device</label>
-                                <select class="form-control" name="device">
-                                        @foreach (var device in Model.Devices)
-                                        {
-                                            <option value="@device.Id">@device.Name - @device.Phone</option>
-                                        }
-                                </select>
-                            </div>
-                            <div class="form-group receivers">
-                                <label>Select Group</label>
-                                <select class="form-control select2" name="group">
-                                        @foreach (var group in Model.Groups)
-                                        {
-                                            <option value="@group.Id">@group.Name</option>
-                                        }
-                                </select>
-                            </div>
+                        <div class="form-group">
+                            <label>@Localizer["Select Device"]</label>
+                            <select name="device" class="form-control">
+                                @foreach (var device in Model.Devices)
+                                {
+                                    <option value="@device.Id">@device.Name - @device.Phone</option>
+                                }
+                            </select>
                         </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-neutral float-right">Send Now</button>
+                        <div class="form-group receivers">
+                            <label>@Localizer["Select Group"]</label>
+                            <select name="group" class="form-control select2">
+                                @foreach (var group in Model.Groups)
+                                {
+                                    <option value="@group.Id">@group.Name</option>
+                                }
+                            </select>
                         </div>
-                    </form>
-                </div>
-                }
-                else
-                {
-                <div class="alert bg-gradient-primary text-white">Create some template and contacts</div>
-                }
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-neutral submit-btn float-right">@Localizer["Sent Now"]</button>
+                    </div>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="alert bg-gradient-primary text-white">
+                <span class="text-left">@Localizer["Create some template and contacts"]</span>
+            </div>
+        }
     </div>
 </div>
 
+<!-- Summary Cards -->
 <div class="row justify-content-center">
     <div class="col-12">
         <div class="row d-flex justify-content-between flex-wrap">
             <div class="col">
-                <partial name="_CardStats" model="new CardStatsModel { Title = \"Total Messages Sent\", Value = Model.Total, Icon = \"fi fi-rs-rocket-lunch\" }" />
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers">@Model.Total.ToString("N0")</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-rocket-lunch mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">@Localizer["Total Messages Sent"]</h5>
+                    </div>
+                </div>
             </div>
             <div class="col">
-                <partial name="_CardStats" model="new CardStatsModel { Title = \"Last 30 days Messages\", Value = Model.Last30Messages, Icon = \"ni ni-calendar-grid-58\" }" />
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 pending-transfers">@Model.Last30Messages.ToString("N0")</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="ni ni-calendar-grid-58"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">@Localizer["Last 30 days Messages"]</h5>
+                    </div>
+                </div>
             </div>
             <div class="col">
-                <partial name="_CardStats" model="new CardStatsModel { Title = \"Today's Transaction\", Value = Model.TodayTransaction, Icon = \"fi fi-rs-calendar-day\" }" />
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 completed-transfers">@Model.TodayTransaction.ToString("N0")</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-calendar-day mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">@Localizer["Today's Transaction"]</h5>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="card">
+        <!-- Table -->
+        <div class="card mt-4">
             <div class="card-body">
                 <div class="row">
-                            @if (Model.Posts.Any())
-                            {
-                            <div class="col-sm-12">
-                                <h4>Transaction History</h4>
-                            </div>
-                            <div class="col-sm-12 table-responsive">
-                                <table class="table col-12">
-                                    <thead>
+                    @if (Model.Posts.Any())
+                    {
+                        <div class="col-sm-12">
+                            <h4>@Localizer["Transaction History"]</h4>
+                        </div>
+                        <div class="col-sm-12 table-responsive">
+                            <table class="table col-12">
+                                <thead>
+                                    <tr>
+                                        <th>@Localizer["Message From"]</th>
+                                        <th>@Localizer["Message To"]</th>
+                                        <th>@Localizer["Message Type"]</th>
+                                        <th>@Localizer["Template name"]</th>
+                                        <th class="text-right">@Localizer["Requested At"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var log in Model.Posts)
+                                    {
                                         <tr>
-                                            <th>Message From</th>
-                                            <th>Message To</th>
-                                            <th>Message Type</th>
-                                            <th>Template name</th>
-                                            <th class="text-right">Requested At</th>
+                                            <td>@log.From</td>
+                                            <td>@log.To</td>
+                                            <td>@(log.Template != null ? "Template" : "Plain Text")</td>
+                                            <td>@(log.Template?.Title ?? "")</td>
+                                            <td class="text-right">@log.CreatedAt.ToString("dd MMMM yyyy")</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                            @foreach (var log in Model.Posts)
-                                            {
-                                                <tr>
-                                                    <td>@log.From</td>
-                                                    <td>@log.To</td>
-                                                    <td>@(log.Template != null ? "Template" : "Plain Text")</td>
-                                                    <td>@log.Template?.Title</td>
-                                                    <td class="text-right">@log.CreatedAt.ToString("dd MMMM yyyy")</td>
-                                                </tr>
-                                            }
-                                    </tbody>
-                                </table>
-                                <div class="d-flex justify-content-center">
-                                        @Html.Partial("_Pagination", Model.Posts)
-                                </div>
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="d-flex justify-content-center">
+                                @* @Html.Partial("_Pagination", Model.Posts) *@
                             </div>
-                            }
-                            else
-                            {
-                            <div class="btn btn-neutral col-12 text-center">No Transaction Found</div>
-                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="btn btn-neutral col-12 text-center">@Localizer["No Transaction Found"]</div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-        @section Scripts {
-        <script src="~/assets/vendor/select2/dist/js/select2.min.js"></script>
-        <script src="~/assets/js/pages/user/wa-bulk-index.js?v=1"></script>
-        }
+@section Scripts {
+    <script src="~/assets/vendor/select2/dist/js/select2.min.js"></script>
+    <script src="~/assets/js/pages/user/wa-bulk-index.js?v=1"></script>
+}
