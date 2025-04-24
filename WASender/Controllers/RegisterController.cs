@@ -8,21 +8,22 @@ using WASender.Services;
 
 namespace WASender.Controllers
 {
-    public class RegisterController : Controller
+    public class RegisterController : BaseController
     {
         private readonly IRegisterService _registerService;
-        private readonly ILogger<RegisterController> _logger;
 
-        public RegisterController(IRegisterService registerService, ILogger<RegisterController> logger)
+        public RegisterController(IGlobalDataService globalDataService, IRegisterService registerService, ILogger<RegisterController> logger)
+            : base(globalDataService, logger)
         {
             _registerService = registerService;
-            _logger = logger;
         }
 
         // ✅ Load Registration Form with PlanId
         [HttpGet]
         public async Task<IActionResult> Index(ulong? id)
         {
+            await LoadGlobalDataAsync();
+
             var (planTitle, planId) = await _registerService.GetPlanDetails(id);
             ViewBag.PlanTitle = planTitle;
             ViewBag.PlanId = planId;

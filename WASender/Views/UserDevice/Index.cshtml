@@ -1,0 +1,163 @@
+﻿@model List<WASender.Models.Device>
+
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Title"] = "Device";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Create Device", url = Url.Action("Create", "UserDevice"), is_button = false, components = "" }
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row d-flex justify-content-between flex-wrap">
+            <!-- Total Devices Card -->
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers" id="total-device">
+                                    <img src="@Url.Content("~/uploads/loader.gif")" />
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-devices mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Total Devices</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Devices Card -->
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers" id="total-active">
+                                    <img src="@Url.Content("~/uploads/loader.gif")" />
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-badge-check mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Active Devices</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inactive Devices Card -->
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 completed-transfers" id="total-inactive">
+                                    <img src="@Url.Content("~/uploads/loader.gif")" />
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-exclamation mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Inactive Devices</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (Model != null && Model.Count > 0)
+        {
+            <div class="row">
+                @foreach (var device in Model)
+                {
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card border-0">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0 text-dark">@device.Name</h5>
+                                        <div class="mt-3 mb-0">
+                                            <span class="pt-2 text-dark">
+                                                Phone :
+                                                @if (!string.IsNullOrEmpty(device.Phone))
+                                                {
+                                                    <a href="@Url.Action("Scan", "Device", new { uuid = device.Uuid })">
+                                                        @device.Phone
+                                                    </a>
+                                                }
+                                            </span>
+                                            <br /><br />
+                                            <span class="pt-2 text-dark">Total Messages: @device.Smstransactions?.Count().ToString("N0")</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-sm btn-neutral mr-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            <a class="dropdown-item has-icon" href="@Url.Action("Scan", "Device", new { uuid = device.Uuid })">
+                                                <i class="fas fa-qrcode"></i> Scan
+                                            </a>
+                                            @if (device.Status == 1)
+                                            {
+                                                <a class="dropdown-item has-icon" href="@Url.Content("~/user/device/chats/" + device.Uuid)">
+                                                    <i class="fi fi-rs-comments-question-check"></i> Chats
+                                                </a>
+                                                <a class="dropdown-item has-icon" href="@Url.Content("~/user/device/groups/" + device.Uuid)">
+                                                    <i class="fi fi-rs-folder-tree"></i> Groups
+                                                </a>
+                                            }
+                                            <a class="dropdown-item has-icon" href="@Url.Action("Edit", "Device", new { uuid = device.Uuid })">
+                                                <i class="fi fi-rs-edit"></i> Edit Device Name
+                                            </a>
+                                            <a class="dropdown-item has-icon" href="@Url.Action("Show", "Device", new { uuid = device.Uuid })">
+                                                <i class="ni ni-align-left-2"></i> View Log
+                                            </a>
+                                            <a class="dropdown-item has-icon delete-confirm" href="javascript:void(0)" data-action="@Url.Action("Destroy", "Device", new { uuid = device.Uuid })">
+                                                <i class="fas fa-trash"></i> Remove Device
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-sm">
+                                    <a class="text-nowrap font-weight-600" href="@Url.Action("Scan", "Device", new { uuid = device.Uuid })">
+                                        <span class="text-dark">Status :</span>
+                                        <span class="badge badge-sm @(device.Status == 1 ? "badge-success" : "badge-danger")">
+                                            @(device.Status == 1 ? "Active" : "Inactive")
+                                        </span>
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert bg-gradient-primary text-white">
+                <span class="text-left">Opps There Is No Device Found....</span>
+            </div>
+        }
+    </div>
+</div>
+
+<input type="hidden" id="base_url" value="@Url.Content("~")" />
+
+@section Scripts {
+    <script src="@Url.Content("~/assets/js/pages/user/device.js")"></script>
+}

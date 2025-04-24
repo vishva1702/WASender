@@ -1,0 +1,99 @@
+﻿@{
+    ViewData["Title"] = "Create Device";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <h6 class="h2 text-white d-inline-block mb-0">Create Device</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="/user/device">Devices</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Create</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-6 col-5 text-right">
+                    <a href="@Url.Action("Index", "UserDevice")" class="btn btn-sm btn-neutral">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Create New Device</h3>
+                </div>
+                <div class="card-body">
+                    <form id="createDeviceForm">
+                        <div class="form-group">
+                            <label for="deviceName">Device Name</label>
+                            <input type="text" class="form-control" id="deviceName" name="name"
+                                   placeholder="e.g., My iPhone 13" required>
+                            <small class="form-text text-muted">Give your device a recognizable name</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="webhookUrl">Webhook URL</label>
+                            <input type="url" class="form-control" id="webhookUrl" name="webhook_url"
+                                   placeholder="https://webhook.site/your-unique-id" required>
+                            <small class="form-text text-muted">
+                                We'll send WhatsApp events to this URL.
+                                <a href="https://webhook.site" target="_blank">Get a test webhook</a>
+                            </small>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Create Device
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#createDeviceForm').submit(function(e) {
+                e.preventDefault();
+
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creating...');
+
+                $.ajax({
+                    url: '/UserDevice/Store',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMsg = 'An error occurred';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+                        alert(errorMsg);
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false).html('<i class="fas fa-plus"></i> Create Device');
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,104 @@
+﻿@{
+    var info = ViewBag.Info as WASender.Models.Post;
+    var excerpt = ViewBag.Excerpt as string;
+    var longDesc = ViewBag.LongDescription as string;
+    var languages = ViewBag.Languages as Dictionary<string, string>;
+}
+
+@{
+    ViewData["Title"] = "Edit a feature";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Back", url = Url.Action("Index", "AdminFeatures"), is_button = false, components = "" }
+    };
+}
+@await Html.PartialAsync("_HeaderSection")
+
+<form asp-action="Update" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="@info.Id" />
+
+    <div class="row">
+        <div class="col-lg-5">
+            <strong>Edit features post</strong>
+            <p>Edit your features post details and necessary information from here</p>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="form-group row">
+                        <label class="col-lg-12">Features Title</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="title" class="form-control" value="@info.Title" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Preview Image</label>
+                        <div class="col-lg-12">
+                            <input type="file" name="preview_image" accept="image/*" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Banner Image</label>
+                        <div class="col-lg-12">
+                            <input type="file" name="banner_image" accept="image/*" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Short Description</label>
+                        <div class="col-lg-12">
+                            <textarea name="description" class="form-control h-100" maxlength="500" required>@excerpt</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-3">
+                        <label class="col-lg-12">Main Description</label>
+                        <div class="col-lg-12">
+                            <textarea name="main_description" class="form-control h-200" required>@longDesc</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Select Language</label>
+                        <div class="col-lg-12">
+                            <select name="language" class="form-control">
+                                @foreach (var lang in languages)
+                                {
+                                    <option value="@lang.Key" selected="@(info.Lang == lang.Key ? "selected" : null)">@lang.Value</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <div class="col-lg-12 d-flex align-items-center">
+                            <label class="custom-toggle custom-toggle-primary">
+                                <input type="checkbox" name="featured" value="1" @(info.Featured == 1 ? "checked" : "") />
+                                <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                            </label>
+                            <label class="ml-2 mt-1"><h4>Make it featured?</h4></label>
+                        </div>
+
+                        <div class="col-lg-12 d-flex align-items-center mt-2">
+                            <label class="custom-toggle custom-toggle-primary">
+                                <input type="checkbox" name="status" value="1" @(info.Status == 1 ? "checked" : "") />
+                                <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                            </label>
+                            <label class="ml-2 mt-1"><h4>Make it publish?</h4></label>
+                        </div>
+
+                        <div class="col-lg-12 mt-3">
+                            <button type="submit" class="btn btn-neutral submit-button">Submit</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

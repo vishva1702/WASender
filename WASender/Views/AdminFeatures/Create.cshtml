@@ -1,0 +1,121 @@
+﻿@{
+    ViewData["Title"] = "Create Feature";
+    var languages = ViewBag.Languages as Dictionary<string, string>;
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Back", url = Url.Action("Index", "AdminFeatures"), is_button = false, components = "" }
+    };
+}
+@await Html.PartialAsync("_HeaderSection")
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<form asp-area="Admin" asp-controller="AdminFeatures" asp-action="Store" method="post" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-lg-5">
+            <strong>Create a features post</strong>
+            <p>Add your features details and necessary information from here</p>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-body">
+                    <!-- Feature Title -->
+                    <div class="form-group row">
+                        <label class="col-lg-12">Features Title</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="title" required class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- Preview Image -->
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Preview Image</label>
+                        <div class="col-lg-12">
+                            <input type="file" name="preview_image" accept="image/*" required class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- Banner Image -->
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Banner Image</label>
+                        <div class="col-lg-12">
+                            <input type="file" name="banner_image" accept="image/*" required class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- Short Description -->
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Short Description</label>
+                        <div class="col-lg-12">
+                            <textarea name="description" maxlength="500" class="form-control" rows="3" required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Main Description -->
+                    <div class="form-group row mt-3">
+                        <label class="col-lg-12">Main Description</label>
+                        <div class="col-lg-12">
+                            <textarea name="main_description" class="form-control" rows="5" required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Select Language -->
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Select Language</label>
+                        <div class="col-lg-12">
+                            <select name="language" class="form-control">
+                                @foreach (var lang in languages ?? new Dictionary<string, string>())
+                                {
+                                    <option value="@lang.Key">@lang.Value</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Toggles -->
+                    <div class="form-group row mt-2">
+                        <!-- Featured toggle -->
+                        <div class="col-lg-12 d-flex align-items-center mb-2">
+                            <label class="custom-toggle custom-toggle-primary mr-2">
+                                <input type="checkbox" name="featured" value="1" />
+                                <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                            </label>
+                            <label><h5 class="mb-0">Make it featured?</h5></label>
+                        </div>
+
+                        <!-- Publish toggle -->
+                        <div class="col-lg-12 d-flex align-items-center">
+                            <label class="custom-toggle custom-toggle-primary mr-2">
+                                <input type="checkbox" name="status" value="1" />
+                                <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                            </label>
+                            <label><h5 class="mb-0">Make it publish?</h5></label>
+                        </div>
+                    </div>
+
+                    <!-- Submit button -->
+                    <div class="form-group row mt-3">
+                        <div class="col-lg-12">
+                            <button type="submit" class="btn btn-neutral submit-button">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

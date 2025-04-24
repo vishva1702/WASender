@@ -15,7 +15,7 @@ public partial class Plan
 
     public double? Price { get; set; }
 
-    public int? IsFeatured { get; set; }
+    public int? IsFeatured { get; set; } 
 
     public int? IsRecommended { get; set; }
 

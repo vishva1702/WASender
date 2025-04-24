@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using WASender.Services;
 using Microsoft.AspNetCore.Authorization;
 
 namespace WASender.Controllers.AdminSide
@@ -17,6 +18,12 @@ namespace WASender.Controllers.AdminSide
 
 
         public AdminHomeController(ApplicationDbContext context)
+    public class AdminHomeController : BaseController
+    {
+        private readonly ApplicationDbContext _context;
+
+        public AdminHomeController(IGlobalDataService globalDataService, ILogger<AdminHomeController> logger, ApplicationDbContext context)
+            : base(globalDataService, logger)
         {
             _context = context;
         }
@@ -24,6 +31,8 @@ namespace WASender.Controllers.AdminSide
         public async Task<IActionResult> Index()
         {
             
+            await LoadGlobalDataAsync();
+
             ViewData["TotalOrders"] = await _context.Orders.CountAsync();
 
             ViewData["PendingOrders"] = await _context.Orders.CountAsync(o => o.Status == 2);
@@ -64,6 +73,7 @@ namespace WASender.Controllers.AdminSide
                     Link = Url.Action("Details", "Order", new { id = o.Id })
                 })
                 .ToListAsync();
+
 
             ViewData["PopularPlans"] = await _context.Plans
                 .Where(p => p.Orders.Any())
@@ -146,7 +156,6 @@ namespace WASender.Controllers.AdminSide
         }
     }
 
-    // 🟢 SalesOverview Request Model
     public class SalesOverview
     {
         public string Type { get; set; }

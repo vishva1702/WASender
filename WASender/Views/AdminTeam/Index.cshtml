@@ -1,0 +1,208 @@
+﻿@model List<Post>
+@{
+    ViewData["Title"] = "Our Team";
+    var totalPosts = ViewData["TotalPosts"];
+    var totalActivePosts = ViewData["TotalActivePosts"];
+    var totalInactivePosts = ViewData["TotalInactivePosts"];
+}
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Create A Team", url = Url.Action("Create", "AdminTeam"), is_button = false, components = "" }
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row d-flex justify-content-between flex-wrap">
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0">@totalPosts</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-users-alt mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Total Members</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0">@totalActivePosts</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-comment-user mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Active Members</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0">@totalInactivePosts</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-delete-user mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Inactive Members</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table Section -->
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                <h3 class="mb-0">Our Team</h3>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col-5">Name</th>
+                            <th class="col-2">Position</th>
+                            <th class="col-3 text-right">Status</th>
+                            <th class="col-2 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var post in Model)
+                            {
+                                var previewMeta = post.Postmetas.FirstOrDefault(m => m.Key == "preview");
+                                var previewImage = previewMeta?.Value ?? "/images/default.png";
+
+                                <tr>
+                                    <td class="text-left">
+                                        <img src="@Url.Content(previewImage)" class="avatar rounded-square mr-3" width="50">
+                                        @post.Title
+                                    </td>
+                                    <td class="text-left">
+                                        @post.Slug
+                                    </td>
+                                    <td class="text-right">
+                                        <span class="badge badge-@(post.Status == 1 ? "success" : "danger")">
+                                            @(post.Status == 1 ? "Active" : "Draft")
+                                        </span>
+                                    </td>
+
+                                    <td class="text-right">
+                                        <div class="btn-group mb-2 float-right">
+                                            <button class="btn btn-neutral btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                                Action
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item has-icon" href="@Url.Action("Edit", "AdminTeam", new { id = post.Id })">
+                                                    <i class="fi fi-rs-edit"></i> Edit
+                                                </a>
+                                                <a class="dropdown-item has-icon text-danger delete-confirm" href="#" data-action="@Url.Action("Delete", "AdminTeam", new { id = post.Id })">
+                                                    <i class="fas fa-trash"></i> Remove Member
+                                                </a>
+
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center">
+                                    <div class="alert bg-gradient-primary text-white">
+                                        <span>No records found</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-footer py-4">
+                <nav>
+                    <!-- Pagination will be handled here in a real scenario -->
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="@Url.Content("~/assets/vendor/select2/dist/js/select2.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/pages/user/contact.js")"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+                                      document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".delete-confirm").forEach(button => {
+                button.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    let deleteUrl = this.getAttribute("data-action");
+
+                    if (!deleteUrl) {
+                        Swal.fire("Error!", "Invalid delete URL.", "error");
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You want to delete this member?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(deleteUrl, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-Requested-With": "XMLHttpRequest"
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire("Deleted!", data.message, "success").then(() => location.reload());
+                                } else {
+                                    Swal.fire("Error!", data.message, "error");
+                                }
+                            })
+                            .catch(error => Swal.fire("Error!", "Failed to delete: " + error.message, "error"));
+                        }
+                    });
+                });
+            });
+        });
+
+    </script>
+}

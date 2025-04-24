@@ -40,7 +40,7 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/admin/support") ? "active" : "")" asp-area="Admin" asp-controller="Support" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/support") ? "active" : "")" asp-area="Admin" asp-controller="AdminSupport" asp-action="Index">
             <i class="fi fi-rs-headset"></i>
             <span class="nav-link-text">Help & Supports</span>
         </a>
@@ -110,6 +110,7 @@
             <ul class="nav nav-sm flex-column">
                 <li class="nav-item">
                     <a asp-area="Admin" asp-controller="AdminBlog" asp-action="Index" class="nav-link">Blogs</a>
+                    <a asp-area="Admin" asp-controller="Blog" asp-action="Index" class="nav-link">Blogs</a>
                 </li>
                 <li class="nav-item">
                     <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="nav-link">Category</a>
@@ -128,12 +129,14 @@
     </li>
     <li class="nav-item">
         <a class="nav-link @(currentPath.StartsWithSegments("/admin/features") ? "active" : "")" asp-area="Admin" asp-controller="Features" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/features") ? "active" : "")" asp-area="Admin" asp-controller="AdminFeatures" asp-action="Index">
             <i class="fi fi-rs-dice-alt"></i>
             <span class="nav-link-text">Features</span>
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link @(currentPath.StartsWithSegments("/admin/testimonials") ? "active" : "")" asp-area="Admin" asp-controller="Testimonial" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/testimonials") ? "active" : "")" asp-area="Admin" asp-controller="Testimonials" asp-action="Index">
             <i class="fi fi-rs-comment-quote"></i>
             <span class="nav-link-text">Testimonials</span>
         </a>
@@ -152,6 +155,7 @@
     </li>
     <li class="nav-item">
         <a class="nav-link @(currentPath.StartsWithSegments("/admin/partner") ? "active" : "")" asp-area="Admin" asp-controller="Partner" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/partner") ? "active" : "")" asp-area="Admin" asp-controller="AdminPartener" asp-action="Index">
             <i class="fi fi-rs-animated-icon"></i>
             <span class="nav-link-text">Partners</span>
         </a>
@@ -184,7 +188,8 @@
 
 <!-- Heading -->
 <h6 class="navbar-heading p-0 text-muted mt-4">Site Settings</h6>
-<ul class="navbar-nav">
+<ul class="navbar-nav mb-md-3">
+
     <li class="nav-item">
         <a class="nav-link" asp-area="Admin" asp-controller="PageSettings" asp-action="Index">
             <i class="fi fi-rs-magic-wand"></i>
@@ -198,6 +203,28 @@
            role="button"
            aria-expanded="false"
            aria-controls="navbar-forms">
+
+    <li class="nav-item">
+        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString().StartsWith("Admin") == true || ViewContext.RouteData.Values["controller"]?.ToString().StartsWith("Role") == true ? "active" : "")"
+            href="#admin-roles" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="navbar-forms">
+            <i class="fi fi-rs-shield-check"></i>
+            <span class="nav-link-text">Admin and Role</span>
+        </a>
+        <div class="collapse" id="admin-roles">
+            <ul class="nav nav-sm flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="AdminAdmin" asp-action="Index">Admin</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="AdminRole" asp-action="Index">Roles</a>
+                </li> 
+            </ul>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString().StartsWith("Admin") == true || ViewContext.RouteData.Values["controller"]?.ToString().StartsWith("Role") == true ? "active" : "")"
+           href="#dev-settings" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="navbar-forms">
             <i class="fi fi-rs-settings"></i>
             <span class="nav-link-text">Developer Settings</span>
         </a>
@@ -230,17 +257,37 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="AdminDeveloperSettings" asp-action="Show" asp-route-id="app-settings">App Settings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="AdminDeveloperSettings" asp-action="Show" asp-route-id="mail-settings">SMTP Settings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="AdminDeveloperSettings" asp-action="Show" asp-route-id="wa-settings">Whatsapp Server</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="AdminDeveloperSettings" asp-action="Show" asp-route-id="storage-settings">Storage Settings</a>
+                </li>
             </ul>
         </div>
     </li>
 
+    <li class="nav-item">
+        <a class="nav-link" asp-area="Admin" asp-controller="Update" asp-action="Index">
+            <i class="fi fi-rs-download"></i>
+            <span class="nav-link-text">Update</span>
+        </a>
+    </li>
+
 </ul>
+
 
 <!-- My Settings -->
 <h6 class="navbar-heading p-0 text-muted mt-2">My Settings</h6>
 <ul class="navbar-nav mb-md-3">
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/admin/profile") ? "active" : "")" asp-area="Admin" asp-controller="Profile" asp-action="Index">
+        <a class="nav-link" asp-area="Admin" asp-controller="AdminProfile" asp-action="Index">
             <i class="fi fi-rs-comment-user"></i>
             <span class="nav-link-text">Profile Settings</span>
         </a>
@@ -254,5 +301,6 @@
 </ul>
 
 <form id="logout-form" method="post" asp-area="Admin" asp-controller="Account" asp-action="Logout">
+<form id="logout-form" method="post" asp-area="Admin" asp-controller="Login" asp-action="Logout">
     @Html.AntiForgeryToken()
 </form>

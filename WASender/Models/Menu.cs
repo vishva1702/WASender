@@ -11,7 +11,7 @@ public partial class Menu
 
     public string Position { get; set; } = null!;
 
-    public string Data { get; set; } = null!;
+    public string Data { get; set; } 
 
     public string Lang { get; set; } = null!;
 

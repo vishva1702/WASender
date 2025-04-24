@@ -68,6 +68,14 @@ public class LoginController : BaseController
             new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", CultureInfo.CurrentCulture.TextInfo.ToTitleCase(role))
             // Optionally add additional claims if needed
         };
+{
+    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+    new Claim("UserId", user.Id.ToString()), // Add this
+    new Claim("Avatar", user.Avatar ?? ""), // Add this if Avatar exists in user
+    new Claim(ClaimTypes.Name, email),
+    new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", CultureInfo.CurrentCulture.TextInfo.ToTitleCase(role))
+};
+
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
@@ -77,6 +85,7 @@ public class LoginController : BaseController
             {
                 IsPersistent = true,
                 ExpiresUtc = DateTime.UtcNow.AddMinutes(60)
+                ExpiresUtc = DateTime.UtcNow.AddMinutes(120)
             });
 
         // Set the JWT token in a cookie (if needed)
@@ -113,6 +122,7 @@ public class LoginController : BaseController
         HttpContext.Session.Clear();
 
         return RedirectToAction("Index", "Home"); // Redirect to login page after logout
+        return RedirectToAction("Index", "Login"); // Redirect to login page after logout
     }
 
     [HttpPost]
@@ -139,4 +149,5 @@ public class LoginController : BaseController
         _logger.LogInformation("API Login successful for {Email}, role: {Role}", email, role);
         return Ok(new { Token = token, Role = role });
     }
+}
 }

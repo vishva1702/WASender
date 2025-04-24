@@ -1,0 +1,132 @@
+﻿@model IEnumerable<WASender.Models.User>
+
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Title"] = "Admins";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "<i class='fa fa-plus'></i>&nbsp;Create a admin", url = Url.Action("Create", "AdminAdmin"), is_button = false, components = "" }
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-30">
+                    <div class="col-lg-6">
+                        <h4>Admins</h4>
+                    </div>
+                    <div class="col-lg-6">
+                        <!-- You can add extra filter or search bar here if needed -->
+                    </div>
+                </div>
+                <br />
+                <div class="card-action-filter">
+                    <div class="table-responsive custom-table">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Role</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in Model)
+                                {
+                                    <tr>
+                                        <td>@user.Name</td>
+                                        <td>@user.Email</td>
+                                        <td>
+                                            @if (user.Status == 1)
+                                            {
+                                                <span class="badge badge-success">Active</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-danger">Deactive</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(user.Role))
+                                            {
+                                                <span class="badge badge-primary">
+                                                    @(user.Role == "admin" ? "Admin" :  user.Role)
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">No Role</span>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="@Url.Action("Edit", "AdminAdmin", new { id = user.Id })" class="btn btn-neutral btn-sm">Edit</a>
+                                            <a href="#" data-url="@Url.Action("Delete", "AdminAdmin", new { id = user.Id })" class="btn btn-neutral btn-sm delete-confirm">Delete</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div> 
+                </div> 
+            </div> 
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="@Url.Content("~/assets/vendor/select2/dist/js/select2.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/pages/user/contact.js")"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+                                      document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".delete-confirm").forEach(button => {
+                button.addEventListener("click", function (e) {
+                    e.preventDefault();
+                     let deleteUrl = this.getAttribute("data-url");
+
+                    if (!deleteUrl) {
+                        Swal.fire("Error!", "Invalid delete URL.", "error");
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You want to delete this member?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(deleteUrl, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-Requested-With": "XMLHttpRequest"
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire("Deleted!", data.message, "success").then(() => location.reload());
+                                } else {
+                                    Swal.fire("Error!", data.message, "error");
+                                }
+                            })
+                            .catch(error => Swal.fire("Error!", "Failed to delete: " + error.message, "error"));
+                        }
+                    });
+                });
+            });
+        });
+
+    </script>
+}

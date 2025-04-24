@@ -10,7 +10,7 @@ namespace WASender.Controllers
         private readonly IFeatureService _featureService;
 
         public FeaturesController(IGlobalDataService globalDataService, IFeatureService featureService, ILogger<FeaturesController> logger)
-            : base(globalDataService, logger) // Pass both required parameters to BaseController
+            : base(globalDataService, logger) 
         {
             _featureService = featureService;
         }
@@ -28,7 +28,7 @@ namespace WASender.Controllers
             var faqs = await _featureService.GetFaqsAsync();
             ViewBag.Faqs = faqs;
 
-            return View("List"); // Render List.cshtml
+            return View("List"); 
         }
 
         public async Task<IActionResult> Details(string slug)
@@ -42,7 +42,7 @@ namespace WASender.Controllers
             }
 
             ViewBag.Feature = feature;
-            return View("Show"); // Render Show.cshtml
+            return View("Show"); 
         }
 
         public async Task<IActionResult> Faq()

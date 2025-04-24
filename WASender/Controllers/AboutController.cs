@@ -19,6 +19,8 @@ namespace WASender.Controllers
 
         public async Task<IActionResult> Index()
         {
+            await LoadGlobalDataAsync();
+
             try
             {
                 await LoadGlobalDataAsync();

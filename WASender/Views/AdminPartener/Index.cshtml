@@ -1,0 +1,321 @@
+﻿@{
+    var brands = ViewData["brands"] as List<WASender.Models.Category>;
+    var totalBrands = ViewBag.totalBrands;
+    var activeBrands = ViewBag.activeBrands;
+    var inActiveBrands = ViewBag.inActiveBrands;
+    var selectedStatus = ViewBag.Status?.ToString();
+}
+@{
+    ViewData["Title"] = "Categories";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new {
+            name = "<i class='fa fa-plus'></i>&nbsp;Create a partner",
+            url = "#",
+            is_button = true,
+            components = "data-toggle='modal' data-target='#addRecord' id='add_record'"
+        }
+    };
+}
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row d-flex justify-content-between flex-wrap">
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers" id="total-device">@totalBrands</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-elevator mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Total Partners</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers" id="total-active">@activeBrands</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-badge-check mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Active Partners</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 completed-transfers" id="total-inactive">@inActiveBrands</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-circle-cross mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Inactive Partners</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                <h3 class="mb-0">Partners / Brands</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col-2">Image</th>
+                            <th class="col-3">Url</th>
+                            <th class="col-1">Type</th>
+                            <th class="col-2">Status</th>
+                            <th class="col-2">Created At</th>
+                            <th class="col-2 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in brands)
+                        {
+                            <tr>
+                                <td class="text-left">
+                                    <img src="@row.Slug" class="avatar rounded-square w-70-per" />
+                                </td>
+                                <td class="text-left">@row.Title</td>
+                                <td class="text-left">@((row.Lang == "en") ? "Partner" : row.Lang)</td>
+                                <td class="text-left">
+                                    <span class="badge badge-@(row.Status == 1 ? "success" : "danger")">
+                                        @(row.Status == 1 ? "Active" : "Draft")
+                                    </span>
+                                </td>
+                                <td>@(row.CreatedAt?.ToString("MMMM-dd-yyyy"))</td>
+                                <td class="text-right">
+                                    <div class="btn-group mb-2 float-right">
+                                        <button class="btn btn-neutral btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                            Action
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item has-icon edit-row" href="#"
+                                               data-action="/AdminPartener/Update/@row.Id"
+                                               data-url="@row.Title"
+                                               data-type="@row.Lang"
+                                               data-status="@row.Status"
+                                               data-id="@row.Id"
+                                               data-toggle="modal"
+                                               data-target="#editModal">
+                                                <i class="fi fi-rs-edit"></i> Edit
+                                            </a>
+
+                                            <a class="dropdown-item has-icon delete-confirm" href="#"
+                                               data-action="/AdminPartener/Destroy/@row.Id">
+                                                <i class="fas fa-trash"></i> Remove
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                @if (brands.Count == 0)
+                {
+                    <div class="text-center mt-2">
+                        <div class="alert bg-gradient-primary text-white">
+                            <span class="text-left">!Opps no records found</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Create Partner Modal -->
+<div class="modal fade" id="addRecord" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <form method="post" action="/AdminPartener/Store" enctype="multipart/form-data">
+            <div class="modal-header">
+               <h3 class="modal-title">Create Partner</h3>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               <div class="form-group mb-3">
+                  <label for="url">Brand URL</label>
+                  <input type="text" name="url" id="url" class="form-control" value="@ViewData["Url"]" />
+               </div>
+               <div class="form-group mb-3">
+                  <label for="image">Brand Image</label>
+                  <input type="file" accept="image/*" name="image" id="image" required class="form-control" />
+               </div>
+                    <div class="form-group mb-3">
+                        <label for="type">Type</label>
+                        <select class="form-control" name="type" id="type">
+                            <option value="partner" selected="@(ViewBag.Type?.ToString() == "partner" ? "selected" : null)">Partner / Brand</option>
+                            <option value="integration" selected="@(ViewBag.Type?.ToString() == "integration" ? "selected" : null)">Integration Partner</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="status">Status</label>
+                        <select class="form-control" name="status" id="status">
+                            <option value="1">Active</option>
+                            <option value="0">InActive</option>
+                        </select>
+                    </div>
+
+            </div>
+            <div class="modal-footer">
+               <button type="submit" class="btn btn-neutral">Create Now</button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editForm" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="id" id="edit_id" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Partner</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Brand Url</label>
+                        <input type="text" name="url" id="edit_url" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Brand Image</label>
+                        <input type="file" name="image" class="form-control" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_type">Type</label>
+                        <select class="form-control" name="type" id="edit_type">
+                            <option value="partner">Partner / Brand</option>
+                            <option value="integration">Integration Partner</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_status">Status</label>
+                        <select class="form-control" name="status" id="edit_status">
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Update Now</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/assets/js/pages/admin/menu-list.js"></script>
+    <script src="{{ asset('assets/js/pages/admin/brand.js') }}"></script>
+
+    <script src="@Url.Content("~/assets/vendor/select2/dist/js/select2.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/pages/user/contact.js")"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+                                      document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".delete-confirm").forEach(button => {
+                button.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    let deleteUrl = this.getAttribute("data-action");
+
+                    if (!deleteUrl) {
+                        Swal.fire("Error!", "Invalid delete URL.", "error");
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You want to delete this member?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(deleteUrl, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-Requested-With": "XMLHttpRequest"
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire("Deleted!", data.message, "success").then(() => location.reload());
+                                } else {
+                                    Swal.fire("Error!", data.message, "error");
+                                }
+                            })
+                            .catch(error => Swal.fire("Error!", "Failed to delete: " + error.message, "error"));
+                        }
+                    });
+                });
+            });
+        });
+
+    </script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const editButtons = document.querySelectorAll('.edit-row');
+            const editForm = document.getElementById('editForm');
+
+            editButtons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id = this.getAttribute('data-id');
+                    const url = this.getAttribute('data-url');
+                    const type = this.getAttribute('data-type');
+                    const status = this.getAttribute('data-status');
+                    const actionUrl = this.getAttribute('data-action');
+
+                    editForm.setAttribute('action', actionUrl);
+                    document.getElementById('edit_id').value = id;
+                    document.getElementById('edit_url').value = url;
+                    document.getElementById('edit_type').value = type;
+                    document.getElementById('edit_status').value = status;
+                });
+            });
+        });
+    </script>
+
+}

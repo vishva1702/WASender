@@ -24,6 +24,7 @@ namespace WASender.Controllers
         public async Task<IActionResult> ForgotPasswordAsync()
         {
             await LoadGlobalDataAsync();
+
             return View();
         }
 
@@ -82,7 +83,7 @@ namespace WASender.Controllers
             if (success)
             {
                 TempData["SuccessMessage"] = "Password has been reset successfully!";
-                return RedirectToAction("Index", "Login"); // Redirect to the login page
+                return RedirectToAction("Index", "Login"); 
             }
             else
             {
