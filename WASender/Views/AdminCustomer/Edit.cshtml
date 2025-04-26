@@ -1,0 +1,91 @@
+﻿@model WASender.Models.User
+
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row">
+    <div class="col-lg-5 mt-5">
+        <strong>Edit User</strong>
+        <p>Edit user profile information</p>
+    </div>
+    <div class="col-lg-7 mt-5">
+        <!-- Display Success or Error Messages -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+
+        <form asp-action="Update" asp-controller="AdminCustomer" method="post">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.Id)
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Name</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="Name" required class="form-control" value="@Model.Name">
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Email</label>
+                        <div class="col-lg-12">
+                            <input type="email" name="Email" required class="form-control" value="@Model.Email">
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Phone</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="Phone" class="form-control" value="@Model.Phone">
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Address</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="Address" class="form-control" value="@Model.Address">
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">New Password</label>
+                        <div class="col-lg-12">
+                            <input type="password" name="Password" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Status</label>
+                        <div class="col-lg-12">
+                            @Html.DropDownListFor(model => model.Status,
+                                     new SelectList(new[]
+                                     {
+                            new { Value = "1", Text = "Active" },
+                            new { Value = "0", Text = "Deactive" }
+                            }, "Value", "Text", Model.Status),
+                                     new { @class = "form-control" })
+                        </div>
+                    </div>
+
+
+
+
+
+                    <div class="form-group row mt-3">
+                        <div class="col-lg-12">
+                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                            <a href="@Url.Action("Index", "AdminCustomer")" class="btn btn-secondary btn-sm">Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

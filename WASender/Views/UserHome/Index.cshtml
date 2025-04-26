@@ -15,6 +15,7 @@
                     <div class="col">
                         <h5 class="card-title text-uppercase text-muted mb-0">Total Devices</h5>
 <<<<<<< HEAD
+<<<<<<< HEAD
                         <img src="~/uploads/loader.gif" class="loader" />
                         <span class="h2 font-weight-bold mb-0 data-text" style="display: none;">@ViewData["TotalDevices"]</span>
                     </div>
@@ -181,7 +182,12 @@
                         <span class="h2 font-weight-bold mb-0" id="total-device">
                             <img src="~/uploads/loader.gif" />
                         </span>
+=======
+                        <img src="~/uploads/loader.gif" class="loader" />
+                        <span class="h2 font-weight-bold mb-0 data-text" style="display: none;">@ViewData["TotalDevices"]</span>
+>>>>>>> 3c411f0 (AdminCategory,AdminTAg,AdminCustomer page)
                     </div>
+
                     <div class="col-auto">
                         <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
                             <i class="fas fa-server"></i>
@@ -199,9 +205,8 @@
                 <div class="row">
                     <div class="col">
                         <h5 class="card-title text-uppercase text-muted mb-0">Total Messages</h5>
-                        <span class="h2 font-weight-bold mb-0 mt-1" id="total-messages">
-                            <img src="~/uploads/loader.gif" />
-                        </span>
+                        <img src="~/uploads/loader.gif" class="loader" />
+                        <span class="h2 font-weight-bold mb-0 data-text" style="display: none;">@ViewData["TotalMessages"]</span>
                     </div>
                     <div class="col-auto">
                         <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
@@ -220,9 +225,8 @@
                 <div class="row">
                     <div class="col">
                         <h5 class="card-title text-uppercase text-muted mb-0">Pending Schedules</h5>
-                        <span class="h2 font-weight-bold mb-0" id="total-schedule">
-                            <img src="~/uploads/loader.gif" />
-                        </span>
+                        <img src="~/uploads/loader.gif" class="loader" />
+                        <span class="h2 font-weight-bold mb-0 data-text" style="display: none;">@ViewData["PendingSchedules"]</span>
                     </div>
                     <div class="col-auto">
                         <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
@@ -241,9 +245,8 @@
                 <div class="row">
                     <div class="col">
                         <h5 class="card-title text-uppercase text-muted mb-0">Total Contacts</h5>
-                        <span class="h2 font-weight-bold mb-0" id="total-contacts">
-                            <img src="~/uploads/loader.gif" />
-                        </span>
+                        <img src="~/uploads/loader.gif" class="loader" />
+                        <span class="h2 font-weight-bold mb-0 data-text" style="display: none;">@ViewData["TotalContacts"]</span>
                     </div>
                     <div class="col-auto">
                         <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
@@ -254,7 +257,6 @@
             </div>
         </div>
     </div>
-</div>
 
 <!-- Alert Messages -->
 @if (TempData["Success"] != null)
@@ -334,5 +336,18 @@
     <script src="~/assets/vendor/chart.js/dist/chart.min.js"></script>
     <script src="~/assets/plugins/canvas-confetti/confetti.browser.min.js"></script>
     <script src="~/assets/js/pages/user/dashboard.js"></script>
+<<<<<<< HEAD
 }
 >>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))
+=======
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(function () {
+                document.querySelectorAll('.loader').forEach(loader => loader.style.display = 'none');
+                document.querySelectorAll('.data-text').forEach(data => data.style.display = 'inline');
+            }, 2000); // 2 seconds delay
+        });
+    </script>
+
+}
+>>>>>>> 3c411f0 (AdminCategory,AdminTAg,AdminCustomer page)

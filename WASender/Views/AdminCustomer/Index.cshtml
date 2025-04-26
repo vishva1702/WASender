@@ -1,0 +1,197 @@
+﻿@model List<WASender.Models.User>
+@using WASender.Models
+
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+@await Html.PartialAsync("_HeaderSection")
+
+
+<div class="container">
+
+    <!-- Customer Stats Cards -->
+    <div class="row d-flex justify-content-between flex-wrap">
+        <div class="col">
+            <div class="card card-stats">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <span class="h2 font-weight-bold mb-0 total-transfers" id="total-device">
+                                @ViewData["TotalCustomers"]
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                <i class="fi fi-rs-users-alt mt-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="card-title text-muted mb-0">Total Customers</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card card-stats">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <span class="h2 font-weight-bold mb-0 total-transfers" id="total-active">
+                                @ViewData["TotalActiveCustomers"]
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                <i class="fi fi-rs-map-marker-check mt-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="card-title text-muted mb-0">Active Customers</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card card-stats">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <span class="h2 font-weight-bold mb-0 completed-transfers" id="total-inactive">
+                                @ViewData["TotalExpiredCustomers"]
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                <i class="fi fi-rs-user-time mt-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="card-title text-muted mb-0">Expired Customers</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card card-stats">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <span class="h2 font-weight-bold mb-0 completed-transfers" id="total-suspended">
+                                @ViewData["TotalSuspendedCustomers"]
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                <i class="fi fi-rs-delete-user mt-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="card-title text-muted mb-0">Suspended Customers</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- Search Form -->
+    <form method="get" class="card-header-form mb-4">
+        <div class="input-group">
+            <input type="text" name="search" value="@Context.Request.Query["search"]" class="form-control" placeholder="Search...">
+            <select class="form-control" name="type">
+                <option value="email" selected="@(Context.Request.Query["type"] == "email")">User Email</option>
+                <option value="name" selected="@(Context.Request.Query["type"] == "name")">Name</option>
+            </select>
+            <div class="input-group-btn">
+                <button class="btn btn-neutral btn-icon" type="submit"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Customers Table -->
+    <div class="card">
+        <div class="card-header border-0">
+            <h3 class="mb-0">Customers</h3>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Plan</th>
+                        <th>Orders</th>
+                        <th>Expire Date</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                @if (Model.Any())
+                {
+                    <tbody class="list">
+                        @foreach (var customer in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <a href="@Url.Action("Details", "AdminCustomer", new { id = customer.Id })" class="text-dark">
+                                        @customer.Name
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="text-dark" href="@Url.Action("Edit", "AdminCustomer", new { id = customer.Id })">
+                                        @customer.Email
+                                    </a>
+                                </td>
+                                <td>@(customer.Plan ?? "N/A")</td>
+
+                                <td class="text-center">@customer.Orders.Count</td>
+                                <td class="text-center">@customer.WillExpire?.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    <span class="badge @(customer.Status == 1 ? "badge-success" : "badge-danger")">
+                                        @(customer.Status == 1 ? "Active" : "Suspended")
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    @(customer.CreatedAt.HasValue ? customer.CreatedAt.Value.ToString("dd MMM yy") : "N/A")
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                            <a class="dropdown-item" href="@Url.Action("Show", "AdminCustomer", new { id = customer.Id })">View</a>
+                                            <a class="dropdown-item" href="@Url.Action("Edit", "AdminCustomer", new { id = customer.Id })">Edit</a>
+                                            <form method="post" asp-action="Delete" asp-controller="AdminCustomer" asp-route-id="@customer.Id" class="d-inline">
+                                                <button type="submit" class="dropdown-item text-danger delete-confirm">Remove</button>
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            <div class="alert bg-gradient-primary text-white">
+                                <span class="text-left">Oops! No records found.</span>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+@* 
+        <div class="card-footer py-4">
+            <!-- Pagination (Assuming you're using PagedList) -->
+            @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", new { page }))
+        </div> *@
+    </div>
+</div>

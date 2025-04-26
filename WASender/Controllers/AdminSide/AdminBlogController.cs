@@ -10,11 +10,7 @@ using WASender.Helpers;
 namespace WASender.Controllers.Admin
 {
     [Route("admin/[controller]")]
-<<<<<<< HEAD
-    public class AdminBlogController : Controller // 👈 Switched from ControllerBase
-=======
     public class AdminBlogController : Controller
->>>>>>> Dashboard
     {
         private readonly ApplicationDbContext _context;
         private readonly BlogHelper _blogHelper;
@@ -50,12 +46,6 @@ namespace WASender.Controllers.Admin
             return View("Index", posts);
         }
 
-
-<<<<<<< HEAD
-=======
-
-
->>>>>>> Dashboard
         // GET: admin/blogs/create
         [HttpGet("create")]
         public async Task<IActionResult> Create()
@@ -152,8 +142,4 @@ namespace WASender.Controllers.Admin
             }
         }
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> Dashboard
