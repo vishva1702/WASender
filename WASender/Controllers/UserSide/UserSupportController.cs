@@ -16,7 +16,10 @@ namespace WASender.Controllers
     [Authorize(Roles = "user,User")]
 =======
     [Authorize]
+<<<<<<< HEAD
 >>>>>>> Dashboard
+=======
+>>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))
     public class UserSupportController : BaseController
     {
         private readonly ApplicationDbContext _context;

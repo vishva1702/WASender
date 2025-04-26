@@ -17,15 +17,20 @@ using Microsoft.Extensions.Logging;
 namespace WASender.Controllers.UserSide
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
     [Authorize(Roles = "user, User")] // 🔒 Ensures only logged-in users can access this controller
     [Route("UserHome")]
 =======
 >>>>>>> Dashboard
     [Authorize(Roles = "user,User")]
+=======
+    [Authorize(Roles = "user, User")] 
+>>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))
     public class UserHomeController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         public UserHomeController(ApplicationDbContext context,IGlobalDataService globalDataService, ILogger<FeaturesController> logger)
              : base(globalDataService, logger) // Pass both required parameters to BaseController
@@ -52,6 +57,11 @@ namespace WASender.Controllers.UserSide
                 return ulong.TryParse(userIdStr, out var userId) ? userId : null;
             }
         }
+=======
+        public UserHomeController(IGlobalDataService globalDataService, ILogger<FeaturesController> logger)
+             : base(globalDataService, logger) 
+        { }
+>>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))
 
         public async Task<IActionResult> Index()
         {

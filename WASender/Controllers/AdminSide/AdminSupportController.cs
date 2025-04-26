@@ -1,9 +1,13 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 =======
 ﻿using Microsoft.AspNetCore.Mvc;
 >>>>>>> Dashboard
+=======
+﻿using Microsoft.AspNetCore.Mvc;
+>>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,9 +18,12 @@ using WASender.Services;
 namespace WASender.Controllers.AdminSide
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
     [Authorize(Roles = "admin,Admin")]
 =======
 >>>>>>> Dashboard
+=======
+>>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))
     public class AdminSupportController : BaseController
     {
         private readonly ApplicationDbContext _context;

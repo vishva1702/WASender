@@ -119,6 +119,10 @@ public class LoginController : BaseController
 
         // Optionally clear the session if used
         HttpContext.Session.Clear();
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))
         return RedirectToAction("Index", "Login"); // Redirect to login page after logout
     }
 
@@ -146,4 +150,8 @@ public class LoginController : BaseController
         _logger.LogInformation("API Login successful for {Email}, role: {Role}", email, role);
         return Ok(new { Token = token, Role = role });
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using WASender.Controllers.AdminSide;
 using WASender.Services;
 <<<<<<< HEAD
+<<<<<<< HEAD
 using Microsoft.AspNetCore.Authorization;
 
 namespace WASender.Controllers.AdminSide
@@ -20,6 +21,11 @@ namespace WASender.Controllers.AdminSide
 namespace WASender.Controllers.AdminSide
 {
 >>>>>>> Dashboard
+=======
+
+namespace WASender.Controllers.AdminSide
+{
+>>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))
     public class AdminProfileController : BaseController
     {
         private readonly ApplicationDbContext _context;
@@ -117,10 +123,14 @@ namespace WASender.Controllers.AdminSide
             }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             return await Index(); 
 =======
             return await Index(); // Return view instead of redirecting
 >>>>>>> Dashboard
+=======
+            return await Index(); // Return view instead of redirecting
+>>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))
         }
 
     }
