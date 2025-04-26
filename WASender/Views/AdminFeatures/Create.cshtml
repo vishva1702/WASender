@@ -1,4 +1,5 @@
-﻿@{
+
+@{
     ViewData["Title"] = "Create Feature";
     var languages = ViewBag.Languages as Dictionary<string, string>;
     Layout = "~/Views/Shared/_UserLayout.cshtml";
@@ -30,11 +31,9 @@
             <strong>Create a features post</strong>
             <p>Add your features details and necessary information from here</p>
         </div>
-
         <div class="col-lg-7">
             <div class="card">
                 <div class="card-body">
-                    <!-- Feature Title -->
                     <div class="form-group row">
                         <label class="col-lg-12">Features Title</label>
                         <div class="col-lg-12">
@@ -50,7 +49,6 @@
                         </div>
                     </div>
 
-                    <!-- Banner Image -->
                     <div class="form-group row mt-2">
                         <label class="col-lg-12">Banner Image</label>
                         <div class="col-lg-12">
@@ -58,15 +56,13 @@
                         </div>
                     </div>
 
-                    <!-- Short Description -->
                     <div class="form-group row mt-2">
                         <label class="col-lg-12">Short Description</label>
                         <div class="col-lg-12">
-                            <textarea name="description" maxlength="500" class="form-control" rows="3" required></textarea>
+                            <textarea name="description" class="form-control" maxlength="500" required></textarea>
                         </div>
                     </div>
 
-                    <!-- Main Description -->
                     <div class="form-group row mt-3">
                         <label class="col-lg-12">Main Description</label>
                         <div class="col-lg-12">
@@ -74,7 +70,6 @@
                         </div>
                     </div>
 
-                    <!-- Select Language -->
                     <div class="form-group row mt-2">
                         <label class="col-lg-12">Select Language</label>
                         <div class="col-lg-12">

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace WASender.Controllers.AdminSide
 {
     [Authorize(Roles = "admin,Admin")]
+<<<<<<< HEAD
 
     public class AdminHomeController : Controller
     {
@@ -22,6 +23,12 @@ namespace WASender.Controllers.AdminSide
     {
         private readonly ApplicationDbContext _context;
 
+=======
+    public class AdminHomeController : BaseController
+    {
+        private readonly ApplicationDbContext _context;
+
+>>>>>>> Dashboard
         public AdminHomeController(IGlobalDataService globalDataService, ILogger<AdminHomeController> logger, ApplicationDbContext context)
             : base(globalDataService, logger)
         {
@@ -30,7 +37,10 @@ namespace WASender.Controllers.AdminSide
 
         public async Task<IActionResult> Index()
         {
+<<<<<<< HEAD
             
+=======
+>>>>>>> Dashboard
             await LoadGlobalDataAsync();
 
             ViewData["TotalOrders"] = await _context.Orders.CountAsync();

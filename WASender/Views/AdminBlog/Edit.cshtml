@@ -1,0 +1,186 @@
+﻿@model WASender.Models.Post
+
+@{
+    ViewData["Title"] = "Edit Blog";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    var seo = ViewBag.Seo as Dictionary<string, string>;
+    var shortDescription = ViewBag.ShortDescription as string;
+    var longDescription = ViewBag.LongDescription as string;
+    var selectedCategories = ViewBag.SelectedCategoryIds as List<ulong>;
+    var selectedTags = ViewBag.SelectedTagIds as List<ulong>;
+}@await Html.PartialAsync("_HeaderSection")
+
+<link rel="stylesheet" href="~/assets/plugins/select2/select2.min.css" />
+<link rel="stylesheet" href="~/assets/plugins/summernote/summernote-bs4.css" />
+
+<form asp-action="Update" asp-controller="AdminBlog" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10"> 
+            <div class="card">
+                <div class="card-body">
+                    <!-- Blog Title -->
+                    <div class="form-group row">
+                        <label class="col-lg-12">Blog Title</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="Title" required value="@Model.Title" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- Blog Image -->
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Blog Image (Preview)</label>
+                        <div class="col-lg-12">
+                            <input type="file" name="Preview" class="form-control" accept="image/*" />
+                        </div>
+                    </div>
+
+                    <!-- Short Description -->
+                    <div class="form-group row mt-3">
+                        <label class="col-lg-12">Short Description</label>
+                        <div class="col-lg-12">
+                            <textarea name="ShortDescription" class="form-control" maxlength="500">@shortDescription</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Main Description -->
+                    <div class="form-group row mt-3">
+                        <label class="col-lg-12">Main Description</label>
+                        <div class="col-lg-12">
+                            <textarea name="MainDescription" class="summernote">@longDescription</textarea>
+                        </div>
+                    </div>
+
+
+                    <!-- Language -->
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Select Language</label>
+                        <div class="col-lg-12">
+                            <select name="Lang" class="form-control">
+                                @if (ViewBag.Languages != null)
+                                {
+                                    foreach (var lang in (Dictionary<string, string>)ViewBag.Languages)
+                                    {
+                                        <option value="@lang.Key" selected="@(lang.Key == Model?.Lang ? "selected" : null)">@lang.Value</option>
+                                    }
+                                }
+
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Categories -->
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Select Category</label>
+                        <div class="col-lg-12">
+                            <select name="CategoryIds" class="form-control select2" multiple>
+                                @if (ViewBag.Categories != null)
+                                {
+                                    foreach (var cat in (Dictionary<ulong, string>)ViewBag.Categories)
+                                    {
+                                        <option value="@cat.Key" selected="@(selectedCategories?.Contains(cat.Key) == true ? "selected" : null)">
+                                            @cat.Value
+                                        </option>
+                                    }
+                                }
+
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Select Tags</label>
+                        <div class="col-lg-12">
+                            <select name="TagIds" class="form-control select2" multiple>
+                                @if (ViewBag.Tags != null)
+                                {
+                                    foreach (var tag in (Dictionary<ulong, string>)ViewBag.Tags)
+                                    {
+                                        <option value="@tag.Key" selected="@(selectedTags != null && selectedTags.Contains(tag.Key) ? "selected" : null)">
+                                            @tag.Value
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <!-- SEO Meta Title -->
+                    <div class="form-group row mt-3">
+                        <label class="col-lg-12">SEO Meta Title</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="MetaTitle" value="@seo["title"]" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- SEO Meta Image -->
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">SEO Meta Image</label>
+                        <div class="col-lg-12">
+                            <input type="file" name="MetaImage" class="form-control" accept="image/*" />
+                        </div>
+                    </div>
+
+                    <!-- SEO Meta Description -->
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">SEO Meta Description</label>
+                        <div class="col-lg-12">
+                            <textarea name="MetaDescription" class="form-control">@seo["description"]</textarea>
+                        </div>
+                    </div>
+
+                    <!-- SEO Meta Tags -->
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">SEO Meta Tags</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="MetaTags" value="@seo["tags"]" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- Featured and Publish -->
+                    <div class="form-group row mt-3">
+                        <div class="col-lg-12 d-flex">
+                            <label class="custom-toggle custom-toggle-primary">
+                                <input type="checkbox" name="Featured" value="1" class="save-template" @(Model.Featured == 1 ? "checked" : null) />
+                                <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                            </label>
+                            <label class="mt-1 ml-1"><h4>Make it featured?</h4></label>
+                        </div>
+                        <div class="col-lg-12 d-flex">
+                            <label class="custom-toggle custom-toggle-primary">
+                                <input type="checkbox" name="Status" value="1" class="save-template" @(Model.Status == 1 ? "checked" : null) />
+                                <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                            </label>
+                            <label class="mt-1 ml-1"><h4>Make it publish?</h4></label>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="form-group row mt-3">
+                        <div class="col-lg-12">
+                            <button type="submit" class="btn btn-neutral">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="~/assets/plugins/select2/select2.min.js"></script>
+    <script src="~/assets/plugins/summernote/summernote-bs4.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            $('.summernote').summernote({
+                height: 300
+            });
+        });
+    </script>
+}

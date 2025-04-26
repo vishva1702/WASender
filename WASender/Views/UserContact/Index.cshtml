@@ -1,0 +1,276 @@
+﻿@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model IEnumerable<WASender.Models.Contact>
+
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    // Set Header Section Data
+    ViewData["Title"] = "Contact List";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Create Contact", url = Url.Action("Create", "UserContact"), is_button = false, components = "" },
+        new { name = "Contact Groups", url = Url.Action("Index", "UserGroup"), is_button = false, components = "" },
+        new { name = "Import Contacts", url = "#", is_button = true, components = "data-toggle='modal' data-target='#import-contact'" },
+        new { name = "Sent Bulk With Template", url = "#", is_button = true, components = "data-toggle='modal' data-target='#send-template-bulk' id='send-template-bulks'" },
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+@section Styles {
+    <link rel="stylesheet" type="text/css" href="~/assets/vendor/select2/dist/css/select2.min.css">
+}
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row d-flex justify-content-between flex-wrap">
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers" id="total-device">
+                                    @(Model != null ? Model.Count() : 0)
+                                </span>
+
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-address-book mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Total Contacts</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers" id="total-active">
+                                    @ViewBag.Limit
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fas fa-signal"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-sm"></p>
+                        <h5 class="card-title text-muted mb-0">@Localizer["Contacts statics"]</h5>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+       
+
+        @if (Model.Any())
+        {
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 table-responsive">
+                            <table class="table col-12">
+                                <thead>
+                                    <tr>
+                                        <th class="col-3">Contact Name</th>
+                                        <th class="col-3 text-right">Whatsapp Number</th>
+                                        <th class="col-2 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var contact in Model)
+                                    {
+                                        <tr>
+                                            <td>@contact.Name</td>
+                                            <td class="text-right">@contact.Phone</td>
+                                            <td>
+                                                <div class="btn-group mb-2 float-right">
+                                                    <button class="btn btn-neutral btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Action
+                                                    </button>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item edit-contact" href="#" data-id="@contact.Id" data-name="@contact.Name" data-phone="@contact.Phone" data-toggle="modal" data-target="#editModal">
+                                                            <i class="ni ni-align-left-2"></i> Edit
+                                                        </a>
+                                                        <a class="dropdown-item delete-confirm" href="#" data-action="@Url.Action("Delete", "UserContact", new { id = contact.Id })">
+                                                            <i class="fas fa-trash"></i> Remove Number
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert bg-gradient-primary text-white">
+                <span class="text-left">Oops! There are no contacts found...</span>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Edit Contact Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-action="Update" asp-controller="UserContact">
+                <input type="hidden" name="id" id="contact_id" />
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="contact_id" /> <!-- Add this hidden field -->
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Contact</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>User Name</label>
+                        <input type="text" name="name" id="user_name" placeholder="John Doe" maxlength="50" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>WhatsApp Number</label>
+                        <input type="number" name="phone" id="user_phone" placeholder="Enter Phone Number With Country Code" maxlength="15" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Group</label>
+                        <select name="group" class="form-control" id="group-list">
+                            @foreach (var group in ViewBag.Groups)
+                            {
+                                <option value="@group.Id">@group.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Import Contact Modal -->
+<div class="modal fade" id="import-contact" tabindex="-1" aria-labelledby="importModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-action="ImportContact" asp-controller="Contact" enctype="multipart/form-data" class="ajaxform_instant_reload">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Import Contact</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Select CSV <a href="@Url.Content("~/uploads/demo-contact.csv")" download>(Download Sample)</a></label>
+                        <input type="file" accept=".csv" name="file" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Group</label>
+                        <select name="group" class="form-control">
+                            @foreach (var group in ViewBag.Groups)
+                            {
+                                <option value="@group.Id">@group.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary submit-btn">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="@Url.Content("~/assets/vendor/select2/dist/js/select2.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/pages/user/contact.js")"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Handle edit button click to populate modal
+               $(document).ready(function() {
+                   $('.edit-contact').on('click', function() {
+                       var contactId = $(this).data('id');
+                       var contactName = $(this).data('name');
+                       var contactPhone = $(this).data('phone');
+
+                       // Populate the modal fields
+                       $('#contact_id').val(contactId);
+                       $('#user_name').val(contactName);
+                       $('#user_phone').val(contactPhone);
+                   });
+               });
+
+
+        // Delete Contact Script (Unchanged)
+
+
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".delete-confirm").forEach(button => {
+                button.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    let deleteUrl = this.getAttribute("data-action");
+
+                    if (!deleteUrl) {
+                        Swal.fire("Error!", "Invalid delete URL.", "error");
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You want to delete this?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(deleteUrl, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-CSRF-TOKEN": document.querySelector('input[name="__RequestVerificationToken"]').value
+                                }
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    Swal.fire("Deleted!", "Your contact has been deleted.", "success")
+                                        .then(() => location.reload());
+                                } else {
+                                    return response.text().then(text => { throw new Error(text); });
+                                }
+                            })
+                            .catch(error => Swal.fire("Error!", "Failed to delete: " + error.message, "error"));
+                        }
+                    });
+                });
+            });
+        });
+
+       
+    </script>
+}
+

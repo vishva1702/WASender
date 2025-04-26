@@ -24,7 +24,6 @@ namespace WASender.Controllers
         public async Task<IActionResult> ForgotPasswordAsync()
         {
             await LoadGlobalDataAsync();
-
             return View();
         }
 

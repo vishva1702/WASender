@@ -65,7 +65,7 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/admin/contacts") ? "active" : "")" asp-area="Admin" asp-controller="Contacts" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/contacts") ? "active" : "")" asp-area="Admin" asp-controller="AdminContacts" asp-action="Index">
             <i class="fi fi-rs-address-book"></i>
             <span class="nav-link-text">Contacts</span>
         </a>
@@ -110,7 +110,6 @@
             <ul class="nav nav-sm flex-column">
                 <li class="nav-item">
                     <a asp-area="Admin" asp-controller="AdminBlog" asp-action="Index" class="nav-link">Blogs</a>
-                    <a asp-area="Admin" asp-controller="Blog" asp-action="Index" class="nav-link">Blogs</a>
                 </li>
                 <li class="nav-item">
                     <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="nav-link">Category</a>
@@ -122,20 +121,18 @@
         </div>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/admin/faq") ? "active" : "")" asp-area="Admin" asp-controller="Faq" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/faq") ? "active" : "")" asp-area="Admin" asp-controller="AdminFaq" asp-action="Index">
             <i class="fi fi-rs-comments-question-check"></i>
             <span class="nav-link-text">FAQ</span>
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/admin/features") ? "active" : "")" asp-area="Admin" asp-controller="Features" asp-action="Index">
         <a class="nav-link @(currentPath.StartsWithSegments("/admin/features") ? "active" : "")" asp-area="Admin" asp-controller="AdminFeatures" asp-action="Index">
             <i class="fi fi-rs-dice-alt"></i>
             <span class="nav-link-text">Features</span>
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/admin/testimonials") ? "active" : "")" asp-area="Admin" asp-controller="Testimonial" asp-action="Index">
         <a class="nav-link @(currentPath.StartsWithSegments("/admin/testimonials") ? "active" : "")" asp-area="Admin" asp-controller="Testimonials" asp-action="Index">
             <i class="fi fi-rs-comment-quote"></i>
             <span class="nav-link-text">Testimonials</span>
@@ -155,7 +152,6 @@
     </li>
     <li class="nav-item">
         <a class="nav-link @(currentPath.StartsWithSegments("/admin/partner") ? "active" : "")" asp-area="Admin" asp-controller="Partner" asp-action="Index">
-        <a class="nav-link @(currentPath.StartsWithSegments("/admin/partner") ? "active" : "")" asp-area="Admin" asp-controller="AdminPartener" asp-action="Index">
             <i class="fi fi-rs-animated-icon"></i>
             <span class="nav-link-text">Partners</span>
         </a>
@@ -179,7 +175,7 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentPath.StartsWithSegments("/admin/seo") ? "active" : "")" asp-area="Admin" asp-controller="Seo" asp-action="Index">
+        <a class="nav-link @(currentPath.StartsWithSegments("/admin/seo") ? "active" : "")" asp-area="Admin" asp-controller="AdminSeo" asp-action="Index">
             <i class="fi fi-rs-chart-line-up"></i>
             <span class="nav-link-text">SEO Settings</span>
         </a>
@@ -300,7 +296,6 @@
     </li>
 </ul>
 
-<form id="logout-form" method="post" asp-area="Admin" asp-controller="Account" asp-action="Logout">
 <form id="logout-form" method="post" asp-area="Admin" asp-controller="Login" asp-action="Logout">
     @Html.AntiForgeryToken()
 </form>

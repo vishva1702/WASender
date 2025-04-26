@@ -7,7 +7,10 @@ using WASender.Services;
 
 namespace WASender.Controllers.AdminSide
 {
+<<<<<<< HEAD
     [Authorize(Roles = "admin,Admin")]
+=======
+>>>>>>> Dashboard
     public class AdminMenuController : BaseController
     {
         private readonly ApplicationDbContext _context;

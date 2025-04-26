@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,14 +15,30 @@ namespace WASender.Controllers.AdminSide
 
         public AdminFeaturesController(IGlobalDataService globalDataService, ILogger<AdminHomeController> logger, ApplicationDbContext context)
             : base(globalDataService, logger)
+=======
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WASender.Models;
+
+namespace WASender.Controllers.AdminSide
+{
+    public class AdminFeaturesController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+
+        public AdminFeaturesController(ApplicationDbContext context)
+>>>>>>> Dashboard
         {
             _context = context;
         }
 
         public async Task<IActionResult> Index()
         {
+<<<<<<< HEAD
             await LoadGlobalDataAsync();
 
+=======
+>>>>>>> Dashboard
             // Get features
             var posts = await _context.Posts
                 .Where(p => p.Type == "feature")
@@ -32,7 +49,13 @@ namespace WASender.Controllers.AdminSide
             // Get languages (simulate fetching from settings or config)
             var languages = new Dictionary<string, string>
         {
+<<<<<<< HEAD
             { "en", "English" }
+=======
+            { "en", "English" },
+            { "fr", "French" },
+            { "es", "Spanish" }
+>>>>>>> Dashboard
         };
 
             ViewBag.Posts = posts;
@@ -43,10 +66,15 @@ namespace WASender.Controllers.AdminSide
 
 
         [HttpGet]
+<<<<<<< HEAD
         public async Task<IActionResult> Create()
         {
              await LoadGlobalDataAsync();
 
+=======
+        public IActionResult Create()
+        {
+>>>>>>> Dashboard
             var languages = GetOption("languages");
             ViewBag.Languages = languages;
             return View();
@@ -61,7 +89,11 @@ namespace WASender.Controllers.AdminSide
                 var description = form["description"];
                 var mainDescription = form["main_description"];
                 var lang = form["language"].FirstOrDefault() ?? "en";
+<<<<<<< HEAD
                 var status = form["status"].Count > 0 ? 1 : 0; 
+=======
+                var status = form["status"].Count > 0 ? 1 : 0;
+>>>>>>> Dashboard
                 var featured = form["featured"].Count > 0 ? 1 : 0;
 
                 var previewImage = Request.Form.Files["preview_image"];
@@ -69,8 +101,12 @@ namespace WASender.Controllers.AdminSide
 
                 if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(description) || string.IsNullOrEmpty(mainDescription) || previewImage == null || bannerImage == null)
                 {
+<<<<<<< HEAD
                     TempData["Error"] = "Please fill in all required fields.";
                     return RedirectToAction("Create");
+=======
+                    return BadRequest("Validation failed.");
+>>>>>>> Dashboard
                 }
 
                 var post = new Post
@@ -79,7 +115,11 @@ namespace WASender.Controllers.AdminSide
                     Slug = GenerateSlug(title),
                     Type = "feature",
                     Lang = lang,
+<<<<<<< HEAD
                     Status = status, // ✅ fixed here
+=======
+                    Status = status,
+>>>>>>> Dashboard
                     Featured = featured,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -89,10 +129,17 @@ namespace WASender.Controllers.AdminSide
                 await _context.SaveChangesAsync();
 
                 var metas = new List<Postmeta>
+<<<<<<< HEAD
         {
             new Postmeta { PostId = post.Id, Key = "excerpt", Value = description },
             new Postmeta { PostId = post.Id, Key = "main_description", Value = mainDescription }
         };
+=======
+            {
+                new Postmeta { PostId = post.Id, Key = "excerpt", Value = description },
+                new Postmeta { PostId = post.Id, Key = "main_description", Value = mainDescription }
+            };
+>>>>>>> Dashboard
 
                 var previewPath = await FileUploader.SaveFile(previewImage);
                 var bannerPath = await FileUploader.SaveFile(bannerImage);
@@ -103,6 +150,7 @@ namespace WASender.Controllers.AdminSide
                 _context.Postmetas.AddRange(metas);
                 await _context.SaveChangesAsync();
 
+<<<<<<< HEAD
                 TempData["Success"] = "Feature created successfully.";
                 return RedirectToAction("Index", "AdminFeatures", new { area = "Admin" });
             }
@@ -115,12 +163,32 @@ namespace WASender.Controllers.AdminSide
 
 
 
+=======
+                return Json(new
+                {
+                    redirect = Url.Action("Index", "Features", new { area = "Admin" }),
+                    message = "Feature created successfully..."
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+>>>>>>> Dashboard
         // Dummy implementation - replace with actual logic
         private Dictionary<string, string> GetOption(string key)
         {
             return new Dictionary<string, string>
         {
+<<<<<<< HEAD
             { "en", "English" }
+=======
+            { "en", "English" },
+            { "fr", "French" },
+            { "hi", "Hindi" }
+>>>>>>> Dashboard
         };
         }
 
@@ -128,6 +196,7 @@ namespace WASender.Controllers.AdminSide
         {
             return input.ToLower().Replace(" ", "-").Replace(".", "").Replace(",", "").Trim('-');
         }
+<<<<<<< HEAD
 
         [HttpPost]
         public async Task<IActionResult> Destroy(ulong id)
@@ -294,5 +363,7 @@ namespace WASender.Controllers.AdminSide
         }
 
 
+=======
+>>>>>>> Dashboard
     }
 }

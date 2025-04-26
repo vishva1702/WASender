@@ -6,12 +6,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WASender.Contracts;
 using WASender.Contracts.AdminSide;
-using WASender.Contracts.UserSide;
 using WASender.Helpers;
 using WASender.Models;
 using WASender.Services;
 using WASender.Services.AdminSide;
-using WASender.Services.UserSide;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,12 +89,16 @@ builder.Services.AddSession(options =>
 });
 
 // Register Services (Dependency Injection)
+// 🔹 Register Services (Dependency Injection)
+builder.Services.AddScoped<IFaqService, FaqService>();
+builder.Services.AddScoped<ISeoService, SeoService>();
+builder.Services.AddScoped<UploaderHelper>();
+builder.Services.AddScoped<BlogHelper>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IGlobalDataService, GlobalDataService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<IAboutService, AboutService>();
-builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IFeatureService, FeatureService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();

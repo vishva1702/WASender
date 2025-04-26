@@ -9,11 +9,17 @@ using WASender.Models;
 using Microsoft.Extensions.Logging;
 using WASender.Controllers.AdminSide;
 using WASender.Services;
+<<<<<<< HEAD
 using Microsoft.AspNetCore.Authorization;
 
 namespace WASender.Controllers.AdminSide
 {
     [Authorize(Roles = "admin,Admin")]
+=======
+
+namespace WASender.Controllers.AdminSide
+{
+>>>>>>> Dashboard
     public class AdminProfileController : BaseController
     {
         private readonly ApplicationDbContext _context;
@@ -110,7 +116,11 @@ namespace WASender.Controllers.AdminSide
                 ViewBag.Error = "An error occurred while updating your profile.";
             }
 
+<<<<<<< HEAD
             return await Index(); 
+=======
+            return await Index(); // Return view instead of redirecting
+>>>>>>> Dashboard
         }
 
     }

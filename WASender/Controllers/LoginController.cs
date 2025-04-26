@@ -84,7 +84,6 @@ public class LoginController : BaseController
             new AuthenticationProperties
             {
                 IsPersistent = true,
-                ExpiresUtc = DateTime.UtcNow.AddMinutes(60)
                 ExpiresUtc = DateTime.UtcNow.AddMinutes(120)
             });
 
@@ -120,8 +119,6 @@ public class LoginController : BaseController
 
         // Optionally clear the session if used
         HttpContext.Session.Clear();
-
-        return RedirectToAction("Index", "Home"); // Redirect to login page after logout
         return RedirectToAction("Index", "Login"); // Redirect to login page after logout
     }
 
@@ -149,5 +146,4 @@ public class LoginController : BaseController
         _logger.LogInformation("API Login successful for {Email}, role: {Role}", email, role);
         return Ok(new { Token = token, Role = role });
     }
-}
 }

@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+<<<<<<< HEAD
 using System.Security.Claims;
+=======
+>>>>>>> Dashboard
 using WASender.Models;
 using WASender.Services;
 using System;
@@ -13,13 +16,17 @@ using Microsoft.Extensions.Logging;
 
 namespace WASender.Controllers.UserSide
 {
+<<<<<<< HEAD
     [Authorize(Roles = "user, User")] // 🔒 Ensures only logged-in users can access this controller
     [Route("UserHome")]
+=======
+>>>>>>> Dashboard
     [Authorize(Roles = "user,User")]
     public class UserHomeController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
+<<<<<<< HEAD
         public UserHomeController(ApplicationDbContext context,IGlobalDataService globalDataService, ILogger<FeaturesController> logger)
              : base(globalDataService, logger) // Pass both required parameters to BaseController
         {
@@ -28,6 +35,8 @@ namespace WASender.Controllers.UserSide
 
 
         [HttpGet("")]
+=======
+>>>>>>> Dashboard
         public UserHomeController(IGlobalDataService globalDataService, ILogger<UserHomeController> logger, ApplicationDbContext context)
             : base(globalDataService, logger)
         {
@@ -47,6 +56,7 @@ namespace WASender.Controllers.UserSide
         public async Task<IActionResult> Index()
         {
             await LoadGlobalDataAsync();
+<<<<<<< HEAD
             var userId = ulong.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var user = _context.Users.FirstOrDefault(u => u.Id == userId);
             if (user?.WillExpire != null)
@@ -154,6 +164,8 @@ namespace WASender.Controllers.UserSide
                     smstransactions = g.Count()
                 })
                 .ToList<dynamic>();
+=======
+>>>>>>> Dashboard
 
             if (UserId == null)
             {
@@ -284,6 +296,7 @@ namespace WASender.Controllers.UserSide
         }
     }
 
+<<<<<<< HEAD
     public static class DateTimeExtensions
     {
         public static string ToRelativeTime(this DateTime? dateTime)
@@ -318,6 +331,8 @@ namespace WASender.Controllers.UserSide
 
             return span.Seconds <= 5 ? "just now" : string.Empty;
         }
+=======
+>>>>>>> Dashboard
     public class ActivityOverview
     {
         public string Type { get; set; }

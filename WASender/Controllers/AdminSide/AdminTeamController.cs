@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,21 +11,41 @@ namespace WASender.Controllers.AdminSide
 {
     [Authorize(Roles = "admin,Admin")]
     public class AdminTeamController : BaseController
+=======
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using WASender.Models;
+
+namespace WASender.Controllers.AdminSide
+{
+    public class AdminTeamController : Controller
+>>>>>>> Dashboard
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _env;
 
+<<<<<<< HEAD
         public AdminTeamController(IGlobalDataService globalDataService,ILogger<BaseController> logger,ApplicationDbContext context,IWebHostEnvironment env)
           : base(globalDataService, logger) 
+=======
+
+        public AdminTeamController(ApplicationDbContext context, IWebHostEnvironment env)
+>>>>>>> Dashboard
         {
             _context = context;
             _env = env;
         }
 
+<<<<<<< HEAD
 
         public async Task<IActionResult> Index()
         {
             await LoadGlobalDataAsync();
+=======
+        public async Task<IActionResult> Index()
+        {
+>>>>>>> Dashboard
             try
             {
                 // Check database connectivity
@@ -58,10 +79,15 @@ namespace WASender.Controllers.AdminSide
 
 
         // Create Method (Display the form)
+<<<<<<< HEAD
         public async Task<IActionResult> Create()
         {
            await LoadGlobalDataAsync();
 
+=======
+        public IActionResult Create()
+        {
+>>>>>>> Dashboard
             var post = new Post
             {
                 Status = 0  // Default to inactive status
@@ -72,7 +98,11 @@ namespace WASender.Controllers.AdminSide
 
 
         [HttpPost]
+<<<<<<< HEAD
         public async Task<IActionResult> Store(IFormFile profile_picture, string member_name, string member_position, string about, [FromForm] string status, Dictionary<string, string> socials)
+=======
+        public async Task<IActionResult> Store(IFormFile profile_picture,string member_name,string member_position,string about,[FromForm] string status,Dictionary<string, string> socials)
+>>>>>>> Dashboard
         {
             int parsedStatus = status == "1" ? 1 : 0; // Ensure correct parsing
 
@@ -90,7 +120,11 @@ namespace WASender.Controllers.AdminSide
                 {
                     Title = member_name,
                     Slug = member_position,
+<<<<<<< HEAD
                     Status = parsedStatus, // Initial status
+=======
+                    Status = parsedStatus, // Store correct status
+>>>>>>> Dashboard
                     Type = "team",
                     CreatedAt = DateTime.UtcNow
                 };
@@ -98,6 +132,7 @@ namespace WASender.Controllers.AdminSide
                 _context.Posts.Add(post);
                 await _context.SaveChangesAsync();
 
+<<<<<<< HEAD
                 // DEBUG: Check if DB default changed the status
                 var initialStatus = post.Status;
                 Console.WriteLine($"Status after first save: {initialStatus}");
@@ -111,6 +146,8 @@ namespace WASender.Controllers.AdminSide
                     await _context.SaveChangesAsync();
                 }
 
+=======
+>>>>>>> Dashboard
                 var socialJson = JsonSerializer.Serialize(socials ?? new Dictionary<string, string>());
                 _context.Postmetas.Add(new Postmeta { PostId = post.Id, Key = "excerpt", Value = socialJson });
                 _context.Postmetas.Add(new Postmeta { PostId = post.Id, Key = "description", Value = about });
@@ -120,7 +157,10 @@ namespace WASender.Controllers.AdminSide
 
                 await _context.SaveChangesAsync();
 
+<<<<<<< HEAD
                 TempData["Success"] = "Team member created successfully.";
+=======
+>>>>>>> Dashboard
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -132,12 +172,18 @@ namespace WASender.Controllers.AdminSide
 
 
 
+<<<<<<< HEAD
 
         // GET: Edit Team Member
         public async Task<IActionResult> Edit(ulong id)
         {
             await LoadGlobalDataAsync();
 
+=======
+        // GET: Edit Team Member
+        public async Task<IActionResult> Edit(ulong id)
+        {
+>>>>>>> Dashboard
             var post = await _context.Posts
                 .Where(p => p.Id == id && p.Type == "team") // Ensure fetching the correct type
                 .Include(p => p.Postmetas)
@@ -184,6 +230,7 @@ namespace WASender.Controllers.AdminSide
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+<<<<<<< HEAD
                 int parsedStatus = status == "1" ? 1 : 0; // Consistent parsing logic
 
                 post.Title = member_name;
@@ -203,6 +250,16 @@ namespace WASender.Controllers.AdminSide
 
                 // Update social media links
                 var socialJson = JsonSerializer.Serialize(socials ?? new Dictionary<string, string>());
+=======
+                post.Title = member_name;
+                post.Slug = member_position;
+                post.Status = int.TryParse(status, out int parsedStatus) ? parsedStatus : post.Status;
+
+                await _context.SaveChangesAsync();
+
+                // Update social media links
+                var socialJson = JsonSerializer.Serialize(socials);
+>>>>>>> Dashboard
                 var excerptMeta = post.Postmetas.FirstOrDefault(m => m.Key == "excerpt");
                 if (excerptMeta != null)
                 {

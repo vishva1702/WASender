@@ -7,26 +7,43 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WASender.Models;
+<<<<<<< HEAD
 using WASender.Services;
+=======
+>>>>>>> Dashboard
 
 namespace WASender.Controllers.AdminSide
 {
     [Authorize(Roles = "admin,Admin")]
+<<<<<<< HEAD
     public class AdminPlanController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
         public AdminPlanController(IGlobalDataService globalDataService, ILogger<AdminHomeController> logger, ApplicationDbContext context)
              : base(globalDataService, logger)
+=======
+
+    public class AdminPlanController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+
+        public AdminPlanController(ApplicationDbContext context)
+>>>>>>> Dashboard
         {
             _context = context;
         }
 
         // GET: Admin/Plan
+<<<<<<< HEAD
         public async Task<IActionResult> Index()
         {
            await LoadGlobalDataAsync();
 
+=======
+        public IActionResult Index()
+        {
+>>>>>>> Dashboard
             var plans = _context.Plans
                 .Include(p => p.Orders)
                 .OrderByDescending(p => p.CreatedAt)
@@ -41,10 +58,15 @@ namespace WASender.Controllers.AdminSide
 
 
         // GET: Admin/Plan/Create
+<<<<<<< HEAD
         public async Task<IActionResult> Create()
         {
              await LoadGlobalDataAsync();
 
+=======
+        public IActionResult Create()
+        {
+>>>>>>> Dashboard
             return View();
         }
 
@@ -106,10 +128,15 @@ namespace WASender.Controllers.AdminSide
 
 
         // GET: Admin/Plan/Edit/5
+<<<<<<< HEAD
         public async Task<IActionResult> Edit(ulong id)
         {
             await LoadGlobalDataAsync();
 
+=======
+        public IActionResult Edit(ulong id)
+        {
+>>>>>>> Dashboard
             var plan = _context.Plans.Find(id);
             if (plan == null) return NotFound();
 

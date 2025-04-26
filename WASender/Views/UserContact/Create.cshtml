@@ -1,0 +1,76 @@
+﻿
+
+@{
+    ViewData["Title"] = "user";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Back", url = Url.Action("UserContact", "User"), is_button = false, components = "" }
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4>Create Contact</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" asp-controller="UserContact" asp-action="Store">
+                    @Html.AntiForgeryToken() <!-- Correct way -->
+
+
+                    <div class="form-group row mb-4">
+                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">User Name</label>
+                        <div class="col-sm-12 col-md-7">
+                            <input type="text" name="name" placeholder="John Doe" maxlength="50" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-4">
+                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">WhatsApp Number</label>
+                        <div class="col-sm-12 col-md-7">
+                            <input type="text" name="phone" placeholder="Enter Phone Number With Country Code" maxlength="15" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-4">
+                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Select Group</label>
+                        <div class="col-sm-12 col-md-7">
+                            <select name="groupId" class="form-control" required>
+                                @foreach (var group in ViewBag.Groups)
+                                {
+                                    <option value="@group.Id">@group.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-4">
+                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3"></label>
+                        <div class="col-sm-12 col-md-7">
+                            <button type="submit" class="btn btn-outline-primary submit-btn">Create Now</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector("form").addEventListener("submit", function () {
+        console.log("Form is submitting...");
+    });
+</script>

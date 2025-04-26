@@ -2,7 +2,10 @@
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 
     ViewData["Title"] = "Support Tickets";
-   
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Create Support Request", url = Url.Action("Create", "UserSupport"), is_button = false, components = "" }
+    };
     var supports = ViewData["Supports"] as List<WASender.Models.Support>;
     var total = ViewData["Total"] as int? ?? 0;
     var openSupport = ViewData["OpenSupport"] as int? ?? 0;
