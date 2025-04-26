@@ -18,16 +18,13 @@ namespace WASender.Controllers
             : base(globalDataService, logger)
         {
             _forgotPasswordService = forgotPasswordService;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<IActionResult> ForgotPasswordAsync()
         {
-<<<<<<< HEAD
             await LoadGlobalDataAsync();
-=======
-
->>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))
             return View();
         }
 
@@ -35,7 +32,6 @@ namespace WASender.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(string email)
         {
-
             if (string.IsNullOrEmpty(email))
             {
                 ModelState.AddModelError("", "Email is required.");
@@ -70,11 +66,13 @@ namespace WASender.Controllers
                 ViewBag.Error = "Invalid request. Missing token or email.";
                 return View();
             }
+
             if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(password_confirmation))
             {
                 ViewBag.Error = "Both password fields are required.";
                 return View();
             }
+
             if (password != password_confirmation)
             {
                 ViewBag.Error = "Passwords do not match.";
@@ -86,7 +84,7 @@ namespace WASender.Controllers
             if (success)
             {
                 TempData["SuccessMessage"] = "Password has been reset successfully!";
-                return RedirectToAction("Index", "Login"); 
+                return RedirectToAction("Index", "Login");
             }
             else
             {

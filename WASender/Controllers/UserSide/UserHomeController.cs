@@ -12,17 +12,25 @@ using Microsoft.Extensions.Logging;
 
 namespace WASender.Controllers.UserSide
 {
-    [Authorize(Roles = "user, User")] // 🔒 Ensures only logged-in users can access this controller
-    [Route("UserHome")]
+    [Authorize(Roles = "user,User")]
     public class UserHomeController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
-        // Constructor with proper dependency injection
         public UserHomeController(IGlobalDataService globalDataService, ILogger<UserHomeController> logger, ApplicationDbContext context)
             : base(globalDataService, logger)
         {
             _context = context;
+        }
+
+        protected ulong? UserId
+        {
+            get
+            {
+                var userIdStr = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+                _logger.LogInformation($"Retrieved UserId: {userIdStr}");
+                return ulong.TryParse(userIdStr, out var userId) ? userId : null;
+            }
         }
 
         // Property to get the UserId from claims
@@ -82,92 +90,6 @@ namespace WASender.Controllers.UserSide
             return View();
         }
 
-        // Action to return dashboard data as JSON
-        [HttpGet("dashboard-data")]
-        public IActionResult DashboardData()
-        {
-            var userId = ulong.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-
-            var data = new Dictionary<string, object>
-            {
-                ["devicesCount"] = _context.Devices.Count(d => d.UserId == userId),
-                ["messagesCount"] = _context.Smstransactions.Count(s => s.UserId == userId),
-                ["contactCount"] = _context.Contacts.Count(c => c.UserId == userId),
-                ["scheduleCount"] = _context.Schedulemessages.Count(s => s.Status == "pending" && s.UserId == userId),
-                ["devices"] = _context.Devices
-                    .Where(d => d.UserId == userId)
-                    .Include(d => d.Smstransactions)
-                    .OrderByDescending(d => d.Status)
-                    .OrderByDescending(d => d.Id)
-                    .Select(d => new
-                    {
-                        uuid = d.Uuid,
-                        name = d.Name,
-                        status = d.Status,
-                        phone = d.Phone,
-                        smstransaction_count = d.Smstransactions.Count
-                    })
-                    .ToList(),
-                ["messagesStatics"] = GetMessagesTransaction(7, userId),
-                ["typeStatics"] = MessagesStatics(7, userId),
-                ["chatbotStatics"] = GetChatbotTransaction(7, userId)
-            };
-
-            return Json(data);
-        }
-
-        // Method to get messages transaction within the past 'days' days
-        private List<dynamic> GetMessagesTransaction(int days, ulong userId)
-        {
-            var dateFrom = DateTime.Now.AddDays(-days).Date;
-
-            return _context.Smstransactions
-                .Where(s => s.UserId == userId && s.CreatedAt >= dateFrom)
-                .OrderBy(s => s.Id)
-                .GroupBy(s => s.CreatedAt.Value.Date)
-                .Select(g => new
-                {
-                    date = g.Key,
-                    smstransactions = g.Count()
-                })
-                .ToList<dynamic>();
-        }
-
-        // Method to get chatbot transaction data
-        private List<dynamic> GetChatbotTransaction(int days, ulong userId)
-        {
-            var dateFrom = DateTime.Now.AddDays(-days).Date;
-
-            return _context.Smstransactions
-                .Where(s => s.UserId == userId && s.Type == "chatbot" && s.CreatedAt >= dateFrom)
-                .OrderBy(s => s.Id)
-                .GroupBy(s => s.CreatedAt.Value.Date)
-                .Select(g => new
-                {
-                    date = g.Key,
-                    smstransactions = g.Count()
-                })
-                .ToList<dynamic>();
-        }
-
-        // Method to get messages statistics by type (e.g., "sms", "chatbot")
-        private List<dynamic> MessagesStatics(int days, ulong userId)
-        {
-            var dateFrom = DateTime.Now.AddDays(-days).Date;
-
-            return _context.Smstransactions
-                .Where(s => s.UserId == userId && s.CreatedAt >= dateFrom)
-                .OrderBy(s => s.Id)
-                .GroupBy(s => s.Type)
-                .Select(g => new
-                {
-                    type = g.Key,
-                    smstransactions = g.Count()
-                })
-                .ToList<dynamic>();
-        }
-
-        // Method to handle user activity overview for Monthly, Yearly, or Weekly data
         [HttpPost]
         public async Task<JsonResult> UserActivityOverview([FromBody] ActivityOverview request)
         {
@@ -239,7 +161,6 @@ namespace WASender.Controllers.UserSide
             return Json(new { transactions = new List<object>() });
         }
 
-        // Method to get messages transaction data based on days
         private async Task<List<object>> GetMessagesTransaction(int days)
         {
             if (UserId == null) return new List<object>();
@@ -254,6 +175,11 @@ namespace WASender.Controllers.UserSide
                 })
                 .ToListAsync<object>();
         }
+    }
+
+    public class ActivityOverview
+    {
+        public string Type { get; set; }
     }
 
     // Activity overview model for handling request types

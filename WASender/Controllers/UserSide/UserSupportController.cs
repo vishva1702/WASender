@@ -12,14 +12,7 @@ using WASender.Services;
 
 namespace WASender.Controllers
 {
-<<<<<<< HEAD
     [Authorize(Roles = "user,User")]
-=======
-    [Authorize]
-<<<<<<< HEAD
->>>>>>> Dashboard
-=======
->>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))
     public class UserSupportController : BaseController
     {
         private readonly ApplicationDbContext _context;
@@ -51,11 +44,10 @@ namespace WASender.Controllers
                 .ToListAsync();
 
             var openSupport = await _context.Supports
-    .CountAsync(s => s.UserId == userId && s.Status == 1);
+                .CountAsync(s => s.UserId == userId && s.Status == 1);
 
             var pendingSupport = await _context.Supports
-    .CountAsync(s => s.UserId == userId && s.Status != 1 && s.Status != 0);
-
+                .CountAsync(s => s.UserId == userId && s.Status != 1 && s.Status != 0);
 
             var total = await _context.Supports
                 .CountAsync(s => s.UserId == userId);
@@ -190,7 +182,6 @@ namespace WASender.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Show", new { id = support.Id });
-
         }
 
         [HttpPost]
@@ -211,7 +202,7 @@ namespace WASender.Controllers
                 return NotFound();
             }
 
-            support.Status = 0; 
+            support.Status = 0;
             await _context.SaveChangesAsync();
 
             return Json(new

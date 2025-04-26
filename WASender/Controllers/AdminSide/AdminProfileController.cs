@@ -7,25 +7,12 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using WASender.Models;
 using Microsoft.Extensions.Logging;
-using WASender.Controllers.AdminSide;
 using WASender.Services;
-<<<<<<< HEAD
-<<<<<<< HEAD
 using Microsoft.AspNetCore.Authorization;
 
 namespace WASender.Controllers.AdminSide
 {
     [Authorize(Roles = "admin,Admin")]
-=======
-
-namespace WASender.Controllers.AdminSide
-{
->>>>>>> Dashboard
-=======
-
-namespace WASender.Controllers.AdminSide
-{
->>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))
     public class AdminProfileController : BaseController
     {
         private readonly ApplicationDbContext _context;
@@ -75,13 +62,13 @@ namespace WASender.Controllers.AdminSide
                     if (passwordHasher.VerifyHashedPassword(user, user.Password, oldPassword) == PasswordVerificationResult.Failed)
                     {
                         ViewBag.Error = "Old password is incorrect.";
-                        return await Index(); // Return view with error message
+                        return await Index();
                     }
 
                     if (newPassword != confirmPassword)
                     {
                         ViewBag.Error = "New password and confirm password do not match.";
-                        return await Index(); // Return view with error message
+                        return await Index();
                     }
 
                     user.Password = passwordHasher.HashPassword(user, newPassword);
@@ -117,21 +104,12 @@ namespace WASender.Controllers.AdminSide
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ViewBag.Error = "An error occurred while updating your profile.";
             }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-            return await Index(); 
-=======
-            return await Index(); // Return view instead of redirecting
->>>>>>> Dashboard
-=======
-            return await Index(); // Return view instead of redirecting
->>>>>>> 7a385f5 (UserSide (Home, Blogs, Features, Contactus, pricing page ))
+            return await Index();
         }
-
     }
 }
