@@ -1,0 +1,148 @@
+﻿@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Title"] = "Support Tickets";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Create Support Request", url = Url.Action("Create", "UserSupport"), is_button = false, components = "" }
+    };
+    var supports = ViewData["Supports"] as List<WASender.Models.Support>;
+    var total = ViewData["Total"] as int? ?? 0;
+    var openSupport = ViewData["OpenSupport"] as int? ?? 0;
+    var pendingSupport = ViewData["PendingSupport"] as int? ?? 0;
+    var page = ViewData["Page"] as int? ?? 1;
+    var pageSize = ViewData["PageSize"] as int? ?? 20;
+}
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row d-flex justify-content-between flex-wrap">
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0">
+                                    @ViewBag.TotalSupports
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-tickets-airline mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Total Tickets</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0">
+                                    @ViewBag.OpenSupport
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-ticket-airline mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Open Tickets</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0">
+                                    @ViewBag.PendingSupport
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-time-forward mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Pending Supports</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                <h3 class="mb-0">Tickets</h3>
+                <form action="" method="get">
+                    <div class="input-group">
+                        <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Search......">
+                        <select class="form-control" name="type">
+                            <option value="email" selected="@(ViewBag.Type == "email" ? "selected" : null)">User Email</option>
+                            <option value="ticket_no" selected="@(ViewBag.Type == "ticket_no" ? "selected" : null)">Ticket No</option>
+                            <option value="subject" selected="@(ViewBag.Type == "subject" ? "selected" : null)">Subject</option>
+                        </select>
+                        <div class="input-group-btn">
+                            <button class="btn btn-primary btn-icon"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Ticket No</th>
+                            <th>Subject</th>
+                            <th>Conversations</th>
+                            <th>Status</th>
+                            <th>User</th>
+                            <th>Created At</th>
+                            <th>Ticket</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.Supports.Count > 0)
+                        {
+                            @foreach (var support in ViewBag.Supports)
+                            {
+                                <tr>
+                                    <td class="text-center">@support.TicketNo</td>
+                                    <td>
+                                        <a class="text-dark" asp-action="Show" asp-route-id="@support.Id">
+                                            @(support.Subject.Length > 50 ? support.Subject.Substring(0, 50) + "..." : support.Subject)
+                                        </a>
+                                    </td>
+                                    <td class="text-center">@support.Supportlogs.Count</td>
+                                    <td>
+                                        <span class="badge badge-@(support.Status == 2 ? "warning" : (support.Status == 1 ? "success" : "danger"))">
+                                            @(support.Status == 2 ? "Pending" : (support.Status == 1 ? "Open" : "Closed"))
+                                        </span>
+                                    </td>
+                                    <td class="text-center">@support.User?.Name</td>
+                                    <td class="text-center">@support.CreatedAt?.ToString("dd MMM yy")</td>
+                                    <td><a asp-action="Show" asp-route-id="@support.Id" class="btn btn-neutral btn-sm">View Ticket</a></td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="7" class="text-center">No support queries found.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

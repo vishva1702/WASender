@@ -1,0 +1,110 @@
+﻿@{
+    ViewData["Title"] = "Create Role";
+
+    // Cast the permission groups from ViewBag
+    var permissionGroups = ViewBag.PermissionGroups as List<WASender.Controllers.AdminSide.AdminRoleController.PermissionGroup>;
+
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Back", url = Url.Action("Index", "AdminRole"), is_button = false, components = "" }
+    };
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4>Add Role</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div class="pt-20">
+                        <div class="form-group">
+                            <label>Role Name</label>
+                            <input type="text" class="form-control" required name="name" placeholder="sub admin" />
+                            @if (ViewData.ModelState.ContainsKey("Name"))
+                            {
+                                <span class="text-danger">@ViewData.ModelState["Name"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
+                            }
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input checkAll" id="customCheck12" />
+                                    <label class="custom-control-label checkAll" for="customCheck12">Check All Permissions</label>
+                                </div>
+
+                                <hr />
+
+                                @if (permissionGroups != null && permissionGroups.Any())
+                                {
+                                    int i = 1;
+                                    <div class="row">
+                                        @foreach (var group in permissionGroups)
+                                        {
+                                            <div class="col-sm-6">
+                                                <div class="row">
+                                                    <div class="col-3">
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" class="custom-control-input group-input" id="@($"{i}Management")" value="@group.GroupName" data-class="role-@i-management-checkbox" />
+                                                            <label class="custom-control-label" for="@($"{i}Management")">@group.GroupName</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-9 role-@i-management-checkbox">
+                                                        @foreach (var permission in group.Permissions)
+                                                        {
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input" name="permissions[]" id="checkPermission@permission.Id" value="@permission.Name" />
+                                                                <label class="custom-control-label" for="checkPermission@permission.Id">@permission.Name</label>
+                                                            </div>
+                                                        }
+                                                        <br />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            i++;
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-muted">No permissions available.</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-neutral submit-button">
+                            <i class="fa fa-save"></i> Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

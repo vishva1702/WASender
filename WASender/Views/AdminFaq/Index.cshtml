@@ -1,0 +1,277 @@
+﻿@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Title"] = "Frequently Asked Questions";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "<i class='fa fa-plus'></i>&nbsp;Create FAQ", url = "#", is_button = true, components = "data-bs-toggle='modal' data-bs-target='#addFaqModal'" },
+    };
+}
+@await Html.PartialAsync("_HeaderSection")
+
+
+    <link rel="stylesheet" type="text/css" href="~/assets/vendor/select2/dist/css/select2.min.css">
+
+
+<div class="card">
+    <div class="card-header border-0">
+        <h3 class="mb-0">FAQS</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+                <tr>
+                    <th class="col-3">Question</th>
+                    <th class="col-6">Answer</th>
+                    <th class="col-1 text-right">Language</th>
+                    <th class="col-1 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && ((List<WASender.Models.Post>)Model).Any())
+                {
+                    var postList = (List<WASender.Models.Post>)Model;
+                    foreach (WASender.Models.Post faq in postList)
+                    {
+                        <tr>
+                            <td class="text-left">@faq.Title</td>
+                            <td class="text-left" style="white-space: normal; word-wrap: break-word; max-width: 400px;">
+                                @{
+                                    var metas = faq.Postmetas as IEnumerable<WASender.Models.Postmeta>;
+                                    var excerpt = metas?.FirstOrDefault(m => m.Key == "excerpt")?.Value;
+                                }
+                                @excerpt
+                            </td>
+
+                            <td class="text-right">@faq.Lang</td>
+                            <td class="text-right">
+                                <div class="btn-group mb-2 float-right">
+                                    <button class="btn btn-neutral btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Action
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item has-icon edit-row" href="#"
+                                               data-action="@Url.Action("Edit", "AdminFaq", new { id = faq.Id })"
+                                               data-id="@faq.Id"
+                                               data-title="@faq.Title"
+                                               data-answer="@faq.Slug"
+                                               data-lang="@faq.Lang"
+                                               data-position="@faq.Slug"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#editModal">
+                                                <i class="fi fi-rs-edit"></i> Edit
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <button type="button"
+                                                    class="dropdown-item has-icon delete-confirm"
+                                                    data-action="@Url.Action("Delete", "AdminFaq", new { id = faq.Id })">
+                                                <i class="fas fa-trash"></i> Remove FAQ
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="4" class="text-center">No FAQs available.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add FAQ Modal -->
+<div class="modal fade" id="addFaqModal" tabindex="-1" aria-labelledby="addFaqLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Store" method="post">
+                <div class="modal-header">
+                    <h3>Create FAQ</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Question</label>
+                        <input type="text" name="question" maxlength="150" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Answer</label>
+                        <textarea class="form-control h-100" maxlength="500" name="answer" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Select position</label>
+                        <select class="form-control" name="position" required>
+                            <option value="top">For App Question</option>
+                            <option value="bottom" selected>Regular</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Language</label>
+                        <select class="form-control" name="language" required>
+                            @if (ViewBag.Languages is Dictionary<string, string> languages)
+                            {
+                                foreach (var language in languages)
+                                {
+                                    <option value="@language.Key">@language.Value</option>
+                                }
+                            }
+                            else
+                            {
+                                <option disabled selected>No languages available</option>
+                            }
+
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-outline-primary col-12 submit-button">Create Now</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit FAQ Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Edit" method="post" class="ajaxform_instant_reload edit-modal">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="_method" value="PUT" />
+
+                <div class="modal-header">
+                    <h3>Edit FAQ</h3>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Question</label>
+                        <input type="text" name="question" maxlength="150" class="form-control" id="question" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Answer</label>
+                        <textarea class="form-control h-100" maxlength="500" name="answer" required id="answer"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Position</label>
+                        <select class="form-control" name="position" id="position" required>
+                            <option value="top">For App Question</option>
+                            <option value="bottom">Bottom</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Language</label>
+                        <select class="form-control" name="language" id="language" required>
+                            @if (ViewBag.Languages != null)
+                            {
+                                foreach (var language in (Dictionary<string, string>)ViewBag.Languages)
+                                {
+                                    <option value="@language.Key">@language.Value</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-outline-primary col-12 submit-button">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="@Url.Content("~/assets/vendor/select2/dist/js/select2.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/pages/user/contact.js")"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Delete Contact Script with Two Confirmations
+            document.querySelectorAll(".delete-confirm").forEach(button => {
+                button.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    let deleteUrl = this.getAttribute("data-action");
+
+                    if (!deleteUrl) {
+                        Swal.fire("Error!", "Invalid delete URL.", "error");
+                        return;
+                    }
+
+                    // First Confirmation Box
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You want to delete this?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Second Confirmation Box
+                            Swal.fire({
+                                title: "Final Confirmation",
+                                text: "Are you absolutely sure?",
+                                icon: "question",
+                                showCancelButton: true,
+                                confirmButtonColor: "#007bff",
+                                cancelButtonColor: "#d33",
+                                confirmButtonText: "Yes, delete permanently!"
+                            }).then((finalResult) => {
+                                if (finalResult.isConfirmed) {
+                                    // Perform delete request
+                                    fetch(deleteUrl, {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            "X-CSRF-TOKEN": document.querySelector('input[name="__RequestVerificationToken"]').value
+                                        }
+                                    })
+                                    .then(response => {
+                                        if (response.ok) {
+                                            Swal.fire("Deleted!", "Your contact has been deleted.", "success")
+                                                .then(() => location.reload());
+                                        } else {
+                                            return response.text().then(text => { throw new Error(text); });
+                                        }
+                                    })
+                                    .catch(error => Swal.fire("Error!", "Failed to delete: " + error.message, "error"));
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+
+            // Edit FAQ Modal Script
+            const editFaqModal = document.getElementById('editModal');
+            if (editFaqModal) {
+                editFaqModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+
+                    const id = button.getAttribute('data-id');
+                    const title = button.getAttribute('data-title');
+                    const answer = button.getAttribute('data-answer');
+                    const lang = button.getAttribute('data-lang');
+                    const position = button.getAttribute('data-position') ?? 'bottom';
+
+                    document.getElementById('question').value = title;
+                    document.getElementById('answer').value = answer;
+                    document.getElementById('language').value = lang;
+                    document.getElementById('position').value = position;
+
+                    const form = editFaqModal.querySelector("form");
+                    form.action = `/AdminFaq/edit/${id}`;
+                });
+            }
+        });
+    </script>
+}

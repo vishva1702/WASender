@@ -109,14 +109,14 @@
                         <div class="dropdown-header noti-title">
                             <h6 class="text-overflow m-0">Welcome!</h6>
                         </div>
-                        <a href="@(isUserSection ? "/UserProfile/Index" : "/admin/profile")" class="dropdown-item">
+                        <a href="@(isUserSection ? "/UserProfile" : "/AdminProfile")" class="dropdown-item">
                             <i class="ni ni-single-02"></i>
                             <span>My Profile</span>
                         </a>
 
                         @if (isUserSection)
                         {
-                            <a href="/user/subscription" class="dropdown-item">
+                            <a href="/Subscription/Index" class="dropdown-item">
                                 <i class="ni ni-settings-gear-65"></i>
                                 <span>Subscription</span>
                             </a>
@@ -126,18 +126,19 @@
                             </a>
                         }
 
-                        <a href="@(isUserSection ? "/UserSupport/Index" : "/admin/support")" class="dropdown-item">
+                        <a href="@(isUserSection ? "/UserSupport" : "/AdminSupport")" class="dropdown-item">
                             <i class="ni ni-support-16"></i>
                             <span>Support</span>
                         </a>
                         <div class="dropdown-divider"></div>
-                        <form method="post" asp-action="Index" asp-controller="Home">
+                        <form method="post" asp-action="Logout" asp-controller="Login">
                             @Html.AntiForgeryToken()
                             <button type="submit" class="dropdown-item">
                                 <i class="ni ni-user-run"></i>
                                 <span>Logout</span>
                             </button>
                         </form>
+
                     </div>
                 </li>
             </ul>

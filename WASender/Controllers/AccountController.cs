@@ -6,20 +6,25 @@ using WASender.Contracts;
 
 namespace WASender.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         private readonly IForgotPasswordService _forgotPasswordService;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(IForgotPasswordService forgotPasswordService, ILogger<AccountController> logger)
+        public AccountController(
+            IGlobalDataService globalDataService,
+            IForgotPasswordService forgotPasswordService,
+            ILogger<AccountController> logger)
+            : base(globalDataService, logger)
         {
             _forgotPasswordService = forgotPasswordService;
             _logger = logger;
         }
 
         [HttpGet]
-        public IActionResult ForgotPassword()
+        public async Task<IActionResult> ForgotPasswordAsync()
         {
+            await LoadGlobalDataAsync();
             return View();
         }
 
@@ -61,11 +66,13 @@ namespace WASender.Controllers
                 ViewBag.Error = "Invalid request. Missing token or email.";
                 return View();
             }
+
             if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(password_confirmation))
             {
                 ViewBag.Error = "Both password fields are required.";
                 return View();
             }
+
             if (password != password_confirmation)
             {
                 ViewBag.Error = "Passwords do not match.";
@@ -77,7 +84,7 @@ namespace WASender.Controllers
             if (success)
             {
                 TempData["SuccessMessage"] = "Password has been reset successfully!";
-                return RedirectToAction("Index", "Login"); // Redirect to the login page
+                return RedirectToAction("Index", "Login");
             }
             else
             {

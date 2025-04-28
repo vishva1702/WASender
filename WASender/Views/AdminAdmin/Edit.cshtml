@@ -1,0 +1,91 @@
+﻿@model WASender.Models.User
+@{
+    ViewData["Title"] = "Edit Admin";
+    var roles = ViewBag.Roles as List<Role>;
+}
+
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Back", url = Url.Action("Index", "AdminAdmin"), is_button = false, components = "" }
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row">
+    <div class="col-lg-5 mt-5">
+        <strong>Edit Admin</strong>
+        <p>edit admin profile information</p>
+    </div>
+    <div class="col-lg-7 mt-5">
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="Update" asp-controller="AdminAdmin" method="post">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <div class="pt-20">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" name="Name" class="form-control" id="name" required
+                                   value="@Model.Name" placeholder="Enter Name" autocomplete="off" />
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" name="Email" class="form-control" id="email" required
+                                   value="@Model.Email" placeholder="Enter Email" autocomplete="off" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" name="password" class="form-control" id="password"
+                                   placeholder="Enter Password" autocomplete="off" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password_confirmation">Confirm Password</label>
+                            <input type="password" name="passwordConfirmation" class="form-control"
+                                   id="password_confirmation" placeholder="Confirm Password" autocomplete="off" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="roles">Assign Role</label>
+                            <select name="Role" class="form-control" id="roles" required>
+                                <option disabled selected>Select Role</option>
+                                @if (ViewBag.Roles != null)
+                                {
+                                    foreach (var role in ViewBag.Roles as List<Role>)
+                                    {
+                                        if (role != null && !string.IsNullOrEmpty(role.Name))
+                                        {
+                                            bool isSelected = Model?.Role != null &&
+                                            role.Name != null &&
+                                            string.Equals(Model.Role, role.Name, StringComparison.OrdinalIgnoreCase);
+
+                                            <option value="@role.Name" selected="@isSelected">
+                                                @role.Name
+                                            </option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control" name="status" id="status">
+                                <option value="1" selected="@(Model.Status == 1)">Active</option>
+                                <option value="0" selected="@(Model.Status == 0)">InActive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-footer mt-4">
+                        <div class="btn-publish">
+                            <button type="submit" class="btn btn-neutral submit-button">
+                                <i class="fa fa-save"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

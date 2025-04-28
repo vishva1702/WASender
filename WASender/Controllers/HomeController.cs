@@ -12,7 +12,7 @@ namespace WASender.Controllers
         private readonly IHomeService _homeService;
 
         public HomeController(IGlobalDataService globalDataService, ILogger<HomeController> logger, IHomeService homeService)
-            : base(globalDataService, logger)  // ✅ Fix: Pass `IGlobalDataService` instead of `ApplicationDbContext`
+            : base(globalDataService, logger)  
         {
             _homeService = homeService;
         }

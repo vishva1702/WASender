@@ -1,0 +1,143 @@
+﻿@{
+    ViewData["Title"] = "SMTP Settings";
+    var mailDriver = ViewBag.MailDriver as string;
+}
+
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Title"] = "Admins";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Back To Dashboard", url = Url.Action("Index", "AdminDeveloperSettings"), is_button = false, components = "" }
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row">
+    <div class="col-lg-5 mt-5">
+        <strong>SMTP mail Settings</strong>
+        <p>Edit your SMTP settings for mail transaction</p>
+    </div>
+
+    <div class="col-lg-7 mt-5">
+        <form asp-action="Update" asp-controller="AdminDeveloperSettings" asp-area="Admin" asp-route-id="@ViewBag.Id" method="post" class="ajaxform">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="_method" value="PUT" />
+
+            <div class="card">
+                <div class="card-body">
+
+                    @* Queue mail toggle *@
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Use Queue Job For Mail Transaction?</label>
+                        <div class="col-lg-12">
+                            <select name="QUEUE_MAIL" class="form-control">
+                                <option value="true" selected="@(Environment.GetEnvironmentVariable("QUEUE_MAIL") == "true")">Enable</option>
+                                <option value="false" selected="@(Environment.GetEnvironmentVariable("QUEUE_MAIL") == "false")">Disable</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    @* Mail driver type *@
+                    <div class="form-group row">
+                        <label class="col-lg-12">Mail driver type</label>
+                        <div class="col-lg-12">
+                            <select name="MAIL_DRIVER_TYPE" class="form-control">
+                                <option value="MAIL_MAILER" selected="@(Environment.GetEnvironmentVariable("MAIL_DRIVER_TYPE") == "MAIL_MAILER")">MAIL MAILER</option>
+                                <option value="MAIL_DRIVER" selected="@(Environment.GetEnvironmentVariable("MAIL_DRIVER_TYPE") == "MAIL_DRIVER")">MAIL DRIVER</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    @* Mail driver *@
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Mail Driver</label>
+                        <div class="col-lg-12">
+                            <select name="MAIL_DRIVER" class="form-control">
+                                <option value="sendmail" selected="@(mailDriver == "sendmail")">sendmail</option>
+                                <option value="smtp" selected="@(mailDriver == "smtp")">smtp</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    @* Mail host *@
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Mail Host</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="MAIL_HOST" class="form-control" required value="@Environment.GetEnvironmentVariable("MAIL_HOST")" />
+                        </div>
+                    </div>
+
+                    @* Mail port *@
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Mail Port</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="MAIL_PORT" class="form-control" required value="@Environment.GetEnvironmentVariable("MAIL_PORT")" />
+                        </div>
+                    </div>
+
+                    @* Mail username *@
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Mail Username</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="MAIL_USERNAME" class="form-control" required value="@Environment.GetEnvironmentVariable("MAIL_USERNAME")" />
+                        </div>
+                    </div>
+
+                    @* Mail password *@
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Mail Password</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="MAIL_PASSWORD" class="form-control" required value="@Environment.GetEnvironmentVariable("MAIL_PASSWORD")" />
+                        </div>
+                    </div>
+
+                    @* Encryption *@
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Mail Encryption</label>
+                        <div class="col-lg-12">
+                            <select name="MAIL_ENCRYPTION" class="form-control">
+                                <option value="ssl" selected="@(Environment.GetEnvironmentVariable("MAIL_ENCRYPTION") == "ssl")">SSL</option>
+                                <option value="tls" selected="@(Environment.GetEnvironmentVariable("MAIL_ENCRYPTION") == "tls")">TLS</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    @* From Address *@
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Mail From Address</label>
+                        <div class="col-lg-12">
+                            <input type="email" name="MAIL_FROM_ADDRESS" class="form-control" required placeholder="email" value="@Environment.GetEnvironmentVariable("MAIL_FROM_ADDRESS")" />
+                        </div>
+                    </div>
+
+                    @* From Name *@
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Mail From Name</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="MAIL_FROM_NAME" class="form-control" required placeholder="Website Name" value="@Environment.GetEnvironmentVariable("MAIL_FROM_NAME")" />
+                        </div>
+                    </div>
+
+                    @* Incoming Mail *@
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Incoming Mail</label>
+                        <div class="col-lg-12">
+                            <input type="email" name="MAIL_TO" class="form-control" required placeholder="email" value="@Environment.GetEnvironmentVariable("MAIL_TO")" />
+                        </div>
+                    </div>
+
+                    @* Submit button *@
+                    <div class="form-group row mt-3">
+                        <div class="col-lg-12">
+                            <button type="submit" class="btn btn-neutral submit-button btn-sm float-left">Update Settings</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

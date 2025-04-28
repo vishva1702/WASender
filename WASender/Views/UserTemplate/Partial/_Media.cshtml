@@ -1,0 +1,101 @@
+﻿@model Template
+@using System.Text.Json
+@using System.Collections.Generic
+
+@{
+    Dictionary<string, object>? bodyDict = null;
+    Dictionary<string, object>? imageDict = null;
+    Dictionary<string, object>? documentDict = null;
+
+    try
+    {
+        if (!string.IsNullOrEmpty(Model.Body))
+        {
+            bodyDict = JsonSerializer.Deserialize<Dictionary<string, object>>(Model.Body);
+
+            if (bodyDict != null)
+            {
+                if (bodyDict.ContainsKey("image") && bodyDict["image"] is JsonElement imgElement)
+                {
+                    imageDict = JsonSerializer.Deserialize<Dictionary<string, object>>(imgElement.GetRawText());
+                }
+
+                if (bodyDict.ContainsKey("document") && bodyDict["document"] is JsonElement docElement)
+                {
+                    documentDict = JsonSerializer.Deserialize<Dictionary<string, object>>(docElement.GetRawText());
+                }
+            }
+        }
+    }
+    catch
+    {
+        bodyDict = new Dictionary<string, object>();
+        imageDict = new Dictionary<string, object>();
+        documentDict = new Dictionary<string, object>();
+    }
+
+    var caption = bodyDict != null && bodyDict.ContainsKey("caption") ? bodyDict["caption"]?.ToString() : "";
+    var imageUrl = imageDict != null && imageDict.ContainsKey("url") ? imageDict["url"]?.ToString() : "";
+    var documentUrl = documentDict != null && documentDict.ContainsKey("url") ? documentDict["url"]?.ToString() : "";
+}
+
+<form method="post" asp-action="Update" asp-route-id="@Model.Id" class="ajaxform" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="_method" value="PUT" />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Template Name</label>
+                <input type="text" name="template_name" required class="form-control" value="@Model.Title">
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Select File</label>
+                <input id="phone" type="file" class="form-control" name="file" />
+                <small>Supported file type:</small>
+                <small class="text-danger">jpg, jpeg, png, webp, pdf, docx, xlsx, csv, txt</small>
+                <br>
+                @if (!string.IsNullOrEmpty(imageUrl))
+                {
+                    <a href="@imageUrl" target="_blank">
+                        <img src="@imageUrl" height="50">
+                    </a>
+                }
+                else if (!string.IsNullOrEmpty(documentUrl))
+                {
+                    <a href="@documentUrl" target="_blank">Attachment</a>
+                }
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="form-row mb-1">
+                <label class="col-12 text-left">Media Caption:</label>
+                <div class="col-6">
+                    <button type="button" data-toggle="modal" data-target="#help-modal" class="btn btn-neutral btn-sm float-right">
+                        <i class="fas fas fa-code"></i>&nbsp;Shortcodes
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <textarea class="form-control h-200" name="message" required maxlength="1000">@caption</textarea>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-sm-8 d-flex">
+                    <label class="custom-toggle custom-toggle-primary">
+                        <input type="checkbox" name="status" id="template-status" @(Model.Status == 1 ? "checked" : "")>
+                        <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                    </label>
+                    <label class="mt-1 ml-1" for="template-status">
+                        <h4>Make it active template?</h4>
+                    </label>
+                </div>
+                <div class="col-sm-4">
+                    <button type="submit" class="btn btn-outline-primary submit-button float-right">Save Template</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

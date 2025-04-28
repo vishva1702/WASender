@@ -6,23 +6,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using WASender.Controllers.AdminSide;
 using WASender.Models;
+using WASender.Services;
 
 namespace WASender.Controllers
 {
-    [Authorize]
-    public class UserSupportController : Controller
+    [Authorize(Roles = "user,User")]
+    public class UserSupportController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
-        public UserSupportController(ApplicationDbContext context)
+        public UserSupportController(IGlobalDataService globalDataService, ILogger<AdminHomeController> logger, ApplicationDbContext context)
+            : base(globalDataService, logger)
         {
             _context = context;
         }
 
-        // Index: List Support Tickets with Stats
         public async Task<IActionResult> Index(int page = 1)
         {
+            await LoadGlobalDataAsync();
+
             var userIdString = User.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userIdString) || !ulong.TryParse(userIdString, out ulong userId))
             {
@@ -40,11 +44,10 @@ namespace WASender.Controllers
                 .ToListAsync();
 
             var openSupport = await _context.Supports
-    .CountAsync(s => s.UserId == userId && s.Status == 1);
+                .CountAsync(s => s.UserId == userId && s.Status == 1);
 
             var pendingSupport = await _context.Supports
-    .CountAsync(s => s.UserId == userId && s.Status != 1 && s.Status != 0);
-
+                .CountAsync(s => s.UserId == userId && s.Status != 1 && s.Status != 0);
 
             var total = await _context.Supports
                 .CountAsync(s => s.UserId == userId);
@@ -59,14 +62,12 @@ namespace WASender.Controllers
             return View(supports);
         }
 
-        // Create: Show Ticket Creation Form
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // Store: Save New Ticket
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Store(string subject, string message)
@@ -94,7 +95,7 @@ namespace WASender.Controllers
                 {
                     UserId = userId,
                     Subject = subject,
-                    Status = 2, 
+                    Status = 2,
                     CreatedAt = DateTime.UtcNow,
                     TicketNo = newTicketNo
                 };
@@ -125,7 +126,6 @@ namespace WASender.Controllers
             }
         }
 
-        // Show: View Individual Ticket
         public async Task<IActionResult> Show(ulong id)
         {
             var userIdString = User.FindFirst("UserId")?.Value;
@@ -146,7 +146,6 @@ namespace WASender.Controllers
             return View(support);
         }
 
-        // Update: Add Comment to Existing Ticket
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(ulong id, string message)
@@ -183,10 +182,8 @@ namespace WASender.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Show", new { id = support.Id });
-
         }
 
-        // Close: Mark Ticket as Closed
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Close(ulong id)
@@ -205,7 +202,7 @@ namespace WASender.Controllers
                 return NotFound();
             }
 
-            support.Status = 0; // Closed status
+            support.Status = 0;
             await _context.SaveChangesAsync();
 
             return Json(new

@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using WASender.Controllers;
 using WASender.Models;
@@ -26,8 +27,9 @@ public class LoginController : BaseController
     }
 
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
+        await LoadGlobalDataAsync();
         return View();
     }
 
@@ -56,33 +58,53 @@ public class LoginController : BaseController
 
         var claims = new List<Claim>
         {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim("UserId", user.Id.ToString()), // Custom claim
+            new Claim("Avatar", user.Avatar ?? ""),   // Custom claim if Avatar exists
             new Claim(ClaimTypes.Name, email),
-            new Claim(ClaimTypes.Role, role),
-            new Claim("UserId", user.Id.ToString()) // Ensure UserId claim exists
+            new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", CultureInfo.CurrentCulture.TextInfo.ToTitleCase(role))
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
 
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-            new AuthenticationProperties
-            {
-                IsPersistent = true,
-                ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
-            });
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties
+        {
+            IsPersistent = true,
+            ExpiresUtc = DateTime.UtcNow.AddMinutes(120)
+        });
 
         Response.Cookies.Append("authkey", token, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = true, // Set to true if using HTTPS
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddMinutes(30)
+            Expires = DateTime.UtcNow.AddMinutes(120)
         });
 
         _logger.LogInformation("Login successful for {Email}, role: {Role}", email, role);
+
         await LoadGlobalDataAsync();
 
-        return role == "admin" ? RedirectToAction("Dashboard", "Admin") : RedirectToAction("Index", "UserHome");
+        return role.Equals("Admin", StringComparison.OrdinalIgnoreCase)
+            ? RedirectToAction("Index", "AdminHome")
+            : RedirectToAction("Index", "UserHome");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+        if (Request.Cookies.ContainsKey("authkey"))
+        {
+            Response.Cookies.Delete("authkey");
+        }
+
+        HttpContext.Session.Clear();
+
+        return RedirectToAction("Index", "Login");
     }
 
     [HttpPost]
@@ -107,24 +129,7 @@ public class LoginController : BaseController
         var token = await _loginService.GenerateJwtTokenAsync(email);
 
         _logger.LogInformation("API Login successful for {Email}, role: {Role}", email, role);
+
         return Ok(new { Token = token, Role = role });
     }
-
-    [HttpGet]
-    public async Task<IActionResult> Logout()
-    {
-        _logger.LogInformation("User logged out.");
-
-        // Clear authentication session
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-        // Remove all cookies
-        foreach (var cookie in Request.Cookies.Keys)
-        {
-            Response.Cookies.Delete(cookie);
-        }
-
-        return RedirectToAction("Index", "Home");
-    }
-
 }

@@ -1,0 +1,151 @@
+﻿
+@{
+    ViewData["Title"] = "Features";
+    var posts = ViewBag.Posts as List<WASender.Models.Post>;
+    var languages = ViewData["Languages"] as Dictionary<string, string>;
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Create A Team", url = Url.Action("Create", "AdminFeatures"), is_button = false, components = "" }
+    };
+}
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="card">
+    <div class="card-header">
+        <h3>Our Features</h3>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th class="col-3">Title</th>
+                    <th class="col-6">Description</th>
+                    <th class="col-1 text-right">Language</th>
+                    <th class="col-1 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var post in posts)
+                {
+                    var preview = post.Postmetas.FirstOrDefault(m => m.Key == "preview");
+                    var excerpt = post.Postmetas.FirstOrDefault(m => m.Key == "excerpt");
+                    <tr>
+                        <td class="text-left">
+                            <img src="@preview?.Value" class="avatar rounded-circle mr-3" />
+                            @post.Title
+                        </td>
+                        <td class="text-left">
+                            @excerpt?.Value?.Substring(0, Math.Min(excerpt.Value.Length, 50))
+                        </td>
+                        <td class="text-right">@post.Lang</td>
+                        <td class="text-right">
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown">
+                                    Action
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="@Url.Action("Edit", "AdminFeatures", new { id = post.Id })">
+                                        <i class="fi fi-rs-edit"></i> Edit
+                                    </a>
+                                    <a href="#" class="dropdown-item text-danger delete-confirm" data-action="@Url.Action("Destroy", "AdminFeatures", new { id = post.Id })">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@* Add Feature Modal *@
+<div class="modal fade" id="addRecord" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Create" asp-controller="Features" method="post" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h3>Create Feature</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" name="Title" maxlength="150" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Preview Image</label>
+                        <input type="file" name="PreviewImage" class="form-control" accept="image/*" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="Description" class="form-control" maxlength="500" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Language</label>
+                        <select name="Language" class="form-control" required>
+                            @foreach (var lang in languages)
+                            {
+                                <option value="@lang.Key">@lang.Value</option>
+                            }
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Now</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="@Url.Content("~/assets/vendor/select2/dist/js/select2.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/pages/user/contact.js")"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+                                      document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".delete-confirm").forEach(button => {
+                button.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    let deleteUrl = this.getAttribute("data-action");
+
+                    if (!deleteUrl) {
+                        Swal.fire("Error!", "Invalid delete URL.", "error");
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You want to delete this member?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(deleteUrl, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-Requested-With": "XMLHttpRequest"
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire("Deleted!", data.message, "success").then(() => location.reload());
+                                } else {
+                                    Swal.fire("Error!", data.message, "error");
+                                }
+                            })
+                            .catch(error => Swal.fire("Error!", "Failed to delete: " + error.message, "error"));
+                        }
+                    });
+                });
+            });
+        });
+
+    </script>
+}

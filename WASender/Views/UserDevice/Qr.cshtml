@@ -1,0 +1,280 @@
+﻿@model WASender.Models.Device
+@{
+    ViewData["Title"] = "Scan QR Code";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <h6 class="h2 text-white d-inline-block mb-0">Scan QR Code</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="/user/device">Devices</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Scan QR</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-6 col-5 text-right">
+                    <a href="@Url.Action("Index", "UserDevice")" class="btn btn-sm btn-neutral">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Scan QR Code</h3>
+                    <button id="logoutBtn" class="btn btn-sm btn-danger d-none">
+                        <i class="fas fa-sign-out-alt"></i> Logout Device
+                    </button>
+                </div>
+                <div class="card-body text-center">
+                    <div id="qrContainer" class="my-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <p class="mt-2">Preparing QR Code...</p>
+                    </div>
+
+                    <div id="connectionStatus" class="alert alert-dismissible fade" role="alert">
+                        <span id="statusMessage"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="connectedActions" class="card mt-4 d-none">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a href="@Url.Action("Chats", "UserDevice", new { id = Model.Uuid })"
+                               class="btn btn-block btn-outline-primary">
+                                <i class="fas fa-comments"></i> My Chats
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="@Url.Action("Groups", "UserDevice", new { id = Model.Uuid })"
+                               class="btn btn-block btn-outline-primary">
+                                <i class="fas fa-users"></i> My Groups
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="@Url.Action("SentTextMessage", "User")"
+                               class="btn btn-block btn-outline-success">
+                                <i class="fas fa-paper-plane"></i> Send Message
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="@Url.Action("Create", "BulkMessage")"
+                               class="btn btn-block btn-outline-success">
+                                <i class="fas fa-bullhorn"></i> Bulk Message
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">How to Connect</h3>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="mr-3 text-primary">
+                                    <i class="fas fa-mobile-alt fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-1">Step 1</h5>
+                                    <p class="mb-0">Open WhatsApp on your phone</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="mr-3 text-primary">
+                                    <i class="fas fa-cog fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-1">Step 2</h5>
+                                    <p class="mb-0">Go to Settings > Linked Devices</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="mr-3 text-primary">
+                                    <i class="fas fa-link fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-1">Step 3</h5>
+                                    <p class="mb-0">Tap "Link a Device"</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="mr-3 text-primary">
+                                    <i class="fas fa-qrcode fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-1">Step 4</h5>
+                                    <p class="mb-0">Scan the QR code shown here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="deviceId" value="@Model.Uuid" />
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const deviceId = $('#deviceId').val();
+            let isConnected = false;
+            let checkInterval;
+            let retryCount = 0;
+            const maxRetries = 5;
+
+            // Show status message
+            function showStatus(message, type) {
+                const alert = $('#connectionStatus');
+                alert.removeClass('alert-danger alert-success alert-warning')
+                     .addClass(`alert-${type} show`);
+                $('#statusMessage').text(message);
+
+                // Auto-hide success messages after 5 seconds
+                if (type === 'success') {
+                    setTimeout(() => alert.removeClass('show'), 5000);
+                }
+            }
+
+            // Initialize QR code
+            function initQRCode() {
+                $('#qrContainer').html(`
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <p class="mt-2">Preparing QR Code...</p>
+                    </div>
+                `);
+
+                $.ajax({
+                    url: `/UserDevice/GetQr/${deviceId}`,
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.qr_code_url) {
+                            $('#qrContainer').html(`
+                                <img src="${response.qr_code_url}"
+                                     class="img-fluid"
+                                     alt="QR Code"
+                                     style="max-width: 300px;">
+                                <p class="mt-2">Scan this QR code with WhatsApp</p>
+                                ${response.source === 'local' ?
+                                    '<p class="text-muted small">(Using local QR code)</p>' : ''}
+                            `);
+
+                            if (!response.connected) {
+                                startConnectionCheck();
+                            }
+                        } else {
+                            showStatus('Received invalid QR code response', 'danger');
+                            retryQRCode();
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMsg = 'Failed to load QR code';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg += ': ' + xhr.responseJSON.message;
+                        }
+                        showStatus(errorMsg, 'danger');
+                        retryQRCode();
+                    }
+                });
+            }
+
+            // Retry loading QR code
+            function retryQRCode() {
+                if (retryCount < maxRetries) {
+                    retryCount++;
+                    setTimeout(initQRCode, 3000);
+                } else {
+                    showStatus('Failed after multiple attempts. Please refresh the page.', 'danger');
+                }
+            }
+
+            // Check connection status
+            function startConnectionCheck() {
+                checkInterval = setInterval(function() {
+                    $.get(`/UserDevice/CheckConnection/${deviceId}`)
+                        .done(function(response) {
+                            if (response.connected && !isConnected) {
+                                onDeviceConnected();
+                            }
+                        })
+                        .fail(function() {
+                            console.log('Connection check failed');
+                        });
+                }, 3000); // Check every 3 seconds
+            }
+
+            // Handle successful connection
+            function onDeviceConnected() {
+                isConnected = true;
+                clearInterval(checkInterval);
+
+                $('#qrContainer').html(`
+                    <div class="text-success">
+                        <i class="fas fa-check-circle fa-5x"></i>
+                        <p class="mt-2">Device Connected!</p>
+                    </div>
+                `);
+
+                $('#logoutBtn').removeClass('d-none');
+                $('#connectedActions').removeClass('d-none');
+                showStatus('Your device is now connected!', 'success');
+
+                // Celebrate!
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+
+            // Logout button handler
+            $('#logoutBtn').click(function() {
+                if (confirm('Are you sure you want to logout this device?')) {
+                    $.post(`/UserDevice/LogoutDevice/${deviceId}`)
+                        .done(function() {
+                            location.reload();
+                        })
+                        .fail(function() {
+                            alert('Failed to logout device');
+                        });
+                }
+            });
+
+            // Initialize
+            initQRCode();
+        });
+    </script>
+}

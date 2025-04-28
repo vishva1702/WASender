@@ -1,0 +1,78 @@
+﻿@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Title"] = "App Settings";
+}
+@await Html.PartialAsync("_HeaderSection")
+<!-- Header Section -->
+<div class="d-flex justify-content-end align-items-center mb-4">
+    <a href="/AdminHome/Index" class="btn btn-outline-primary btn-sm btn-icon">
+        Back to dashboard
+    </a>
+</div>
+<div class="row">
+    <div class="col-lg-5 mt-5">
+        <strong>Whatsapp Server Settings</strong>
+        <p>Edit your Whatsapp server settings</p>
+    </div>
+
+    <div class="col-lg-7 mt-5">
+        <form asp-action="Update" asp-controller="DeveloperSettings" asp-route-id="@ViewBag.Id" method="post" class="ajaxform">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="_method" value="PUT" />
+
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Whatsapp Server Url</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="wa_server_url" value="@ViewBag.WaServerUrl" required class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Whatsapp Server Host</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="host" value="@ViewBag.WaServerHost" required class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Whatsapp Server Port</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="port" value="@ViewBag.WaServerPort" required class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Max Retries</label>
+                        <div class="col-lg-12">
+                            <input type="number" name="MAX_RETRIES" value="@ViewBag.WaServerMaxRetries" required class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Reconnect Interval</label>
+                        <div class="col-lg-12">
+                            <input type="text" name="RECONNECT_INTERVAL" value="@ViewBag.ReconnectInterval" required class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row mt-2">
+                        <label class="col-lg-12">Delay Time For Per Message (Millisecond)</label>
+                        <div class="col-lg-12">
+                            <input type="number" name="DELAY_TIME" value="@Environment.GetEnvironmentVariable("DELAY_TIME")" required class="form-control" placeholder="1000 ms = 1 sec" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-4">
+                        <div class="col-lg-12">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

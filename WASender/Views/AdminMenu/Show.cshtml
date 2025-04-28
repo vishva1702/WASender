@@ -1,0 +1,113 @@
+﻿@model WASender.Models.Menu
+
+@{
+    ViewData["Title"] = "Customize Menu";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+            new { name = "Back", url = Url.Action("Index", "AdminMenu"), is_button = false, components = "" }
+    };
+}
+@await Html.PartialAsync("_HeaderSection")
+
+@section Styles {
+    <link rel="stylesheet" href="~/assets/plugins/bootstrap-iconpicker/css/bootstrap-iconpicker.min.css" />
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row mb-10">
+                    <div class="col-sm-10">
+                        <h4>Menu Items</h4>
+                    </div>
+                    <div class="col-sm-2">
+                        <form asp-action="Update" asp-controller="AdminMenu" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="Id" value="@Model.Id" />
+                            <input type="hidden" name="Name" value="@Model.Name" />
+                            <input type="hidden" name="Position" value="@Model.Position" />
+                            <input type="hidden" name="Status" value="@Model.Status" />
+                            <input type="hidden" name="Lang" value="@Model.Lang" />
+
+                            <input type="hidden" name="data" id="data" value='@Html.Raw(Json.Serialize(ViewBag.Contents))' />
+                            <button id="form-button" class="btn btn-neutral submit-button float-right" type="submit">
+                                Save
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ul id="myEditor" class="sortableLists list-group"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="mb-5">Create Menu Items</h4>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger d-none">
+                            <ul id="errors"></ul>
+                        </div>
+                        <form id="frmEdit">
+                            @Html.AntiForgeryToken()
+                            <div class="custom-form">
+                                <div class="form-group">
+                                    <label for="text">Text</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control item-menu" id="text" name="text" placeholder="Text" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" id="myEditor_icon" class="btn btn-neutral btn-sm"></button>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="icon" class="item-menu">
+                                </div>
+                                <div class="form-group">
+                                    <label for="href">URL</label>
+                                    <input type="text" class="form-control item-menu" id="href" name="href" placeholder="URL" required autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label for="target">Target</label>
+                                    <select name="target" id="target" class="form-control item-menu">
+                                        <option value="_self">Self</option>
+                                        <option value="_blank">Blank</option>
+                                        <option value="_top">Top</option>
+                                    </select>
+                                </div>
+                                <div class="form-group d-none">
+                                    <label for="title">Tooltip</label>
+                                    <input type="text" name="title" class="form-control item-menu" id="title" placeholder="Tooltip">
+                                </div>
+                            </div>
+                        </form>
+                        <div class="menu-add-update d-flex">
+                            <button type="button" id="btnUpdate" class="btn btn-warning text-white col-6 mr-2" disabled>
+                                <i class="fas fa-sync-alt"></i> Update
+                            </button>
+                            <button type="button" id="btnAdd" class="btn btn-neutral col-6">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" value="@ViewBag.Contents" id="menu-data">
+
+@section Scripts {
+    <script src="~/assets/plugins/menu-editor/jquery-menu-editor.min.js"></script>
+    <script src="~/assets/plugins/bootstrap-iconpicker/js/iconset/fontawesome5-3-1.min.js"></script>
+    <script src="~/assets/plugins/bootstrap-iconpicker/js/bootstrap-iconpicker.min.js"></script>
+    <script src="~/assets/plugins/menu-editor/menu.js"></script>
+}

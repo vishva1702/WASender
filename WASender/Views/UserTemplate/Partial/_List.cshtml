@@ -1,0 +1,150 @@
+﻿@model WASender.Models.Template
+@using Newtonsoft.Json
+
+@{
+    Layout = null;
+
+    dynamic body = string.IsNullOrEmpty(Model.Body) 
+        ? new { title = "", text = "", footer = "", buttonText = "", sections = new List<dynamic>() }
+        : JsonConvert.DeserializeObject<dynamic>(Model.Body);
+}
+
+<form method="post" asp-action="Update" asp-route-id="@Model.Id" class="ajaxform">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="_method" value="PUT" />
+    
+    <div class="row">
+        <!-- Template Name -->
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Template Name</label>
+                <input type="text" name="template_name" class="form-control" value="@Model.Title">
+            </div>
+        </div>
+
+        <!-- Header Title -->
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Template Title (Header)</label>
+                <input type="text" class="form-control" name="header_title" placeholder="Example: Amazing boldfaced list title" value="@body.title" required maxlength="50" />
+            </div>
+        </div>
+
+        <!-- Message -->
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Message:</label>
+                <textarea class="form-control h-200" name="message" required maxlength="1000">@body.text</textarea>
+            </div>
+        </div>
+
+        <!-- Footer Text -->
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Template Footer Text</label>
+                <input type="text" class="form-control" name="footer_text" placeholder="Example: Thank you" required maxlength="50" value="@body.footer" />
+            </div>
+        </div>
+
+        <!-- Button Text -->
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Button Text for select option</label>
+                <input type="text" class="form-control" name="button_text" placeholder="Example: Required, text on the button to view the list" value="@body.buttonText" required maxlength="50" />
+            </div>
+        </div>
+
+        <!-- List Options -->
+        <div class="col-sm-12">
+            <div class="list-option-area">
+                <div class="row">
+                    <div class="col-6">
+                        <h4 class="mt-2">List Options</h4>
+                    </div>
+                    <div class="col-6">
+                        <a href="javascript:void(0)" id="add-more-option" class="btn btn-sm btn-primary btn-neutral float-right mb-1">
+                            <i class="fa fa-plus"></i> Add More Card
+                        </a>
+                    </div>
+                </div>
+
+                <div class="list-area">
+                    @for (var sectionKey = 0; sectionKey < body.sections.Count; sectionKey++)
+                    {
+                        var section = body.sections[sectionKey];
+
+                        <div class="card card-primary card-item card-area@(sectionKey + 1)">
+                            <div class="card-header">
+                                <h4>List @(sectionKey + 1)</h4>
+                                @if (sectionKey > 0)
+                                {
+                                    <div class="card-header-action">
+                                        <a href="javascript:void(0)" class="btn btn-danger btn-sm delete-card" data-target=".card-area@(sectionKey + 1)">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>List Section Title</label>
+@*                                     <input type="text" class="form-control" name="section[@(sectionKey + 1)][title]" placeholder="Example: Select a fruit" required maxlength="50" value="@section.title" />
+ *@                                </div>
+
+                                <div class="row list-item-area@(sectionKey + 1)">
+                                    @for (var rowKey = 0; rowKey < section.rows.Count; rowKey++)
+                                    {
+                                        var row = section.rows[rowKey];
+
+                                        <div class="col-6 item-@(sectionKey + 1)-@(rowKey + 1)">
+                                            <div class="form-group">
+                                                <label>Enter List Value Name</label>
+                                                <input type="text" class="form-control" name="section[@(sectionKey + 1)][value][@(rowKey)][title]" placeholder="Example: Banana" required maxlength="50" value="@row.title" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6 item-@(sectionKey + 1)-@(rowKey + 1)">
+                                            <div class="form-group">
+                                                <label>Enter List Value Description</label>
+                                                @if (rowKey != 0)
+                                                {
+                                                    <a href="javascript:void(0)" class="float-right btn btn-sm btn-danger remove-option-item" data-target=".item-@(sectionKey + 1)-@(rowKey + 1)">X</a>
+                                                }
+                                                <input type="text" class="form-control" name="section[@(sectionKey + 1)][value][@(rowKey)][description]" placeholder="Example: Banana is a healthy food" maxlength="50" value="@row.description" />
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="text-right">
+                                    <a href="javascript:void(0)" class="btn btn-sm btn-neutral add-more-option-item option-item-btn@(sectionKey + 1)" data-target=".list-item-area@(sectionKey + 1)" data-key="@(sectionKey + 1)">
+                                        <i class="fas fa-plus"></i> Add More Item
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Status & Submit -->
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-sm-8 d-flex">
+                    <label class="custom-toggle custom-toggle-primary">
+                        <input type="checkbox" name="status" id="template-status" @(Model.Status == 1 ? "checked" : "")>
+                        <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                    </label>
+                    <label class="mt-1 ml-1" for="template-status">
+                        <h4>Make it active template?</h4>
+                    </label>
+                </div>
+                <div class="col-sm-4">
+                    <button type="submit" class="btn btn-outline-primary submit-button float-right">Save Template</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

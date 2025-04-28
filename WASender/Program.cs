@@ -5,8 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WASender.Contracts;
+using WASender.Contracts.AdminSide;
+using WASender.Helpers;
 using WASender.Models;
 using WASender.Services;
+using WASender.Services.AdminSide;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,28 +28,28 @@ builder.Services.AddControllersWithViews()
     .AddViewLocalization()
     .AddDataAnnotationsLocalization();
 
-// 🔹 JWT Configuration
+// JWT Configuration
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Default to Cookies
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-})
 
+})
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 {
-    options.Cookie.Name = ".AspNetCore.Cookies"; // Explicit cookie name
+    options.Cookie.Name = ".AspNetCore.Cookies";
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Always use HTTPS
-    options.Cookie.SameSite = SameSiteMode.Lax; // Prevent cookie blocking
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
     options.LoginPath = "/Login";
     options.AccessDeniedPath = "/AccessDenied";
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(120);
     options.SlidingExpiration = true;
-})
 
+})
 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
 {
     options.RequireHttpsMetadata = false;
@@ -59,23 +62,25 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(key)
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ClockSkew = TimeSpan.Zero // Disable default 5-minute clock skew
     };
 });
 
-// 🔹 Enable CORS (Fixes Cookie Storage Issues in Cross-Origin Scenarios)
+
+// Enable CORS (adjust origins as necessary)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        builder.WithOrigins("https://yourdomain.com", "https://localhost:5001") // Adjust to your domain
-               .AllowCredentials() // Important for cookies!
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        policy.WithOrigins("https://yourdomain.com", "https://localhost:5001")
+              .AllowCredentials()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
     });
 });
 
-// 🔹 Enable session support
+// Enable session support
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -83,22 +88,34 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// Register Services (Dependency Injection)
 // 🔹 Register Services (Dependency Injection)
+builder.Services.AddScoped<IFaqService, FaqService>();
+builder.Services.AddScoped<ISeoService, SeoService>();
+builder.Services.AddScoped<UploaderHelper>();
+builder.Services.AddScoped<BlogHelper>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IGlobalDataService, GlobalDataService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<IAboutService, AboutService>();
-builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IFeatureService, FeatureService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddScoped<WASender.Contracts.IEmailSender, WASender.Services.EmailSender>(); // Ensure full namespace
+builder.Services.AddScoped<WASender.Contracts.IEmailSender, WASender.Services.EmailSender>();
 builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IPlanService, PlanService>();
+builder.Services.AddScoped<NotificationHelper>();
+builder.Services.AddScoped<IUserTemplateService, UserTemplateService>();
+builder.Services.AddScoped<ITestimonialService, TestimonialService>();
+builder.Services.AddScoped<IEnvService, EnvService>();
+builder.Services.AddScoped<IAdminTemplateService, AdminTemplateService>();
+builder.Services.AddScoped<IAdminScheduleService, AdminScheduleService>();
+builder.Services.AddScoped<UploaderHelper>();
+builder.Services.AddScoped<BlogHelper>();
 
 
 
@@ -112,21 +129,21 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); 
+app.UseStaticFiles();
 app.UseRouting();
 
-// 🔹 Apply CORS before Authentication
+// Apply CORS before Authentication
 app.UseCors("AllowAll");
 
-// 🔹 Enable session, authentication, and authorization
+// Enable session, authentication, and authorization
 app.UseSession();
-app.UseAuthentication(); // ✅ Ensure this comes before authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
-// 🔹 Middleware to redirect unauthorized users to login
+// Middleware to redirect unauthorized users AFTER authentication runs
 app.Use(async (context, next) =>
 {
-    if ((context.Request.Path.StartsWithSegments("/Admin") || context.Request.Path.StartsWithSegments("/UserHome"))
+    if ((context.Request.Path.StartsWithSegments("/Admin") || context.Request.Path.StartsWithSegments("/User"))
         && !context.User.Identity.IsAuthenticated)
     {
         context.Response.Redirect("/Login");
@@ -135,8 +152,7 @@ app.Use(async (context, next) =>
     await next();
 });
 
-
-// 🔹 Configure MVC Routing
+// Configure MVC Routing
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

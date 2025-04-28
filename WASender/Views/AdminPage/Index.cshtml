@@ -1,0 +1,151 @@
+﻿@model List<WASender.Models.Post>
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Title"] = "Pages";
+    var totalPosts = ViewBag.TotalPosts ?? 0;
+    var totalActivePosts = ViewBag.TotalActivePosts ?? 0;
+    var totalInActivePosts = ViewBag.TotalInActivePosts ?? 0;
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "+ Create a page", url = Url.Action("Create", "AdminPage"), is_button = false, components = "" }
+    };
+
+}
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row d-flex justify-content-between flex-wrap">
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers" id="total-device">
+                                    @totalPosts
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-document-signed mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Total Pages</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 total-transfers" id="total-active">
+                                    @totalActivePosts
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-assept-document mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Active Pages</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0 completed-transfers" id="total-inactive">
+                                    @totalInActivePosts
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-delete-document mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Inactive Pages</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0 d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Pages</h3>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col-2">Title</th>
+                            <th class="col-4">Url</th>
+                            <th class="col-1">Status</th>
+                            <th class="col-2">Created At</th>
+                            <th class="col-1 text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Count > 0)
+                        {
+                            foreach (var page in Model)
+                            {
+                                <tr>
+                                    <td>@(page.Title?.Length > 50 ? page.Title.Substring(0, 50) + "..." : page.Title)</td>
+                                    <td class="text-left">
+                                        <a href="@($"{Context.Request.Scheme}://{Context.Request.Host}/page/{page.Slug}")" target="_blank">
+                                            @($"{Context.Request.Scheme}://{Context.Request.Host}/page/{page.Slug}".Length > 100
+                                                ? $"{Context.Request.Scheme}://{Context.Request.Host}/page/{page.Slug}".Substring(0, 100) + "..."
+                                                : $"{Context.Request.Scheme}://{Context.Request.Host}/page/{page.Slug}")
+                                        </a>
+
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-@(page.Status == 1 ? "success" : "danger")">
+                                            @(page.Status == 1 ? "Active" : "Draft")
+                                        </span>
+                                    </td>
+                                    <td>@(page.CreatedAt?.ToString("MMMM-dd-yyyy") ?? "-")</td>
+                                     <td class="text-right">
+                                        <div class="btn-group mb-2 float-right">
+                                            <button class="btn btn-neutral btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                                Action
+                                            </button>
+                               
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    <div class="alert bg-gradient-primary text-white">
+                                        <span>!Oops, no records found</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Optional: Paging -->
+            <!-- <div class="card-footer py-4">
+                @* Implement your pagination logic here *@
+            </div> -->
+        </div>
+    </div>
+</div>

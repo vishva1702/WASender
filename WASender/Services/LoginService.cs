@@ -82,12 +82,13 @@ namespace WASender.Services
             };
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: credentials
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(60), // Set token expiry to 1 hour
+            signingCredentials: credentials
             );
+
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

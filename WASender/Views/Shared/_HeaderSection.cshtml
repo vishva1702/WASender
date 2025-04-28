@@ -6,6 +6,7 @@
     var segments = HttpContextAccessor.HttpContext.Request.Path.Value.Split('/', StringSplitOptions.RemoveEmptyEntries);
 }
 
+
 <div class="header" style="margin-top:80px;">
     <div class="container-fluid">
         <div class="header-body">
@@ -20,7 +21,7 @@
                     <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
                         <ol class="breadcrumb breadcrumb-links">
                             <li class="breadcrumb-item">
-                                <a href="@Url.Action("Login", "Account")"><i class="fas fa-home"></i></a>
+                                <a href="@Url.Action("Index", "Login")"><i class="fas fa-home"></i></a>
                             </li>
                             @if (!string.IsNullOrEmpty(title))
                             {

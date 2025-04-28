@@ -1,0 +1,140 @@
+﻿@model List<WASender.Models.Post>
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Title"] = "Blogs";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "+Create a blog post", url = Url.Action("Create", "AdminBlog"), is_button = false, components = "" }
+    };
+}
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row d-flex justify-content-between flex-wrap">
+            <!-- Total Blogs -->
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body d-flex align-items-center justify-content-between">
+                        <span class="h2 font-weight-bold mb-0">@ViewBag.TotalPosts</span>
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="fi fi-rs-blog-text mt-2"></i>
+                        </div>
+                    </div>
+                    <h5 class="card-title text-muted mb-0">Total Blogs</h5>
+                </div>
+            </div>
+            <!-- Active Blogs -->
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body d-flex align-items-center justify-content-between">
+                        <span class="h2 font-weight-bold mb-0">@ViewBag.TotalActivePosts</span>
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="fi fi-rs-circle-book-open mt-2"></i>
+                        </div>
+                    </div>
+                    <h5 class="card-title text-muted mb-0">Active Blogs</h5>
+                </div>
+            </div>
+            <!-- Inactive Blogs -->
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body d-flex align-items-center justify-content-between">
+                        <span class="h2 font-weight-bold mb-0">@ViewBag.TotalInActivePosts</span>
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="fi fi-rs-comment-exclamation mt-2"></i>
+                        </div>
+                    </div>
+                    <h5 class="card-title text-muted mb-0">Inactive Blogs</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Blog Table -->
+<div class="row mt-4">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0 d-flex justify-content-between">
+                <h3>Blogs</h3>
+                <form method="get" class="d-flex">
+                    <input type="text" name="search" class="form-control" value="@ViewBag.Search" placeholder="title......" />
+                    <button class="btn btn-neutral btn-icon ml-2"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Title</th>
+                            <th>Url</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th class="text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="5">
+                                    <div class="text-center mt-2 alert bg-gradient-primary text-white">
+                                        !Opps no records found
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var post in Model)
+                            {
+                                var previewMeta = post.Postmetas.FirstOrDefault(pm => pm.Key == "preview");
+                                string imageUrl = previewMeta != null ? Url.Content(previewMeta.Value) : "/default.png";
+                                <tr>
+                                    <td>
+                                        <img src="@imageUrl" class="avatar rounded-square mr-2" style="width: 30px;" />
+                                        @post.Title.Substring(0, Math.Min(post.Title.Length, 20))
+                                    </td>
+                                    <td>
+                                        <a href="@Url.Action("Details", "Blog", new { slug = post.Slug })" target="_blank">
+                                            @Url.Action("Details", "Blog", new { slug = post.Slug })
+                                        </a>
+                                    </td>
+                                    <td>    
+                                        <span class="badge badge-@(post.Status == 1 ? "success" : "danger")">
+                                            @(post.Status == 1 ? "Active" : "Draft")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @post.CreatedAt?.ToString("MMMM-dd-yyyy")
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-neutral dropdown-toggle" data-toggle="dropdown">
+                                                Action
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="@Url.Action("Edit", "AdminBlog", new { id = post.Id })">
+                                                    <i class="fi fi-rs-edit"></i> Edit Blog
+                                                </a>
+                                                <a class="dropdown-item delete-confirm" href="javascript:void(0)" data-action="@Url.Action("Delete", "Blog", new { id = post.Id })">
+                                                    <i class="fas fa-trash"></i> Remove Blog
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Optional Pagination -->
+            @* Use tag helpers or any paged list logic *@
+        </div>
+    </div>
+</div>

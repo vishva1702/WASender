@@ -1,0 +1,70 @@
+﻿@model WASender.Models.Template
+
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Title"] = "Edit Template";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Edit Template", url = Url.Action("Edit", "UserTemplate"), is_button = false, components = "" }
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<link rel="stylesheet" type="text/css" href="~/assets/vendor/select2/dist/css/select2.min.css" />
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header row">
+                <h4 class="text-left col-6">Edit Template</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        @if (ViewData["Component"] != null)
+                        {
+                            @await Html.PartialAsync(ViewData["Component"].ToString(), Model)
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">Component not found.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal fade" id="help-modal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">Shortcode</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">{name} = recipient can see his/her name</li>
+                    <li class="list-group-item">{phone_number} = recipient can see his/her phone number</li>
+                    <li class="list-group-item">{my_name} = recipient can see your name</li>
+                    <li class="list-group-item">{my_email} = recipient can see your email</li>
+                    <li class="list-group-item">{my_contact_number} = recipient can see your contact number</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-neutral" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script src="~/assets/vendor/select2/dist/js/select2.min.js"></script>
+    <script src="~/assets/js/pages/bulk/template.js"></script>
+}

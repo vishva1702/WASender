@@ -1,0 +1,50 @@
+﻿@model List<dynamic>
+
+@{
+    ViewData["Title"] = "SEO Settings";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header border-0">
+                <h3 class="mb-0">SEO List</h3>
+            </div>
+
+            <!-- Light table -->
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col-2">Page</th>
+                            <th class="col-2">Meta Title</th>
+                            <th class="col-8 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var  seo in Model)
+                        {
+                            <tr>
+                                <td class="text-left">@seo.Key</td>
+                                <td class="text-left">
+                                    @(seo.Content != null && seo.Content.ContainsKey("site_name")
+                                        ? seo.Content["site_name"]
+                                        : "")
+                                </td>
+                                <td class="text-right">
+                                    <a asp-controller="AdminSeo" asp-action="Edit" asp-route-id="@seo.Id" class="btn btn-neutral btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

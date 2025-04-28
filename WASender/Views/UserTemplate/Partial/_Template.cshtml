@@ -1,0 +1,128 @@
+﻿@model Template
+@using System.Text.Json
+@using System.Collections.Generic
+
+@{
+    Dictionary<string, object>? bodyDict = null;
+    try
+    {
+        if (!string.IsNullOrEmpty(Model.Body))
+        {
+            bodyDict = JsonSerializer.Deserialize<Dictionary<string, object>>(Model.Body);
+        }
+    }
+    catch
+    {
+        bodyDict = new Dictionary<string, object>();
+    }
+
+    var messageText = bodyDict != null && bodyDict.ContainsKey("text") ? bodyDict["text"]?.ToString() : "";
+    var footerText = bodyDict != null && bodyDict.ContainsKey("footer") ? bodyDict["footer"]?.ToString() : "";
+    var templateButtons = bodyDict != null && bodyDict.ContainsKey("templateButtons") ? JsonSerializer.Deserialize<List<Dictionary<string, object>>>(bodyDict["templateButtons"].ToString()) : new List<Dictionary<string, object>>();
+}
+
+<form method="post" asp-action="Update" asp-route-id="@Model.Id" class="ajaxform">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="_method" value="PUT" />
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Template Name</label>
+                <input type="text" name="template_name" class="form-control" value="@Model.Title">
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Message</label>
+                <textarea class="form-control h-200" name="message" required maxlength="1000">@messageText</textarea>
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Footer Text</label>
+                <input type="text" class="form-control" name="footer_text" required maxlength="100" value="@footerText" />
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <h4 class="mt-2">Call To Action Buttons</h4>
+            <div id="action-body">
+                @for (var i = 0; i < templateButtons.Count; i++)
+                {
+                    var button = templateButtons[i];
+                    var optionType = "";
+                    var displayText = "";
+                    var buttonAction = "";
+
+                    if (button.ContainsKey("urlButton"))
+                    {
+                        optionType = "urlButton";
+                        displayText = button["urlButton"] is JsonElement jsonElem ? jsonElem.GetProperty("displayText").GetString() : "";
+                        buttonAction = button["urlButton"] is JsonElement jsonElem2 ? jsonElem2.GetProperty("url").GetString() : "";
+                    }
+                    else if (button.ContainsKey("callButton"))
+                    {
+                        optionType = "callButton";
+                        displayText = button["callButton"] is JsonElement jsonElem ? jsonElem.GetProperty("displayText").GetString() : "";
+                        buttonAction = button["callButton"] is JsonElement jsonElem2 ? jsonElem2.GetProperty("phoneNumber").GetString() : "";
+                    }
+                    else if (button.ContainsKey("quickReplyButton"))
+                    {
+                        optionType = "quickReplyButton";
+                        displayText = button["quickReplyButton"] is JsonElement jsonElem ? jsonElem.GetProperty("displayText").GetString() : "";
+                    }
+
+                    <div class="card card-primary mt-2 call-to-action-area">
+                        <div class="card-header">
+                            <h4>Button @(i + 1)</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-sm-4">
+                                    <label>Select Action Type</label>
+                                    <select class="form-control action-type" name="buttons[@i][type]" required>
+                                        <option value="urlButton" selected="@(optionType == "urlButton")">Url Button</option>
+                                        <option value="callButton" selected="@(optionType == "callButton")">Phone number (Call Button)</option>
+                                        <option value="quickReplyButton" selected="@(optionType == "quickReplyButton")">Quick Reply Button</option>
+                                    </select>
+
+                                </div>
+                                <div class="form-group col-sm-4">
+                                    <label>Button Display Text</label>
+                                    <input type="text" class="form-control" name="buttons[@i][displaytext]" required maxlength="50" value="@displayText" />
+                                </div>
+                                @if (optionType != "quickReplyButton")
+                                {
+                                    <div class="form-group col-sm-4">
+                                        <label>Button Click To Action Value</label>
+                                        <input type="text" class="form-control" name="buttons[@i][action]" required maxlength="50" value="@buttonAction" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-sm-8 d-flex">
+                    <label class="custom-toggle custom-toggle-primary">
+                        <input type="checkbox" name="status" id="template-status" @(Model.Status == 1 ? "checked" : "")>
+                        <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
+                    </label>
+                    <label class="mt-1 ml-1" for="template-status">
+                        <h4>Make it active template?</h4>
+                    </label>
+                </div>
+                <div class="col-sm-4">
+                    <button type="submit" class="btn btn-outline-primary submit-button float-right">Save Template</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

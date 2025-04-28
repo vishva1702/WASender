@@ -1,0 +1,109 @@
+﻿@model WASender.Models.User
+
+
+
+<div class="row">
+    <div class="col-sm-4">
+        <div class="card card-profile">
+            <div class="card-img-top bg-gradient-info h-150"></div>
+            <div class="row justify-content-center">
+                <div class="col-lg-3 order-lg-2">
+                    <div class="card-profile-image">
+                        <a href="#">
+                            <img src="@(Model.Avatar ?? $"https://ui-avatars.com/api/?name={Model.Name}")" class="rounded-circle" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body pt-2">
+                <div class="text-center">
+                    <h5 class="h3">@Model.Name</h5>
+                    <div class="h5 font-weight-300">
+                        <i class="ni location_pin mr-2"></i>Join Date: @Model.CreatedAt?.ToString("dd MMMM yyyy")<br>
+                        <i class="ni location_pin mr-2"></i>Will Expire: @Model.WillExpire?.ToString("dd MMMM yyyy")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="timeline timeline-one-side">
+                    <div class="timeline-block">
+                        <span class="timeline-step badge-success"><i class="ni ni-circle-08"></i></span>
+                        <div class="timeline-content">
+                            <small class="text-muted font-weight-bold">Bio</small>
+                            <p>Name: @Model.Name</p>
+                            <p>Email: @Model.Email</p>
+                            <p>Phone: @Model.Phone</p>
+                            <p>Address: @Model.Address</p>
+                        </div>
+                    </div>
+                    <div class="timeline-block">
+                        <span class="timeline-step badge-danger"><i class="ni ni-chart-pie-35"></i></span>
+                        <div class="timeline-content">
+                            <small class="text-muted font-weight-bold">Other Info</small>
+                            <p>Plan Name: <strong>@Model.Plan</strong></p>
+                            <p>Plan Expire Date: @Model.WillExpire?.ToString("dd MMMM yyyy")</p>
+                            <p>Total Orders: @Model.Orders.Count</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                <h3 class="mb-0">Orders</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Order No</th>
+                            <th>Plan Name</th>
+                            <th>Payment Mode</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model.Orders)
+
+                        {
+                            <tr>
+                                <td><a href="@Url.Action("Show", "Order", new { id = order.Id })" class="text-dark">@order.InvoiceNo</a></td>
+                                <td><a href="@Url.Action("Edit", "Plan", new { id = order.PlanId })" class="text-dark">@order.Plan?.Title</a></td>
+                                <td>@order.Gateway?.Name</td>
+                                <td>@(order.Amount?.ToString("C") ?? "N/A")</td>
+                                <td>
+                                    <span class="badge badge-@(order.Status == 2 ? "warning" : (order.Status == 1 ? "success" : "danger"))">
+                                        @(order.Status == 2 ? "Pending" : (order.Status == 1 ? "Approved" : "Declined"))
+                                    </span>
+                                </td>
+                                <td>@(order.CreatedAt?.ToString("dd MMM yy") ?? "N/A")</td>
+                                <td><a href="@Url.Action("Show", "Order", new { id = order.Id })" class="btn btn-neutral btn-sm">View</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (!Model.Orders.Any())
+
+                {
+                    <div class="text-center mt-2">
+                        <div class="alert bg-gradient-primary text-white">
+                            <span class="text-left">!Oops, no orders found</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
