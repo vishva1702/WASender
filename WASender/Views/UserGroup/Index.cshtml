@@ -1,0 +1,188 @@
+﻿@model List<WASender.Models.Group>
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    ViewData["Title"] = "Group List";
+    ViewData["Buttons"] = new List<dynamic>
+    {
+        new { name = "Create Groups", url = "#", is_button = true, components = "data-toggle='modal' data-target='#createModal'" },
+        new { name = "Contact List", url = Url.Action("Index", "Group"), is_button = false, components = "" },
+    };
+}
+
+@await Html.PartialAsync("_HeaderSection")
+
+@section Styles {
+    <link rel="stylesheet" type="text/css" href="~/assets/vendor/select2/dist/css/select2.min.css" />
+}
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <!-- Stats Cards -->
+        <div class="row d-flex justify-content-between flex-wrap">
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0">@ViewBag.totalGroups</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fi fi-rs-address-book mt-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Total Groups</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h2 font-weight-bold mb-0">@ViewBag.limit</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fas fa-signal"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title text-muted mb-0">Groups Statics</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Listing -->
+        @if (Model != null && Model.Any())
+        {
+            <div class="card mt-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 table-responsive">
+                            <table class="table col-12">
+                                <thead>
+                                    <tr>
+                                        <th class="col-3">Group Name</th>
+                                        <th class="col-7 text-right">Total Contact Numbers</th>
+                                        <th class="col-2 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var group in Model)
+                                    {
+                                        <tr>
+                                            <td>@group.Name</td>
+                                            <td class="text-right">
+                                                @(ViewBag.ContactCounts != null && ViewBag.ContactCounts.ContainsKey(group.Id) ? ViewBag.ContactCounts[group.Id] : 0)
+                                            </td>
+                                            <td>
+                                                <div class="btn-group mb-2 float-right">
+                                                    <button class="btn btn-neutral btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Action
+                                                    </button>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item edit-contact"
+                                                           href="#"
+                                                           data-action="@Url.Action("Edit", "Group", new { id = group.Id })"
+                                                           data-name="@group.Name"
+                                                           data-toggle="modal"
+                                                           data-target="#editModal">
+                                                            <i class="ni ni-align-left-2"></i> Edit
+                                                        </a>
+                                                        <a class="dropdown-item delete-confirm"
+                                                           href="javascript:void(0)"
+                                                           data-action="@Url.Action("Delete", "Group", new { id = group.Id })">
+                                                            <i class="fas fa-trash"></i> Remove Number
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert bg-gradient-primary text-white mt-4">
+                <span class="text-left">Oops! There Are No Groups Found...</span>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" asp-action="Store" asp-controller="Group" class="ajaxform_instant_reload">
+            @Html.AntiForgeryToken()
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">Create Group</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Group Name</label>
+                        <input type="text" name="Name" placeholder="Enter your group name" maxlength="50" class="form-control" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary submit-btn">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="post" class="ajaxform_instant_reload edit-modal">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="_method" value="PUT" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Group</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Group Name</label>
+                        <input type="text" name="Name" id="groupname" placeholder="Enter your group name" maxlength="50" class="form-control groupname" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary submit-btn">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.edit-contact').on('click', function () {
+                const name = $(this).data('name');
+                const action = $(this).data('action');
+                $('.groupname').val(name);
+                $('.edit-modal').attr('action', action);
+            });
+        });
+    </script>
+}

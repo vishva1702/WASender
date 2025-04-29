@@ -1,22 +1,32 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WASender.Models;
+using WASender.Services;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace WASender.Controllers.Admin
 {
-    public class AdminContactsController : Controller
+    [Authorize(Roles = "admin,Admin")]
+    public class AdminContactsController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
-        public AdminContactsController(ApplicationDbContext context)
+        public AdminContactsController(
+            IGlobalDataService globalDataService,
+            ILogger<AdminContactsController> logger,
+            ApplicationDbContext context
+        ) : base(globalDataService, logger)
         {
             _context = context;
         }
 
         public async Task<IActionResult> Index(string search, string type)
         {
+            await LoadGlobalDataAsync();
+
             var contacts = _context.Contacts.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
@@ -38,7 +48,9 @@ namespace WASender.Controllers.Admin
             var totalContacts = await _context.Contacts.CountAsync();
             var scheduleContacts = await _context.Contacts.Where(c => c.Schedulecontacts.Any()).CountAsync();
 
-            var paginatedContacts = await contacts.Include(c => c.User).OrderByDescending(c => c.CreatedAt).ToListAsync();
+            var paginatedContacts = await contacts.Include(c => c.User)
+                                                  .OrderByDescending(c => c.CreatedAt)
+                                                  .ToListAsync();
 
             ViewData["TotalContacts"] = totalContacts;
             ViewData["ScheduleContacts"] = scheduleContacts;
@@ -62,6 +74,5 @@ namespace WASender.Controllers.Admin
 
             return Json(new { success = true, message = "Contact deleted successfully" });
         }
-
     }
 }

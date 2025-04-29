@@ -1,14 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WASender.Contracts.AdminSide;
+using WASender.Services;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace WASender.Controllers.Admin
 {
     [Route("AdminFaq")]
-    public class FaqController : Controller
+    public class FaqController : BaseController
     {
         private readonly IFaqService _faqService;
 
-        public FaqController(IFaqService faqService)
+        public FaqController(
+            IFaqService faqService,
+            IGlobalDataService globalDataService,
+            ILogger<FaqController> logger
+        ) : base(globalDataService, logger)
         {
             _faqService = faqService;
         }
@@ -16,6 +24,8 @@ namespace WASender.Controllers.Admin
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            await LoadGlobalDataAsync();
+
             var faqs = await _faqService.GetAllFaqsAsync();
 
             ViewBag.Languages = new Dictionary<string, string>
